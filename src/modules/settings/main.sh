@@ -30,7 +30,7 @@ settings::run() {
             "Logs")
                 logs::run
                 ;;
-            "Back")
+            ""|"Back")
                 return
                 ;;
             "Exit")

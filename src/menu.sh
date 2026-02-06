@@ -30,7 +30,7 @@ menu::main() {
                 settings::run
                 ui::clear_content
                 ;;
-            "Exit")
+            ""|"Exit")
                 ui::goodbye
                 ;;
         esac

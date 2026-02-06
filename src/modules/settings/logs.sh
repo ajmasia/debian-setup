@@ -99,7 +99,7 @@ logs::run() {
             "Clean all logs")
                 logs::clean
                 ;;
-            "Back")
+            ""|"Back")
                 return
                 ;;
             "Exit")

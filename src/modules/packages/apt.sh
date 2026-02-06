@@ -171,7 +171,7 @@ apt::apply() {
             "${options[@]}")"
 
         case "$choice" in
-            "Back")
+            ""|"Back")
                 return
                 ;;
             "Exit")

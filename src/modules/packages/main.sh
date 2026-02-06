@@ -83,7 +83,7 @@ packages::run() {
             "${items[@]}")"
 
         case "$choice" in
-            "Back")
+            ""|"Back")
                 return
                 ;;
             "Exit")
