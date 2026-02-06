@@ -4,18 +4,28 @@
 _MENU_LOADED=1
 
 menu::main() {
-    local choice
+    local choice items
 
     while true; do
+        items=()
+
+        if system::has_pending; then
+            items+=("1. System core")
+        else
+            printf "%b[info]%b %bAll system core tasks completed%b\n\n" \
+                "${COLOR_SURFACE2}" "${COLOR_RESET}" \
+                "${COLOR_SURFACE2}" "${COLOR_RESET}"
+        fi
+
+        items+=("Settings" "Exit")
+
         choice="$(gum::choose \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
             --cursor.foreground "$HEX_BLUE" \
             --item.foreground "$HEX_TEXT" \
             --selected.foreground "$HEX_GREEN" \
-            "1. System core" \
-            "Settings" \
-            "Exit")"
+            "${items[@]}")"
 
         case "$choice" in
             "1. System core")
