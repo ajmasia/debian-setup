@@ -9,6 +9,7 @@ _SYSTEM_TASKS=(
     "${_PWFEEDBACK_LABEL}|_PWFEEDBACK_DESC|pwfeedback::check|pwfeedback::apply"
     "${_EDITOR_LABEL}|_EDITOR_DESC|editor::check|editor::apply"
     "${_ZRAM_LABEL}|_ZRAM_DESC|zram::check|zram::apply"
+    "${_APT_LABEL}|_APT_DESC|apt::check|apt::apply"
 )
 
 system::log_status() {
