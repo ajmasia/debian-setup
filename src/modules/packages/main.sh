@@ -7,6 +7,7 @@ _MOD_PACKAGES_LOADED=1
 _PACKAGES_TASKS=(
     "${_APT_LABEL}|_APT_DESC|apt::check|apt::apply|apt::status"
     "${_FLATPAK_LABEL}|_FLATPAK_DESC|flatpak::check|flatpak::apply|flatpak::status"
+    "${_NIX_LABEL}|_NIX_DESC|nix::check|nix::apply|nix::status"
 )
 
 packages::log_status() {
