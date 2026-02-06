@@ -10,14 +10,14 @@ menu::main() {
         items=()
 
         if system::has_pending; then
-            items+=("1. System core")
+            items+=("System core")
         else
-            printf "%b[info]%b %bAll system core tasks completed%b\n\n" \
+            printf "%b[info]%b %bAll system core tasks completed%b\n" \
                 "${COLOR_SURFACE2}" "${COLOR_RESET}" \
                 "${COLOR_SURFACE2}" "${COLOR_RESET}"
         fi
 
-        items+=("Settings" "Exit")
+        items+=("Package managers" "Settings" "Exit")
 
         choice="$(gum::choose \
             --header "Select an option:" \
@@ -28,8 +28,12 @@ menu::main() {
             "${items[@]}")"
 
         case "$choice" in
-            "1. System core")
+            "System core")
                 system::run
+                ui::clear_content
+                ;;
+            "Package managers")
+                packages::run
                 ui::clear_content
                 ;;
             "Settings")

@@ -19,8 +19,9 @@ source "${SCRIPT_DIR}/src/modules/system/sudoers.sh"
 source "${SCRIPT_DIR}/src/modules/system/pwfeedback.sh"
 source "${SCRIPT_DIR}/src/modules/system/editor.sh"
 source "${SCRIPT_DIR}/src/modules/system/zram.sh"
-source "${SCRIPT_DIR}/src/modules/system/apt.sh"
 source "${SCRIPT_DIR}/src/modules/system/main.sh"
+source "${SCRIPT_DIR}/src/modules/packages/apt.sh"
+source "${SCRIPT_DIR}/src/modules/packages/main.sh"
 source "${SCRIPT_DIR}/src/modules/settings/logs.sh"
 source "${SCRIPT_DIR}/src/modules/settings/main.sh"
 
@@ -57,6 +58,7 @@ main() {
     ui::header "$VERSION"
     ui::session_info
     system::log_status
+    packages::log_status
 
     menu::main
 }
