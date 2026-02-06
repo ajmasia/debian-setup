@@ -44,12 +44,10 @@ packages::run() {
         log::nav "Package managers"
         log::break
 
-        # Show status for each task
+        # Show warnings for tasks that need attention
         for task in "${_PACKAGES_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-            if "$check_fn"; then
-                log::ok "${label}"
-            else
+            if ! "$check_fn"; then
                 local detail
                 detail="$($status_fn)"
                 log::warn "${label} (${detail})"
@@ -58,11 +56,21 @@ packages::run() {
 
         log::break
 
-        # Build menu: task labels + Back + Exit
-        local items=()
+        # Build menu: "Edit X" if configured, "Configure X" if not
+        local items=() apply_fns=()
         for task in "${_PACKAGES_TASKS[@]}"; do
-            IFS='|' read -r label _ _ _ _ <<< "$task"
-            items+=("$label")
+            IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+            local display_label="$label"
+            if "$check_fn" || [[ "$($status_fn)" != *"not installed"* ]]; then
+                local base="${label#Configure }"
+                if [[ "$base" == *" "* ]]; then
+                    display_label="Edit ${base}"
+                else
+                    display_label="Edit ${base} config"
+                fi
+            fi
+            items+=("$display_label")
+            apply_fns+=("$apply_fn")
         done
         items+=("Back" "Exit")
 
@@ -83,11 +91,11 @@ packages::run() {
                 ui::goodbye
                 ;;
             *)
-                # Find and run selected task
-                for task in "${_PACKAGES_TASKS[@]}"; do
-                    IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-                    if [[ "$label" == "$choice" ]]; then
-                        "$apply_fn"
+                # Find and run selected task by display label
+                local i
+                for i in "${!items[@]}"; do
+                    if [[ "${items[$i]}" == "$choice" ]]; then
+                        "${apply_fns[$i]}"
                         break
                     fi
                 done
