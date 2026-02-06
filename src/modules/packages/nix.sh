@@ -62,7 +62,7 @@ nix::apply() {
         if $installed; then
             if $session_ready; then
                 local version
-                version="$(nix --version 2>/dev/null)"
+                version="$(nix --version 2>/dev/null || true)"
                 log::ok "Nix: installed (${version})"
             else
                 log::ok "Nix: installed"
@@ -103,7 +103,7 @@ nix::apply() {
             "${options[@]}")"
 
         case "$choice" in
-            "Back")
+            ""|"Back")
                 return
                 ;;
             "Exit")

@@ -52,7 +52,7 @@ flatpak::apply() {
 
         if $installed; then
             local version
-            version="$(flatpak --version 2>/dev/null)"
+            version="$(flatpak --version 2>/dev/null || true)"
             log::ok "Flatpak: installed (${version})"
         else
             log::warn "Flatpak: not installed"
@@ -98,7 +98,7 @@ flatpak::apply() {
             "${options[@]}")"
 
         case "$choice" in
-            "Back")
+            ""|"Back")
                 return
                 ;;
             "Exit")
@@ -110,6 +110,7 @@ flatpak::apply() {
                 log::info "Installing Flatpak"
                 ui::flush_input
                 if sudo apt install -y flatpak </dev/tty; then
+                    hash -r
                     log::ok "Flatpak installed"
                     log::break
                     log::info "Adding Flathub repository"
@@ -139,6 +140,7 @@ flatpak::apply() {
                 log::info "Removing Flatpak"
                 ui::flush_input
                 if sudo apt remove -y flatpak </dev/tty; then
+                    hash -r
                     log::ok "Flatpak removed"
                 else
                     log::error "Failed to remove Flatpak"

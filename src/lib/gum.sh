@@ -50,5 +50,5 @@ gum::style() {
 }
 
 gum::choose() {
-    gum choose "$@"
+    gum choose "$@" || true
 }
