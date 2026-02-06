@@ -1,8 +1,41 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VERSION="$(cat "${SCRIPT_DIR}/VERSION")"
+
+# Source libraries
+source "${SCRIPT_DIR}/src/lib/colors.sh"
+source "${SCRIPT_DIR}/src/lib/xdg.sh"
+source "${SCRIPT_DIR}/src/lib/log.sh"
+
+show_version() {
+    printf "debian-setup %s\n" "$VERSION"
+}
+
+show_help() {
+    printf "debian-setup %s\n\n" "$VERSION"
+    printf "Usage: debian-setup [options]\n\n"
+    printf "Options:\n"
+    printf "  -v, --version    Show version\n"
+    printf "  -h, --help       Show this help message\n"
+}
+
 main() {
-    echo "debian-setup: scaffolding OK"
+    xdg::init
+
+    case "${1:-}" in
+        -v|--version)
+            show_version
+            return 0
+            ;;
+        -h|--help)
+            show_help
+            return 0
+            ;;
+    esac
+
+    echo "debian-setup: interactive mode (not yet wired)"
 }
 
 main "$@"
