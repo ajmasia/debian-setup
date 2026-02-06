@@ -14,7 +14,7 @@ system::run() {
 
     while true; do
         ui::clear_content
-        log::nav "System"
+        log::nav "1. System core"
         log::break
 
         # Build list of pending tasks
@@ -60,7 +60,7 @@ system::run() {
                 IFS='|' read -r label desc_var check_fn apply_fn <<< "$task"
                 if [[ "$label" == "$selected" ]]; then
                     ui::clear_content
-                    log::nav "System > ${label}"
+                    log::nav "1. System core > ${label}"
                     log::break
                     printf "%b%s%b\n" "${COLOR_OVERLAY1}" "${!desc_var}" "${COLOR_RESET}"
                     log::break

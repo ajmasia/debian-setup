@@ -13,12 +13,12 @@ menu::main() {
             --cursor.foreground "$HEX_BLUE" \
             --item.foreground "$HEX_TEXT" \
             --selected.foreground "$HEX_GREEN" \
-            "System" \
+            "1. System core" \
             "Settings" \
             "Exit")"
 
         case "$choice" in
-            "System")
+            "1. System core")
                 system::run
                 ui::clear_content
                 ;;
