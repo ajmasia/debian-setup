@@ -14,12 +14,17 @@ menu::main() {
             --item.foreground "$HEX_TEXT" \
             --selected.foreground "$HEX_GREEN" \
             "Health" \
+            "Settings" \
             "Exit")"
 
         case "$choice" in
             "Health")
                 ui::clear_content
                 health::run
+                ui::clear_content
+                ;;
+            "Settings")
+                settings::run
                 ui::clear_content
                 ;;
             "Exit")
