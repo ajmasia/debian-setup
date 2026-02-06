@@ -41,6 +41,12 @@ ui::header() {
     _UI_CONTENT_ROW="$(ui::_cursor_row)"
 }
 
+ui::flush_input() {
+    sleep 0.5
+    stty sane </dev/tty 2>/dev/null || true
+    while read -rs -t 0.1 -n 1 </dev/tty 2>/dev/null; do :; done
+}
+
 ui::return_or_exit() {
     local choice
 
