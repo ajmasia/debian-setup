@@ -16,6 +16,9 @@ sudoers::apply() {
     log::warn "Root password required"
     log::break
 
+    # Drain leftover terminal input from gum
+    read -rs -t 0.1 -n 10000 </dev/tty 2>/dev/null || true
+
     if su -c "echo '${USER} ALL=(ALL:ALL) ALL' > '/etc/sudoers.d/${USER}' && chmod 0440 '/etc/sudoers.d/${USER}'"; then
         log::ok "Sudoers entry created for ${USER}"
     else
