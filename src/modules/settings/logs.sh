@@ -14,6 +14,7 @@ logs::view() {
         return
     fi
 
+    log::info "Viewing today's log"
     "$editor" "$log_file"
 }
 
@@ -36,6 +37,7 @@ logs::delete() {
         "Yes")"
 
     if [[ "$choice" == "Yes" ]]; then
+        log::info "Deleting today's log"
         rm "$log_file"
         log::ok "Log deleted"
     fi
@@ -61,6 +63,7 @@ logs::clean() {
         "Yes")"
 
     if [[ "$choice" == "Yes" ]]; then
+        log::info "Cleaning all logs"
         rm -f "${log_dir}"/*.log
         log::ok "All logs cleaned"
     fi
@@ -71,7 +74,7 @@ logs::run() {
 
     while true; do
         ui::clear_content
-        log::info "Settings > Logs"
+        log::nav "Settings > Logs"
         log::break
 
         choice="$(gum::choose \
@@ -83,7 +86,8 @@ logs::run() {
             "View today's log" \
             "Delete today's log" \
             "Clean all logs" \
-            "Back")"
+            "Back" \
+            "Exit")"
 
         case "$choice" in
             "View today's log")
@@ -97,6 +101,10 @@ logs::run() {
                 ;;
             "Back")
                 return
+                ;;
+            "Exit")
+                ui::clear_content
+                ui::goodbye
                 ;;
         esac
     done

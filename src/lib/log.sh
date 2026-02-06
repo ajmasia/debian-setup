@@ -32,6 +32,10 @@ log::warn() {
     _log::to_file "warn" "$1"
 }
 
+log::nav() {
+    printf "%b[>]%b %s\n" "${COLOR_LAVENDER}" "${COLOR_RESET}" "$1"
+}
+
 log::break() {
     printf "\n"
 }

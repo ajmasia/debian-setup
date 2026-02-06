@@ -51,7 +51,7 @@ ui::return_or_exit() {
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
         --selected.foreground "$HEX_GREEN" \
-        "Return" \
+        "Back" \
         "Exit")"
 
     if [[ "$choice" == "Exit" ]]; then
@@ -68,11 +68,11 @@ ui::session_info() {
     os_name="$(system::os)"
     date_str="$(date '+%Y-%m-%d %H:%M:%S')"
 
-    log::info "${date_str} - Session started by ${user}@${hostname} running ${os_name}"
-    log::break
-
     log_file="$(xdg::log_file)"
     _UI_SESSION_LOG_START="$(wc -l < "$log_file")"
+
+    log::info "${date_str} - Session started by ${user}@${hostname} running ${os_name}"
+    log::break
 }
 
 ui::goodbye() {
