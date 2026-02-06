@@ -6,6 +6,7 @@ _MOD_PACKAGES_LOADED=1
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _PACKAGES_TASKS=(
     "${_APT_LABEL}|_APT_DESC|apt::check|apt::apply|apt::status"
+    "${_FLATPAK_LABEL}|_FLATPAK_DESC|flatpak::check|flatpak::apply|flatpak::status"
 )
 
 packages::log_status() {
