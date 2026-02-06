@@ -59,8 +59,6 @@ main() {
     log::break
     ui::header "$VERSION"
     ui::session_info
-    system::log_status
-    packages::log_status
 
     menu::main
 }

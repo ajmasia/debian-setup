@@ -31,6 +31,7 @@ menu::main() {
                 ui::clear_content
                 ;;
             ""|"Exit")
+                ui::clear_content
                 ui::goodbye
                 ;;
         esac
