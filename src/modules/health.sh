@@ -48,29 +48,33 @@ health::run() {
 }
 
 health::_check_system_tasks() {
-    local task label desc_var check_fn apply_fn
+    local task label desc_var check_fn apply_fn status_fn
 
     log::info "System core tasks"
     for task in "${_SYSTEM_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn <<< "$task"
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
             log::ok "${label}"
         else
-            log::warn "${label}"
+            local detail
+            detail="$($status_fn)"
+            log::warn "${label} (${detail})"
         fi
     done
 }
 
 health::_check_packages_tasks() {
-    local task label desc_var check_fn apply_fn
+    local task label desc_var check_fn apply_fn status_fn
 
     log::info "Package manager tasks"
     for task in "${_PACKAGES_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn <<< "$task"
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
             log::ok "${label}"
         else
-            log::warn "${label}"
+            local detail
+            detail="$($status_fn)"
+            log::warn "${label} (${detail})"
         fi
     done
 }

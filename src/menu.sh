@@ -7,17 +7,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=()
-
-        if system::has_pending; then
-            items+=("System core")
-        else
-            printf "%b[info]%b %bAll system core tasks completed%b\n" \
-                "${COLOR_SURFACE2}" "${COLOR_RESET}" \
-                "${COLOR_SURFACE2}" "${COLOR_RESET}"
-        fi
-
-        items+=("Package managers" "Settings" "Exit")
+        items=("System core" "Package managers" "Settings" "Exit")
 
         choice="$(gum::choose \
             --header "Select an option:" \
