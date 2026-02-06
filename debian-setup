@@ -47,8 +47,7 @@ main() {
     ui::clear
     log::break
     ui::header "$VERSION"
-    ui::system_info
-    log::break
+    ui::session_info
 
     menu::main
 }

@@ -26,7 +26,5 @@ health::run() {
     log::ok "Disk (/):   ${disk_usage}"
     log::ok "Uptime:     ${uptime_str}"
 
-    log::section_break
-    log::info "Press Enter to return to menu"
-    read -r
+    ui::return_or_exit
 }

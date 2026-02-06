@@ -18,19 +18,12 @@ menu::main() {
 
         case "$choice" in
             "Health")
-                ui::clear
-                ui::header "$VERSION"
+                ui::clear_content
                 health::run
-                ui::clear
-                ui::header "$VERSION"
-                ui::system_info
-                log::break
+                ui::clear_content
                 ;;
             "Exit")
-                log::break
-                log::ok "Goodbye!"
-                log::break
-                exit 0
+                ui::goodbye
                 ;;
         esac
     done
