@@ -38,6 +38,23 @@ health::run() {
     log::break
 
     health::_check_deps
+    log::break
+
+    health::_check_system_tasks
 
     ui::return_or_exit
+}
+
+health::_check_system_tasks() {
+    local task label desc_var check_fn apply_fn
+
+    log::info "System core tasks"
+    for task in "${_SYSTEM_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn <<< "$task"
+        if "$check_fn"; then
+            log::ok "${label}"
+        else
+            log::warn "${label}"
+        fi
+    done
 }
