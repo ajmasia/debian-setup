@@ -1,0 +1,17 @@
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs (managed via XDG, not in repo)
+*.log
+
+# Environment
+.env
+.env.*
