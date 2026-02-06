@@ -17,14 +17,19 @@ _flatpak::has_flathub() {
     _flatpak::is_installed && flatpak remotes --columns=name 2>/dev/null | grep -q "^flathub$"
 }
 
+_flatpak::session_ready() {
+    [[ "${XDG_DATA_DIRS:-}" == */flatpak* ]]
+}
+
 flatpak::check() {
-    _flatpak::is_installed && _flatpak::has_flathub
+    _flatpak::is_installed && _flatpak::has_flathub && _flatpak::session_ready
 }
 
 flatpak::status() {
     local issues=()
     _flatpak::is_installed || issues+=("not installed")
     _flatpak::is_installed && ! _flatpak::has_flathub && issues+=("missing Flathub")
+    _flatpak::is_installed && ! _flatpak::session_ready && issues+=("restart needed")
     if [[ ${#issues[@]} -gt 0 ]]; then
         local IFS=", "
         printf '%s' "${issues[*]}"
@@ -58,6 +63,11 @@ flatpak::apply() {
                 log::ok "Flathub: enabled"
             else
                 log::warn "Flathub: not configured"
+            fi
+
+            # Detect if restart is needed (flatpak paths not in session)
+            if [[ "$XDG_DATA_DIRS" != */flatpak* ]]; then
+                log::warn "Restart needed to complete Flatpak integration"
             fi
         fi
 
@@ -99,14 +109,15 @@ flatpak::apply() {
                 log::break
                 log::info "Installing Flatpak"
                 ui::flush_input
-                sudo apt install -y flatpak </dev/tty
-                log::ok "Flatpak installed"
-                log::break
-                log::info "Adding Flathub repository"
-                flatpak remote-add --if-not-exists flathub "$_FLATPAK_FLATHUB_URL"
-                log::ok "Flathub repository added"
-                log::break
-                log::warn "A system restart is recommended to complete setup"
+                if sudo apt install -y flatpak </dev/tty; then
+                    log::ok "Flatpak installed"
+                    log::break
+                    log::info "Adding Flathub repository"
+                    flatpak remote-add --if-not-exists flathub "$_FLATPAK_FLATHUB_URL"
+                    log::ok "Flathub repository added"
+                else
+                    log::error "Failed to install Flatpak"
+                fi
                 ;;
             "Add Flathub repository")
                 log::break
@@ -117,15 +128,21 @@ flatpak::apply() {
             "Remove Flathub repository")
                 log::break
                 log::info "Removing Flathub repository"
-                flatpak remote-delete flathub
-                log::ok "Flathub repository removed"
+                if flatpak remote-delete flathub; then
+                    log::ok "Flathub repository removed"
+                else
+                    log::error "Failed to remove Flathub"
+                fi
                 ;;
             "Remove Flatpak")
                 log::break
                 log::info "Removing Flatpak"
                 ui::flush_input
-                sudo apt remove -y flatpak </dev/tty
-                log::ok "Flatpak removed"
+                if sudo apt remove -y flatpak </dev/tty; then
+                    log::ok "Flatpak removed"
+                else
+                    log::error "Failed to remove Flatpak"
+                fi
                 ;;
         esac
     done
