@@ -7,7 +7,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System core" "Package managers" "OpenSSH server" "Developer tools" "Software" "Settings" "Exit")
+        items=("System essentials" "Package managers" "OpenSSH server" "Developer tools" "Software" "Settings" "Exit")
 
         choice="$(gum::choose \
             --header "Select an option:" \
@@ -18,7 +18,7 @@ menu::main() {
             "${items[@]}")"
 
         case "$choice" in
-            "System core")
+            "System essentials")
                 system::run
                 ui::clear_content
                 ;;
