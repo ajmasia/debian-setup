@@ -1,23 +1,23 @@
 # Catppuccin Cursors task
 
-[[ -n "${_MOD_GNOME_CURSORS_LOADED:-}" ]] && return 0
-_MOD_GNOME_CURSORS_LOADED=1
+[[ -n "${_MOD_CURSORS_LOADED:-}" ]] && return 0
+_MOD_CURSORS_LOADED=1
 
-_GNOME_CURSORS_LABEL="Configure Cursors"
-_GNOME_CURSORS_DESC="Install Catppuccin Mocha cursors."
+_CURSORS_LABEL="Configure Cursors"
+_CURSORS_DESC="Install Catppuccin Mocha cursors."
 
-_GNOME_CURSORS_BASE_URL="https://github.com/catppuccin/cursors/releases/latest/download"
-_GNOME_CURSORS_ICONS_DIR="$HOME/.local/share/icons"
+_CURSORS_BASE_URL="https://github.com/catppuccin/cursors/releases/latest/download"
+_CURSORS_ICONS_DIR="$HOME/.local/share/icons"
 
-_gnome_cursors::is_installed() {
+_cursors::is_installed() {
     local current
     current="$(gsettings get org.gnome.desktop.interface cursor-theme 2>/dev/null || true)"
     [[ "$current" == *"catppuccin-mocha"* ]]
 }
 
-_gnome_cursors::find_installed() {
+_cursors::find_installed() {
     local dir
-    for dir in "$_GNOME_CURSORS_ICONS_DIR"/catppuccin-mocha-*-cursors; do
+    for dir in "$_CURSORS_ICONS_DIR"/catppuccin-mocha-*-cursors; do
         if [[ -d "$dir" ]]; then
             basename "$dir"
             return 0
@@ -26,21 +26,21 @@ _gnome_cursors::find_installed() {
     return 1
 }
 
-gnome_cursors::check() {
-    _gnome_cursors::is_installed
+cursors::check() {
+    _cursors::is_installed
 }
 
-gnome_cursors::status() {
-    _gnome_cursors::is_installed || printf 'not installed'
+cursors::status() {
+    _cursors::is_installed || printf 'not installed'
 }
 
-gnome_cursors::apply() {
+cursors::apply() {
     local choice
 
     while true; do
         local installed=false cursor_name=""
-        _gnome_cursors::is_installed && installed=true
-        cursor_name="$(_gnome_cursors::find_installed 2>/dev/null || true)"
+        _cursors::is_installed && installed=true
+        cursor_name="$(_cursors::find_installed 2>/dev/null || true)"
 
         ui::clear_content
         log::nav "GNOME > Appearance > Cursors"
@@ -89,7 +89,7 @@ gnome_cursors::apply() {
                 ;;
             "Install Catppuccin Cursors")
                 log::break
-                _gnome_cursors::install
+                _cursors::install
                 ;;
             "Apply Catppuccin Cursors")
                 log::break
@@ -98,13 +98,13 @@ gnome_cursors::apply() {
                 ;;
             "Remove Catppuccin Cursors")
                 log::break
-                _gnome_cursors::remove "$cursor_name"
+                _cursors::remove "$cursor_name"
                 ;;
         esac
     done
 }
 
-_gnome_cursors::install() {
+_cursors::install() {
     # Choose variant
     local variant
     variant="$(gum::choose \
@@ -121,7 +121,7 @@ _gnome_cursors::install() {
     fi
 
     local cursor_name="catppuccin-mocha-${variant}-cursors"
-    local url="${_GNOME_CURSORS_BASE_URL}/${cursor_name}.zip"
+    local url="${_CURSORS_BASE_URL}/${cursor_name}.zip"
 
     log::info "Downloading ${cursor_name}"
 
@@ -134,12 +134,12 @@ _gnome_cursors::install() {
         return
     fi
 
-    mkdir -p "$_GNOME_CURSORS_ICONS_DIR"
+    mkdir -p "$_CURSORS_ICONS_DIR"
 
     # Remove previous catppuccin cursor theme if any
-    rm -rf "$_GNOME_CURSORS_ICONS_DIR"/catppuccin-mocha-*-cursors 2>/dev/null || true
+    rm -rf "$_CURSORS_ICONS_DIR"/catppuccin-mocha-*-cursors 2>/dev/null || true
 
-    if ! unzip -qo "$tmpdir/cursors.zip" -d "$_GNOME_CURSORS_ICONS_DIR/"; then
+    if ! unzip -qo "$tmpdir/cursors.zip" -d "$_CURSORS_ICONS_DIR/"; then
         log::error "Failed to extract cursors"
         rm -rf "$tmpdir"
         return
@@ -151,11 +151,11 @@ _gnome_cursors::install() {
     log::ok "Cursors installed and applied: ${cursor_name}"
 }
 
-_gnome_cursors::remove() {
+_cursors::remove() {
     local cursor_name="$1"
 
     log::info "Removing Catppuccin cursors"
-    rm -rf "$_GNOME_CURSORS_ICONS_DIR/$cursor_name" 2>/dev/null || true
+    rm -rf "$_CURSORS_ICONS_DIR/$cursor_name" 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface cursor-theme 2>/dev/null || true
     log::ok "Cursors removed and reverted"
 }

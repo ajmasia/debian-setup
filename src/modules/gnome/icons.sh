@@ -1,34 +1,34 @@
 # Papirus Icons + Catppuccin folders task
 
-[[ -n "${_MOD_GNOME_ICONS_LOADED:-}" ]] && return 0
-_MOD_GNOME_ICONS_LOADED=1
+[[ -n "${_MOD_ICONS_LOADED:-}" ]] && return 0
+_MOD_ICONS_LOADED=1
 
-_GNOME_ICONS_LABEL="Configure Icons"
-_GNOME_ICONS_DESC="Install Papirus icons with Catppuccin folder colors."
+_ICONS_LABEL="Configure Icons"
+_ICONS_DESC="Install Papirus icons with Catppuccin folder colors."
 
-_GNOME_ICONS_PAPIRUS_FOLDERS_REPO="https://github.com/catppuccin/papirus-folders.git"
-_GNOME_ICONS_FOLDERS_SCRIPT="https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/papirus-folders"
+_ICONS_PAPIRUS_FOLDERS_REPO="https://github.com/catppuccin/papirus-folders.git"
+_ICONS_FOLDERS_SCRIPT="https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/papirus-folders"
 
-_gnome_icons::is_installed() {
+_icons::is_installed() {
     local current
     current="$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null || true)"
     [[ "$current" == "'Papirus-Dark'" ]]
 }
 
-gnome_icons::check() {
-    _gnome_icons::is_installed
+icons::check() {
+    _icons::is_installed
 }
 
-gnome_icons::status() {
-    _gnome_icons::is_installed || printf 'not installed'
+icons::status() {
+    _icons::is_installed || printf 'not installed'
 }
 
-gnome_icons::apply() {
+icons::apply() {
     local choice
 
     while true; do
         local installed=false
-        _gnome_icons::is_installed && installed=true
+        _icons::is_installed && installed=true
 
         ui::clear_content
         log::nav "GNOME > Appearance > Icons"
@@ -74,17 +74,17 @@ gnome_icons::apply() {
                 ;;
             "Install Papirus + Catppuccin")
                 log::break
-                _gnome_icons::install
+                _icons::install
                 ;;
             "Revert Icons")
                 log::break
-                _gnome_icons::revert
+                _icons::revert
                 ;;
         esac
     done
 }
 
-_gnome_icons::install() {
+_icons::install() {
     # Install papirus base if missing
     if ! dpkg -l papirus-icon-theme 2>/dev/null | grep -q '^ii'; then
         log::info "Installing Papirus icon theme"
@@ -119,7 +119,7 @@ _gnome_icons::install() {
     tmpdir="$(mktemp -d)"
 
     log::info "Downloading Catppuccin folder icons"
-    if ! git clone --depth 1 "$_GNOME_ICONS_PAPIRUS_FOLDERS_REPO" "$tmpdir/papirus-folders" 2>/dev/null; then
+    if ! git clone --depth 1 "$_ICONS_PAPIRUS_FOLDERS_REPO" "$tmpdir/papirus-folders" 2>/dev/null; then
         log::error "Failed to clone repository"
         rm -rf "$tmpdir"
         return
@@ -130,7 +130,7 @@ _gnome_icons::install() {
     sudo cp -r "$tmpdir/papirus-folders/src/"* /usr/share/icons/Papirus/ </dev/tty
 
     # Download and run papirus-folders script
-    if ! curl -fsSL "$_GNOME_ICONS_FOLDERS_SCRIPT" -o "$tmpdir/papirus-folders-bin"; then
+    if ! curl -fsSL "$_ICONS_FOLDERS_SCRIPT" -o "$tmpdir/papirus-folders-bin"; then
         log::error "Failed to download papirus-folders script"
         rm -rf "$tmpdir"
         return
@@ -149,7 +149,7 @@ _gnome_icons::install() {
     log::ok "Papirus-Dark icon theme applied"
 }
 
-_gnome_icons::revert() {
+_icons::revert() {
     log::info "Reverting icon theme to default"
     gsettings reset org.gnome.desktop.interface icon-theme 2>/dev/null || true
     log::ok "Icon theme reverted"
