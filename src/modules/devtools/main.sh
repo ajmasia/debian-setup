@@ -5,6 +5,7 @@ _MOD_DEVTOOLS_LOADED=1
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _DEVTOOLS_TASKS=(
+    "${_BUILD_LABEL}|_BUILD_DESC|build::check|build::apply|build::status"
     "${_NODE_LABEL}|_NODE_DESC|node::check|node::apply|node::status"
     "${_PYTHON_LABEL}|_PYTHON_DESC|python::check|python::apply|python::status"
     "${_RUST_LABEL}|_RUST_DESC|rust::check|rust::apply|rust::status"
@@ -46,16 +47,20 @@ devtools::run() {
         log::break
 
         # Show warnings for tasks that need attention
+        local has_warnings=false
         for task in "${_DEVTOOLS_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
             if ! "$check_fn"; then
+                has_warnings=true
                 local detail
                 detail="$($status_fn)"
                 log::warn "${label} (${detail})"
             fi
         done
 
-        log::break
+        if $has_warnings; then
+            log::break
+        fi
 
         # Build menu: "Edit X" if configured, "Configure X" if not
         local items=() apply_fns=()
