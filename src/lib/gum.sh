@@ -50,5 +50,15 @@ gum::style() {
 }
 
 gum::choose() {
-    gum choose "$@" || true
+    local rc=0
+    gum choose "$@" || rc=$?
+    [[ $rc -eq 130 ]] && exit 130
+    return 0
+}
+
+gum::input() {
+    local rc=0
+    gum input "$@" || rc=$?
+    [[ $rc -eq 130 ]] && exit 130
+    return 0
 }

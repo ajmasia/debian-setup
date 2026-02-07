@@ -168,7 +168,7 @@ _zram::_configure_and_start() {
         "Custom")"
 
     if [[ "$percent" == "Custom" ]]; then
-        percent="$(gum input \
+        percent="$(gum::input \
             --header "Enter zram percentage (1-100):" \
             --header.foreground "$HEX_LAVENDER" \
             --placeholder "e.g. 75")"
