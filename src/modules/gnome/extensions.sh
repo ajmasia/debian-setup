@@ -217,8 +217,9 @@ _extensions::download_and_install() {
     fi
 
     # Extract pk for our shell version
+    local escaped_ver="${shell_ver//./\\.}"
     local pk
-    pk="$(printf '%s' "$info" | grep -oP "\"${shell_ver}\"\s*:\s*\{\"pk\"\s*:\s*\K\d+" || true)"
+    pk="$(printf '%s' "$info" | grep -oP "\"${escaped_ver}\"\s*:\s*\{\"pk\"\s*:\s*\K\d+" || true)"
 
     if [[ -z "$pk" ]]; then
         log::warn "${label}: not available for GNOME Shell ${shell_ver}"
