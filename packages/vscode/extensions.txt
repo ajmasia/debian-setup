@@ -1,0 +1,40 @@
+# VS Code Extensions
+# Format: id|label
+# Lines starting with # are comments
+
+# TypeScript / JavaScript / Node / React
+dbaeumer.vscode-eslint|ESLint
+esbenp.prettier-vscode|Prettier
+biomejs.biome|Biome
+christian-kohler.npm-intellisense|npm IntelliSense
+christian-kohler.path-intellisense|Path IntelliSense
+formulahendry.auto-rename-tag|Auto Rename Tag
+dsznajder.es7-react-js-snippets|ES7 React Snippets
+
+# Python
+ms-python.python|Python
+ms-python.debugpy|Python Debugger
+
+# Rust
+rust-lang.rust-analyzer|Rust Analyzer
+
+# Go
+golang.go|Go
+
+# Nix
+jnoortheen.nix-ide|Nix IDE
+
+# Markdown
+yzhang.markdown-all-in-one|Markdown All in One
+DavidAnson.vscode-markdownlint|markdownlint
+
+# JSON / YAML
+redhat.vscode-yaml|YAML
+
+# Git
+eamodio.gitlens|GitLens
+mhutchie.git-graph|Git Graph
+
+# General
+EditorConfig.EditorConfig|EditorConfig
+usernamehw.errorlens|Error Lens

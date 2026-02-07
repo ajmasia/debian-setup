@@ -1,0 +1,2 @@
+# Visual Studio Code
+code|https://update.code.visualstudio.com/latest/linux-deb-x64/stable
