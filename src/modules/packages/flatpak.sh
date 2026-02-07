@@ -109,13 +109,15 @@ flatpak::apply() {
                 log::break
                 log::info "Installing Flatpak"
                 ui::flush_input
-                if sudo apt install -y flatpak </dev/tty; then
+                if sudo apt install -y flatpak gnome-software-plugin-flatpak </dev/tty; then
                     hash -r
                     log::ok "Flatpak installed"
                     log::break
                     log::info "Adding Flathub repository"
                     flatpak remote-add --if-not-exists flathub "$_FLATPAK_FLATHUB_URL"
                     log::ok "Flathub repository added"
+                    log::break
+                    log::warn "Log out and back in for GNOME Software to show Flatpak apps"
                 else
                     log::error "Failed to install Flatpak"
                 fi
