@@ -182,7 +182,10 @@ apt::apply() {
                 log::break
                 log::info "Modernizing sources to DEB822 format"
                 ui::flush_input
-                sudo apt modernize-sources </dev/tty
+                if ! sudo apt modernize-sources </dev/tty; then
+                    log::error "Failed to modernize sources"
+                    break
+                fi
                 log::ok "Sources modernized to DEB822"
                 is_modern=true
                 # Rewrite to consolidate and add Signed-By
