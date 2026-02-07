@@ -184,10 +184,13 @@ _zram::_configure_and_start() {
     printf 'ALGO=zstd\nPERCENT=%s\n' "$percent" | sudo tee /etc/default/zramswap > /dev/null
 
     log::info "Enabling zramswap service"
-    if sudo systemctl enable --now zramswap </dev/tty \
-        && sudo systemctl restart zramswap; then
+    if ! sudo systemctl enable --now zramswap </dev/tty; then
+        log::error "Failed to enable zramswap"
+        return
+    fi
+    if sudo systemctl restart zramswap; then
         log::ok "zram swap active (${percent}% RAM, zstd)"
     else
-        log::error "Failed to start zramswap"
+        log::warn "zramswap enabled but restart failed"
     fi
 }
