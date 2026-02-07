@@ -1,13 +1,13 @@
 # debian-setup
 
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 Post-install automation for the impatient developer.
 
-Interactive CLI tool that automates common Debian post-installation tasks: system configuration, package manager setup, and source management.
+Interactive CLI tool that automates common Debian post-installation tasks: system configuration, package manager setup, SSH management, and source management.
 
 ## Features
 
@@ -21,6 +21,13 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **APT sources** -- Modernize to DEB822, toggle non-free/backports/deb-src/testing
 - **Flatpak** -- Install Flatpak with Flathub repository
 - **Nix** -- Install/remove Nix package manager (multi-user daemon)
+
+### SSH
+- **SSH server** -- Install and manage openssh-server with service control
+- **Access mode** -- Toggle pubkey-only, pubkey+password, or password-only with root login control
+- **SSH keys** -- Generate ED25519 keys with suffix support for multiple identities
+- **SSH config** -- Manage `~/.ssh/config` entries for GitHub, GitLab, and custom servers
+- **Commit signing** -- Configure git commit signing with SSH keys, conditional `includeIf` for multi-identity setups
 
 ### Settings
 - **Health check** -- System info, dependency status, and task overview
@@ -50,7 +57,7 @@ Options:
   -h, --help       Show this help message
 ```
 
-Run without options to start the interactive menu. Navigate with arrow keys, confirm with Enter, go back with Escape.
+Run without options to start the interactive menu. Navigate with arrow keys, confirm with Enter, go back with Escape, exit with Ctrl+C.
 
 ## Project structure
 
@@ -61,7 +68,7 @@ debian-setup/
 ├── src/
 │   ├── lib/
 │   │   ├── colors.sh              # Catppuccin Mocha palette
-│   │   ├── gum.sh                 # Gum wrappers
+│   │   ├── gum.sh                 # Gum wrappers (choose, input, SIGINT)
 │   │   ├── log.sh                 # Logging (terminal + file)
 │   │   ├── system.sh              # System info queries
 │   │   ├── ui.sh                  # UI components
@@ -79,6 +86,13 @@ debian-setup/
 │   │   │   ├── apt.sh
 │   │   │   ├── flatpak.sh
 │   │   │   └── nix.sh
+│   │   ├── ssh/
+│   │   │   ├── main.sh
+│   │   │   ├── server.sh
+│   │   │   ├── access.sh
+│   │   │   ├── keys.sh
+│   │   │   ├── config.sh
+│   │   │   └── signing.sh
 │   │   └── settings/
 │   │       ├── main.sh
 │   │       └── logs.sh
@@ -92,3 +106,4 @@ debian-setup/
 - **Session logging** -- all actions recorded to daily log files
 - **Wizard pattern** -- each task shows current status and offers contextual actions (install/remove, enable/disable, edit/configure)
 - **Non-destructive** -- every configuration change can be undone from the same menu
+- **Ctrl+C safe** -- clean exit from any prompt via SIGINT handling
