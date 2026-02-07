@@ -128,16 +128,15 @@ _slimbook::_install() {
         local tmp_gpg tmp_list
         tmp_gpg="$(mktemp)"
         tmp_list="$(mktemp)"
+        trap "rm -f '$tmp_gpg' '$tmp_list'" RETURN
 
         if ! curl -fsSL "$_SLIMBOOK_GPG_URL" -o "$tmp_gpg"; then
             log::error "Failed to download Slimbook GPG key"
-            rm -f "$tmp_gpg" "$tmp_list"
             return
         fi
 
         if ! curl -fsSL "$_SLIMBOOK_LIST_URL" -o "$tmp_list"; then
             log::error "Failed to download Slimbook sources list"
-            rm -f "$tmp_gpg" "$tmp_list"
             return
         fi
 
@@ -146,7 +145,6 @@ _slimbook::_install() {
             && sudo chmod 644 "$_SLIMBOOK_GPG_PATH" \
             && sudo mv "$tmp_list" "$_SLIMBOOK_LIST_PATH" </dev/tty \
             && sudo chmod 644 "$_SLIMBOOK_LIST_PATH"
-        rm -f "$tmp_gpg" "$tmp_list"
 
         if ! _slimbook::has_repo; then
             log::error "Failed to configure Slimbook repository"
