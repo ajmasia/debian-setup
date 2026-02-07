@@ -7,7 +7,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System essentials" "Package managers" "OpenSSH server" "Developer tools" "Software" "Settings" "Exit")
+        items=("System essentials" "Package managers" "OpenSSH server" "Developer tools" "Software" "GNOME" "Settings" "Exit")
 
         choice="$(gum::filter \
             --height 12 \
@@ -39,6 +39,10 @@ menu::main() {
                 ;;
             "Software")
                 software::run
+                ui::clear_content
+                ;;
+            "GNOME")
+                gnome::run
                 ui::clear_content
                 ;;
             "Settings")

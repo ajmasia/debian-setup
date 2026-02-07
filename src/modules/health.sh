@@ -49,6 +49,8 @@ health::run() {
     health::_check_devtools_tasks
     log::break
     health::_check_software_tasks
+    log::break
+    health::_check_gnome_tasks
 
     ui::return_or_exit
 }
@@ -122,6 +124,22 @@ health::_check_software_tasks() {
 
     log::info "Software tasks"
     for task in "${_SOFTWARE_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        if "$check_fn"; then
+            log::ok "${label}"
+        else
+            local detail
+            detail="$($status_fn)"
+            log::warn "${label} (${detail})"
+        fi
+    done
+}
+
+health::_check_gnome_tasks() {
+    local task label desc_var check_fn apply_fn status_fn
+
+    log::info "GNOME tasks"
+    for task in "${_GNOME_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
             log::ok "${label}"
