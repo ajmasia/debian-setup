@@ -3,7 +3,7 @@
 [[ -n "${_MOD_KERNEL_LOADED:-}" ]] && return 0
 _MOD_KERNEL_LOADED=1
 
-_KERNEL_LABEL="Configure backports kernel"
+_KERNEL_LABEL="Configure current kernel"
 _KERNEL_DESC="Install or revert the Linux kernel from Debian backports."
 
 _kernel::has_backports() {
@@ -74,9 +74,9 @@ kernel::apply() {
 
         local options=()
         if $bpo_ok; then
-            options+=("Revert to stable kernel")
+            options+=("Switch to stable kernel")
         elif $backports_available; then
-            options+=("Install backports kernel")
+            options+=("Switch to backports kernel")
         else
             log::warn "Backports not enabled in APT sources"
         fi
@@ -98,15 +98,13 @@ kernel::apply() {
                 ui::clear_content
                 ui::goodbye
                 ;;
-            "Install backports kernel")
+            "Switch to backports kernel")
                 log::break
                 _kernel::_install_bpo
-                return
                 ;;
-            "Revert to stable kernel")
+            "Switch to stable kernel")
                 log::break
                 _kernel::_revert_stable
-                return
                 ;;
         esac
     done
@@ -124,55 +122,73 @@ _kernel::_install_bpo() {
     ui::flush_input
     if sudo apt install -y -t "${codename}-backports" linux-image-amd64 linux-headers-amd64 </dev/tty; then
         hash -r
-        log::ok "Backports kernel installed (reboot required)"
+        log::ok "Backports kernel installed"
     else
         log::error "Failed to install backports kernel"
-    fi
-}
-
-_kernel::_revert_stable() {
-    log::info "Reinstalling stable kernel meta-packages"
-    ui::flush_input
-    if sudo apt install -y linux-image-amd64 linux-headers-amd64 </dev/tty; then
-        hash -r
-        log::ok "Stable kernel meta-packages reinstalled"
-    else
-        log::error "Failed to reinstall stable kernel"
         return
     fi
 
-    # Filter out packages matching the running kernel to avoid bricking
-    local running
-    running="$(uname -r)"
+    _kernel::_offer_reboot "backports"
+}
+
+_kernel::_revert_stable() {
+    # 1. Install stable kernel
+    log::info "Installing stable kernel meta-packages"
+    ui::flush_input
+    if sudo apt install -y linux-image-amd64 linux-headers-amd64 </dev/tty; then
+        hash -r
+        log::ok "Stable kernel installed"
+    else
+        log::error "Failed to install stable kernel"
+        return
+    fi
+
+    # 2. Remove backports kernel packages (safe: stable kernel is now installed)
     local bpo_pkgs
     bpo_pkgs="$(_kernel::_bpo_pkgs)"
     if [[ -n "$bpo_pkgs" ]]; then
-        local pkgs=() skipped=()
+        local pkgs=()
         while IFS= read -r pkg; do
-            if [[ "$pkg" == *"$running"* ]]; then
-                skipped+=("$pkg")
-            else
-                pkgs+=("$pkg")
-            fi
+            pkgs+=("$pkg")
         done <<< "$bpo_pkgs"
 
-        if [[ ${#skipped[@]} -gt 0 ]]; then
-            log::warn "Skipping running kernel packages: ${skipped[*]}"
-            log::warn "Reboot into stable kernel first, then remove them"
-        fi
-
-        if [[ ${#pkgs[@]} -gt 0 ]]; then
-            log::info "Removing backports kernel packages: ${pkgs[*]}"
-            ui::flush_input
-            if sudo apt remove -y "${pkgs[@]}" </dev/tty; then
-                hash -r
-                log::ok "Backports kernel packages removed"
-            else
-                log::error "Failed to remove backports kernel packages"
-            fi
+        log::info "Removing backports kernel packages: ${pkgs[*]}"
+        ui::flush_input
+        if sudo DEBIAN_FRONTEND=noninteractive apt remove -y "${pkgs[@]}" </dev/tty; then
+            hash -r
+            log::ok "Backports kernel packages removed"
+        else
+            log::error "Failed to remove backports kernel packages"
+            return
         fi
     fi
 
+    # 3. Update GRUB to set stable kernel as default
+    log::info "Updating GRUB configuration"
+    if sudo update-grub </dev/tty; then
+        log::ok "GRUB updated"
+    else
+        log::warn "Failed to update GRUB"
+    fi
+
+    _kernel::_offer_reboot "stable"
+}
+
+_kernel::_offer_reboot() {
+    local target="$1"
     log::break
-    log::ok "Reboot to use the stable kernel"
+    local reboot_now
+    reboot_now="$(gum::choose \
+        --header "Reboot now to use the ${target} kernel?" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "Yes" "No")"
+
+    if [[ "$reboot_now" == "Yes" ]]; then
+        log::info "Rebooting system"
+        ui::flush_input
+        sudo reboot </dev/tty
+    fi
 }
