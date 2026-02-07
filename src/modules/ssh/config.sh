@@ -207,6 +207,11 @@ _ssh_config::_setup_manual() {
         return
     fi
 
+    if [[ ! "$host" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+        log::error "Invalid host alias (use letters, digits, dots, hyphens, underscores)"
+        return
+    fi
+
     # Check if Host already exists (marker or Host line)
     local host_exists=false
     grep -q "^# ${host}$" "$_SSH_CONFIG_FILE" 2>/dev/null && host_exists=true
@@ -227,6 +232,11 @@ _ssh_config::_setup_manual() {
 
     if [[ -z "$hostname" ]]; then
         log::warn "No hostname provided, cancelled"
+        return
+    fi
+
+    if [[ ! "$hostname" =~ ^[a-zA-Z0-9._:-]+$ ]]; then
+        log::error "Invalid hostname (use letters, digits, dots, hyphens, colons)"
         return
     fi
 
@@ -254,6 +264,11 @@ _ssh_config::_setup_manual() {
         --value "22" \
         --placeholder "22")"
     port="${port:-22}"
+
+    if ! [[ "$port" =~ ^[0-9]+$ ]] || [[ "$port" -lt 1 ]] || [[ "$port" -gt 65535 ]]; then
+        log::error "Invalid port number (1-65535)"
+        return
+    fi
 
     user="$(gum::input \
         --header "User:" \
