@@ -109,7 +109,7 @@ flatpak::apply() {
                 log::break
                 log::info "Installing Flatpak"
                 ui::flush_input
-                if sudo apt install -y flatpak gnome-software-plugin-flatpak </dev/tty; then
+                if sudo apt-get install -y flatpak gnome-software-plugin-flatpak </dev/tty; then
                     hash -r
                     log::ok "Flatpak installed"
                     log::break
@@ -141,7 +141,7 @@ flatpak::apply() {
                 log::break
                 log::info "Removing Flatpak"
                 ui::flush_input
-                if sudo apt remove -y flatpak </dev/tty; then
+                if sudo apt-get remove -y flatpak </dev/tty; then
                     hash -r
                     log::ok "Flatpak removed"
                 else
