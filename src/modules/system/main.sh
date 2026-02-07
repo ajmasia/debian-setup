@@ -48,16 +48,20 @@ system::run() {
         log::break
 
         # Show warnings for tasks that need attention
+        local has_warnings=false
         for task in "${_SYSTEM_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
             if ! "$check_fn"; then
+                has_warnings=true
                 local detail
                 detail="$($status_fn)"
                 log::warn "${label} (${detail})"
             fi
         done
 
-        log::break
+        if $has_warnings; then
+            log::break
+        fi
 
         # Build menu: "Edit X" if configured, "Configure X" if not
         local items=() apply_fns=()

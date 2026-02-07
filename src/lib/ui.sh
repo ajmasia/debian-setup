@@ -5,6 +5,7 @@ _LIB_UI_LOADED=1
 
 _UI_CONTENT_ROW=0
 _UI_SESSION_LOG_START=0
+_UI_VERSION=""
 
 ui::_cursor_row() {
     local row col
@@ -17,12 +18,13 @@ ui::clear() {
 }
 
 ui::clear_content() {
-    tput cup "$((_UI_CONTENT_ROW - 1))" 0
-    tput ed
+    clear
+    ui::header "$_UI_VERSION"
 }
 
 ui::header() {
     local version="$1"
+    _UI_VERSION="$version"
 
     gum::style \
         --foreground "$HEX_MAUVE" \
