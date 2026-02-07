@@ -76,6 +76,12 @@ source "${SCRIPT_DIR}/src/modules/software/hwkeys.sh"
 # Security
 source "${SCRIPT_DIR}/src/modules/software/openpgp.sh"
 source "${SCRIPT_DIR}/src/modules/software/security.sh"
+# Messaging
+source "${SCRIPT_DIR}/src/modules/software/telegram.sh"
+source "${SCRIPT_DIR}/src/modules/software/slack.sh"
+source "${SCRIPT_DIR}/src/modules/software/discord.sh"
+source "${SCRIPT_DIR}/src/modules/software/element.sh"
+source "${SCRIPT_DIR}/src/modules/software/messaging.sh"
 source "${SCRIPT_DIR}/src/modules/software/main.sh"
 source "${SCRIPT_DIR}/src/modules/settings/logs.sh"
 source "${SCRIPT_DIR}/src/modules/settings/main.sh"
