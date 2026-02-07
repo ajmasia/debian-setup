@@ -4,36 +4,50 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.4.0-blue)
+![Version](https://img.shields.io/badge/version-0.6.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 Post-install automation for the impatient developer.
 
-Interactive CLI tool that automates common Debian post-installation tasks: system configuration, package manager setup, SSH management, and source management.
+Interactive CLI tool that automates common Debian post-installation tasks: system configuration, package managers, SSH, developer tools, software installation, and more.
 
 ## Features
 
-### System core
+### System essentials
 - **Sudoers** -- Add/remove current user to sudoers
-- **Password feedback** -- Enable/disable asterisks on sudo password prompt
-- **Default editor** -- Configure vim as system editor with `EDITOR`/`SUDO_EDITOR`
-- **Zram swap** -- Install and configure compressed swap in RAM (zstd)
+- **Password Feedback** -- Enable/disable asterisks on sudo password prompt
+- **Default Editor** -- Configure vim as system editor with `EDITOR`/`SUDO_EDITOR`
+- **Zram Swap** -- Install and configure compressed swap in RAM (zstd)
 - **Kernel** -- Switch between stable and backports kernel with safe removal and reboot
 - **Slimbook EVO** -- Install Slimbook repository and EVO/GNOME meta-packages
 
 ### Package managers
-- **APT sources** -- Modernize to DEB822, toggle non-free/backports/deb-src/testing
+- **APT Sources** -- Modernize to DEB822, toggle non-free/backports/deb-src/testing
 - **Flatpak** -- Install Flatpak with Flathub repository
-- **Nix** -- Install/remove Nix package manager (multi-user daemon)
+- **Nix** -- Install/remove Nix package manager (multi-user daemon, flakes toggle)
 
 ### SSH
-- **SSH server** -- Install and manage openssh-server with service control
-- **Access mode** -- Toggle pubkey-only, pubkey+password, or password-only with root login control
-- **SSH keys** -- Generate ED25519 keys with suffix support for multiple identities
-- **SSH config** -- Manage `~/.ssh/config` entries for GitHub, GitLab, and custom servers
-- **Commit signing** -- Configure git commit signing with SSH keys, conditional `includeIf` for multi-identity setups
+- **OpenSSH Server** -- Install and manage openssh-server with service control
+- **SSH Access** -- Toggle pubkey-only, pubkey+password, or password-only with root login control
+- **SSH Keys** -- Generate ED25519 keys with suffix support for multiple identities
+- **SSH Config** -- Manage `~/.ssh/config` entries for GitHub, GitLab, and custom servers
+- **Commit Signing** -- Configure git commit signing with SSH keys, conditional `includeIf` for multi-identity setups
+
+### Developer tools
+- **Build Essentials** -- Core compilation tools and development libraries
+- **Node.js** -- fnm + Node.js LTS
+- **Python** -- uv package manager
+- **Rust** -- rustup/cargo
+- **Go** -- Go via APT or official tarball
+
+### Software
+- **Utilities** -- CLI utilities (fzf, bat, ripgrep, fd, htop, btop, jq, etc.)
+- **Media** -- Media tools and codecs
+- **Editors** -- VS Code (with extensions management) and Neovim (LazyVim)
+- **Terminals** -- Alacritty (build from source), Kitty (user-space installer), Ptyxis (APT)
+- **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium
 
 ### Settings
 - **Health check** -- System info, dependency status, and task overview
@@ -76,35 +90,35 @@ debian-setup/
 │   │   ├── colors.sh              # Catppuccin Mocha palette
 │   │   ├── gum.sh                 # Gum wrappers (choose, input, SIGINT)
 │   │   ├── log.sh                 # Logging (terminal + file)
+│   │   ├── apt.sh                 # APT package list utilities
 │   │   ├── system.sh              # System info queries
 │   │   ├── ui.sh                  # UI components
 │   │   └── xdg.sh                 # XDG Base Directory support
 │   ├── modules/
 │   │   ├── health.sh
 │   │   ├── system/
-│   │   │   ├── main.sh
-│   │   │   ├── sudoers.sh
-│   │   │   ├── pwfeedback.sh
-│   │   │   ├── editor.sh
-│   │   │   ├── zram.sh
-│   │   │   ├── kernel.sh
-│   │   │   └── slimbook.sh
+│   │   │   ├── main.sh            # Sudoers, Password Feedback, Editor,
+│   │   │   ├── ...                # Zram, Kernel, Slimbook
 │   │   ├── packages/
-│   │   │   ├── main.sh
-│   │   │   ├── apt.sh
-│   │   │   ├── flatpak.sh
-│   │   │   └── nix.sh
+│   │   │   ├── main.sh            # APT Sources, Flatpak, Nix
+│   │   │   ├── ...
 │   │   ├── ssh/
-│   │   │   ├── main.sh
-│   │   │   ├── server.sh
-│   │   │   ├── access.sh
-│   │   │   ├── keys.sh
-│   │   │   ├── config.sh
-│   │   │   └── signing.sh
+│   │   │   ├── main.sh            # Server, Access, Keys, Config, Signing
+│   │   │   ├── ...
+│   │   ├── devtools/
+│   │   │   ├── main.sh            # Build, Node, Python, Rust, Go
+│   │   │   ├── ...
+│   │   ├── software/
+│   │   │   ├── main.sh            # Utilities, Media, Editors, Terminals,
+│   │   │   ├── ...                # Browsers
 │   │   └── settings/
 │   │       ├── main.sh
 │   │       └── logs.sh
 │   └── menu.sh
+├── packages/
+│   ├── apt/                        # Package lists (build, utils, media)
+│   └── vscode/
+│       └── extensions.txt          # VS Code extensions (id|label)
 ```
 
 ## Design
@@ -112,6 +126,7 @@ debian-setup/
 - **Catppuccin Mocha** color palette throughout
 - **XDG compliant** -- logs stored in `$XDG_STATE_HOME/debian-setup/logs/`
 - **Session logging** -- all actions recorded to daily log files
-- **Wizard pattern** -- each task shows current status and offers contextual actions (install/remove, enable/disable, edit/configure)
+- **Wizard pattern** -- each task shows current status and offers contextual actions (install/remove, enable/disable)
 - **Non-destructive** -- every configuration change can be undone from the same menu
+- **Repo cleanup** -- removing browsers/packages with external repos also removes the repo and GPG key
 - **Ctrl+C safe** -- clean exit from any prompt via SIGINT handling
