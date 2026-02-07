@@ -159,26 +159,31 @@ apt::list_wizard() {
 
         log::info "$info_label"
 
-        local all_installed=true has_installed=false
+        local installed_pkgs=() pending_pkgs=()
         while IFS= read -r pkg; do
             if apt::is_installed "$pkg"; then
-                log::ok "$pkg"
-                has_installed=true
+                installed_pkgs+=("$pkg")
             else
-                log::warn "${pkg} (not installed)"
-                all_installed=false
+                pending_pkgs+=("$pkg")
             fi
         done < <(apt::read_list "$file")
+
+        if [[ ${#installed_pkgs[@]} -gt 0 ]]; then
+            log::ok "${installed_pkgs[*]}"
+        fi
+        if [[ ${#pending_pkgs[@]} -gt 0 ]]; then
+            log::warn "${pending_pkgs[*]} (not installed)"
+        fi
 
         log::break
 
         local options=()
 
-        if ! $all_installed; then
+        if [[ ${#pending_pkgs[@]} -gt 0 ]]; then
             options+=("Install all pending" "Select packages to install")
         fi
 
-        if $has_installed; then
+        if [[ ${#installed_pkgs[@]} -gt 0 ]]; then
             options+=("Remove packages")
         fi
 
@@ -287,26 +292,31 @@ apt::deb_wizard() {
 
         log::info "$info_label"
 
-        local all_installed=true has_installed=false
+        local installed_names=() pending_names_display=()
         while IFS='|' read -r name url; do
             if apt::is_installed "$name"; then
-                log::ok "$name"
-                has_installed=true
+                installed_names+=("$name")
             else
-                log::warn "${name} (not installed)"
-                all_installed=false
+                pending_names_display+=("$name")
             fi
         done < <(apt::read_deb_list "$file")
+
+        if [[ ${#installed_names[@]} -gt 0 ]]; then
+            log::ok "${installed_names[*]}"
+        fi
+        if [[ ${#pending_names_display[@]} -gt 0 ]]; then
+            log::warn "${pending_names_display[*]} (not installed)"
+        fi
 
         log::break
 
         local options=()
 
-        if ! $all_installed; then
+        if [[ ${#pending_names_display[@]} -gt 0 ]]; then
             options+=("Install all pending" "Select packages to install")
         fi
 
-        if $has_installed; then
+        if [[ ${#installed_names[@]} -gt 0 ]]; then
             options+=("Remove packages")
         fi
 
