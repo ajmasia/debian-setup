@@ -45,6 +45,10 @@ health::run() {
     health::_check_packages_tasks
     log::break
     health::_check_ssh_tasks
+    log::break
+    health::_check_devtools_tasks
+    log::break
+    health::_check_software_tasks
 
     ui::return_or_exit
 }
@@ -52,7 +56,7 @@ health::run() {
 health::_check_system_tasks() {
     local task label desc_var check_fn apply_fn status_fn
 
-    log::info "System core tasks"
+    log::info "System essentials tasks"
     for task in "${_SYSTEM_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
@@ -86,6 +90,38 @@ health::_check_ssh_tasks() {
 
     log::info "SSH tasks"
     for task in "${_SSH_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        if "$check_fn"; then
+            log::ok "${label}"
+        else
+            local detail
+            detail="$($status_fn)"
+            log::warn "${label} (${detail})"
+        fi
+    done
+}
+
+health::_check_devtools_tasks() {
+    local task label desc_var check_fn apply_fn status_fn
+
+    log::info "Developer tools tasks"
+    for task in "${_DEVTOOLS_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        if "$check_fn"; then
+            log::ok "${label}"
+        else
+            local detail
+            detail="$($status_fn)"
+            log::warn "${label} (${detail})"
+        fi
+    done
+}
+
+health::_check_software_tasks() {
+    local task label desc_var check_fn apply_fn status_fn
+
+    log::info "Software tasks"
+    for task in "${_SOFTWARE_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
             log::ok "${label}"
