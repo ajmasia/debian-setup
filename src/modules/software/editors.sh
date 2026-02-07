@@ -28,7 +28,7 @@ editors::status() {
     local pending=0
     for task in "${_EDITORS_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-        "$check_fn" || ((pending++))
+        "$check_fn" || pending=$((pending + 1))
     done
     if [[ $pending -gt 0 ]]; then
         printf '%s editors pending' "$pending"

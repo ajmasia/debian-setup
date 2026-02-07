@@ -100,15 +100,14 @@ apt::deb_install() {
     log::info "Installing ${name}..."
     log::break
     ui::flush_input
-    sudo apt-get install -y "$tmpfile" </dev/tty
-    local rc=$?
-    rm -f "$tmpfile"
-    hash -r
-
-    if [[ $rc -eq 0 ]]; then
+    if sudo apt-get install -y "$tmpfile" </dev/tty; then
+        rm -f "$tmpfile"
+        hash -r
         log::break
         log::ok "${name} installed"
     else
+        rm -f "$tmpfile"
+        hash -r
         log::break
         log::error "Failed to install ${name}"
         return 1
