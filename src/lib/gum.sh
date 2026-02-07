@@ -56,6 +56,13 @@ gum::choose() {
     return 0
 }
 
+gum::filter() {
+    local rc=0
+    gum filter "$@" || rc=$?
+    [[ $rc -eq 130 ]] && exit 130
+    return 0
+}
+
 gum::input() {
     local rc=0
     gum input "$@" || rc=$?

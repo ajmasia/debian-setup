@@ -9,12 +9,15 @@ menu::main() {
     while true; do
         items=("System essentials" "Package managers" "OpenSSH server" "Developer tools" "Software" "Settings" "Exit")
 
-        choice="$(gum::choose \
+        choice="$(gum::filter \
+            --height 12 \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
-            --cursor.foreground "$HEX_BLUE" \
-            --item.foreground "$HEX_TEXT" \
-            --selected.foreground "$HEX_GREEN" \
+            --indicator.foreground "$HEX_BLUE" \
+            --text.foreground "$HEX_TEXT" \
+            --cursor-text.foreground "$HEX_GREEN" \
+            --match.foreground "$HEX_MAUVE" \
+            --placeholder "Type to filter..." \
             "${items[@]}")"
 
         case "$choice" in
