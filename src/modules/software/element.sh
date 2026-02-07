@@ -87,7 +87,7 @@ _element::install() {
     log::info "Adding Element repository"
     ui::flush_input
 
-    if ! sudo wget -qO "$_ELEMENT_GPG_KEY" "$_ELEMENT_GPG_URL" </dev/tty; then
+    if ! sudo curl -fsSLo "$_ELEMENT_GPG_KEY" "$_ELEMENT_GPG_URL" </dev/tty; then
         log::error "Failed to download Element GPG key"
         return
     fi
