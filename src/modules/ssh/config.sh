@@ -3,7 +3,7 @@
 [[ -n "${_MOD_SSH_CONFIG_LOADED:-}" ]] && return 0
 _MOD_SSH_CONFIG_LOADED=1
 
-_SSH_CONFIG_LABEL="Configure SSH config"
+_SSH_CONFIG_LABEL="Configure SSH Config"
 _SSH_CONFIG_DESC="Manage ~/.ssh/config entries for GitHub, GitLab, and custom servers."
 
 _SSH_CONFIG_FILE="$HOME/.ssh/config"

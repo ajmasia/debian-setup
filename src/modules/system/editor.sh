@@ -3,7 +3,7 @@
 [[ -n "${_MOD_EDITOR_LOADED:-}" ]] && return 0
 _MOD_EDITOR_LOADED=1
 
-_EDITOR_LABEL="Configure default editor"
+_EDITOR_LABEL="Configure Default Editor"
 _EDITOR_DESC="Manage vim as default editor with EDITOR/SUDO_EDITOR in ~/.bashrc."
 
 _editor::vim_installed() {

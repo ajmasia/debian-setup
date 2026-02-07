@@ -3,7 +3,7 @@
 [[ -n "${_MOD_KERNEL_LOADED:-}" ]] && return 0
 _MOD_KERNEL_LOADED=1
 
-_KERNEL_LABEL="Configure current kernel"
+_KERNEL_LABEL="Configure Kernel"
 _KERNEL_DESC="Install or revert the Linux kernel from Debian backports."
 
 _kernel::has_backports() {

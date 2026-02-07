@@ -3,7 +3,7 @@
 [[ -n "${_MOD_SUDOERS_LOADED:-}" ]] && return 0
 _MOD_SUDOERS_LOADED=1
 
-_SUDOERS_LABEL="Configure sudoers"
+_SUDOERS_LABEL="Configure Sudoers"
 _SUDOERS_DESC="Manage /etc/sudoers.d/${USER} for sudo privileges."
 
 sudoers::check() {

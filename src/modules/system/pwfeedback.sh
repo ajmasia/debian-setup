@@ -3,7 +3,7 @@
 [[ -n "${_MOD_PWFEEDBACK_LOADED:-}" ]] && return 0
 _MOD_PWFEEDBACK_LOADED=1
 
-_PWFEEDBACK_LABEL="Configure password feedback"
+_PWFEEDBACK_LABEL="Configure Password Feedback"
 _PWFEEDBACK_DESC="Manage 'Defaults pwfeedback' in /etc/sudoers.d/pwfeedback."
 
 pwfeedback::check() {

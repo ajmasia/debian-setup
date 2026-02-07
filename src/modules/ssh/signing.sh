@@ -3,7 +3,7 @@
 [[ -n "${_MOD_SSH_SIGNING_LOADED:-}" ]] && return 0
 _MOD_SSH_SIGNING_LOADED=1
 
-_SSH_SIGNING_LABEL="Configure commit signing"
+_SSH_SIGNING_LABEL="Configure Commit Signing"
 _SSH_SIGNING_DESC="Configure git commit signing with SSH keys and allowed signers."
 
 _SSH_ALLOWED_SIGNERS="$HOME/.ssh/allowed_signers"

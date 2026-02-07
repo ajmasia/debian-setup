@@ -3,7 +3,7 @@
 [[ -n "${_MOD_SSH_KEYS_LOADED:-}" ]] && return 0
 _MOD_SSH_KEYS_LOADED=1
 
-_SSH_KEYS_LABEL="Configure SSH keys"
+_SSH_KEYS_LABEL="Configure SSH Keys"
 _SSH_KEYS_DESC="Generate and manage ED25519 SSH keys."
 
 _ssh_keys::has_ed25519() {

@@ -3,7 +3,7 @@
 [[ -n "${_MOD_ZRAM_LOADED:-}" ]] && return 0
 _MOD_ZRAM_LOADED=1
 
-_ZRAM_LABEL="Configure zram swap"
+_ZRAM_LABEL="Configure Zram Swap"
 _ZRAM_DESC="Manage compressed swap in RAM (zstd) via zram-tools."
 
 _zram::installed() {

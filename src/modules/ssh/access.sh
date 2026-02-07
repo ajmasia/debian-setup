@@ -3,7 +3,7 @@
 [[ -n "${_MOD_SSH_ACCESS_LOADED:-}" ]] && return 0
 _MOD_SSH_ACCESS_LOADED=1
 
-_SSH_ACCESS_LABEL="Configure SSH access"
+_SSH_ACCESS_LABEL="Configure SSH Access"
 _SSH_ACCESS_DESC="Set SSH access mode: pubkey-only, pubkey+password, or password-only."
 
 # Returns: "pubkey-only", "password-only", "pubkey+password"
