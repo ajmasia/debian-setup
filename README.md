@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.6.2-blue)
+![Version](https://img.shields.io/badge/version-0.7.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -48,6 +48,12 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Editors** -- VS Code (with extensions management) and Neovim (LazyVim)
 - **Terminals** -- Alacritty (build from source), Kitty (user-space installer), Ptyxis (APT)
 - **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium
+- **Security**
+  - **VPN** -- Mullvad VPN, Proton VPN
+  - **Password Managers** -- Proton Pass, Proton Pass CLI, KeePassXC (Flatpak), Bitwarden CLI
+  - **Authenticators** -- Proton Authenticator, Yubico Authenticator (Flatpak)
+  - **Hardware Keys** -- YubiKey Manager, Nitrokey App2 (Flatpak)
+  - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
 
 ### Settings
 - **Health check** -- System info, dependency status, and task overview
@@ -88,7 +94,7 @@ debian-setup/
 ├── src/
 │   ├── lib/
 │   │   ├── colors.sh              # Catppuccin Mocha palette
-│   │   ├── gum.sh                 # Gum wrappers (choose, input, SIGINT)
+│   │   ├── gum.sh                 # Gum wrappers (choose, filter, input, SIGINT)
 │   │   ├── log.sh                 # Logging (terminal + file)
 │   │   ├── apt.sh                 # APT package list utilities
 │   │   ├── system.sh              # System info queries
@@ -110,13 +116,13 @@ debian-setup/
 │   │   │   ├── ...
 │   │   ├── software/
 │   │   │   ├── main.sh            # Utilities, Media, Editors, Terminals,
-│   │   │   ├── ...                # Browsers
+│   │   │   ├── ...                # Browsers, Security
 │   │   └── settings/
 │   │       ├── main.sh
 │   │       └── logs.sh
 │   └── menu.sh
 ├── packages/
-│   ├── apt/                        # Package lists (build, utils, media)
+│   ├── apt/                        # Package lists (build, utils, media, openpgp)
 │   └── vscode/
 │       └── extensions.txt          # VS Code extensions (id|label)
 ```
