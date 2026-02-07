@@ -67,12 +67,7 @@ apt::list_status() {
 # --- .deb package functions (name|url format) ---
 
 apt::read_deb_list() {
-    local file="$1"
-    if [[ ! -f "$file" ]]; then
-        log::error "Package list not found: ${file}"
-        return 1
-    fi
-    grep -v '^\s*#' "$file" | grep -v '^\s*$' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+    apt::read_list "$1"
 }
 
 apt::deb_pending() {
