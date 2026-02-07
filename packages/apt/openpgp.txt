@@ -1,0 +1,4 @@
+gnupg
+seahorse
+scdaemon
+pinentry-gnome3

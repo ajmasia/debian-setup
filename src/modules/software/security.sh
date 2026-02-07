@@ -1,55 +1,54 @@
-# Software module
+# Security sub-module
 
-[[ -n "${_MOD_SOFTWARE_LOADED:-}" ]] && return 0
-_MOD_SOFTWARE_LOADED=1
+[[ -n "${_MOD_SECURITY_LOADED:-}" ]] && return 0
+_MOD_SECURITY_LOADED=1
+
+_SECURITY_LABEL="Configure Security"
+_SECURITY_DESC="Install and configure security tools."
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
-_SOFTWARE_TASKS=(
-    "${_UTILS_LABEL}|_UTILS_DESC|utils::check|utils::apply|utils::status"
-    "${_MEDIA_LABEL}|_MEDIA_DESC|media::check|media::apply|media::status"
-    "${_EDITORS_LABEL}|_EDITORS_DESC|editors::check|editors::run|editors::status"
-    "${_TERMINALS_LABEL}|_TERMINALS_DESC|terminals::check|terminals::run|terminals::status"
-    "${_BROWSERS_LABEL}|_BROWSERS_DESC|browsers::check|browsers::run|browsers::status"
-    "${_SECURITY_LABEL}|_SECURITY_DESC|security::check|security::run|security::status"
+_SECURITY_TASKS=(
+    "${_VPNS_LABEL}|_VPNS_DESC|vpns::check|vpns::run|vpns::status"
+    "${_PASSWORDS_LABEL}|_PASSWORDS_DESC|passwords::check|passwords::run|passwords::status"
+    "${_AUTHENTICATORS_LABEL}|_AUTHENTICATORS_DESC|authenticators::check|authenticators::run|authenticators::status"
+    "${_HWKEYS_LABEL}|_HWKEYS_DESC|hwkeys::check|hwkeys::run|hwkeys::status"
+    "${_OPENPGP_LABEL}|_OPENPGP_DESC|openpgp::check|openpgp::apply|openpgp::status"
 )
 
-software::log_status() {
+security::check() {
     local task label desc_var check_fn apply_fn status_fn
-    _log::to_file "info" "Software status"
-    for task in "${_SOFTWARE_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-        if "$check_fn"; then
-            _log::to_file "ok" "${label}"
-        else
-            local detail
-            detail="$($status_fn)"
-            _log::to_file "warn" "${label} (${detail})"
-        fi
-    done
-}
-
-software::has_pending() {
-    local task label desc_var check_fn apply_fn status_fn
-    for task in "${_SOFTWARE_TASKS[@]}"; do
+    for task in "${_SECURITY_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if ! "$check_fn"; then
-            return 0
+            return 1
         fi
     done
-    return 1
+    return 0
 }
 
-software::run() {
+security::status() {
+    local task label desc_var check_fn apply_fn status_fn
+    local pending=0
+    for task in "${_SECURITY_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        "$check_fn" || pending=$((pending + 1))
+    done
+    if [[ $pending -gt 0 ]]; then
+        printf '%s categories pending' "$pending"
+    fi
+}
+
+security::run() {
     local task label desc_var check_fn apply_fn status_fn choice
 
     while true; do
         ui::clear_content
-        log::nav "Software"
+        log::nav "Software > Security"
         log::break
 
         # Build menu items (strip "Configure " prefix)
         local items=() apply_fns=()
-        for task in "${_SOFTWARE_TASKS[@]}"; do
+        for task in "${_SECURITY_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
             items+=("${label#Configure }")
             apply_fns+=("$apply_fn")
@@ -76,7 +75,6 @@ software::run() {
                 ui::goodbye
                 ;;
             *)
-                # Find and run selected task by display label
                 local i
                 for i in "${!items[@]}"; do
                     if [[ "${items[$i]}" == "$choice" ]]; then

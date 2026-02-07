@@ -55,6 +55,27 @@ source "${SCRIPT_DIR}/src/modules/software/librewolf.sh"
 source "${SCRIPT_DIR}/src/modules/software/mullvad.sh"
 source "${SCRIPT_DIR}/src/modules/software/chromium.sh"
 source "${SCRIPT_DIR}/src/modules/software/browsers.sh"
+# Security > VPNs
+source "${SCRIPT_DIR}/src/modules/software/mullvadvpn.sh"
+source "${SCRIPT_DIR}/src/modules/software/protonvpn.sh"
+source "${SCRIPT_DIR}/src/modules/software/vpns.sh"
+# Security > Passwords
+source "${SCRIPT_DIR}/src/modules/software/protonpass.sh"
+source "${SCRIPT_DIR}/src/modules/software/passcli.sh"
+source "${SCRIPT_DIR}/src/modules/software/keepassxc.sh"
+source "${SCRIPT_DIR}/src/modules/software/bitwarden.sh"
+source "${SCRIPT_DIR}/src/modules/software/passwords.sh"
+# Security > Authenticators
+source "${SCRIPT_DIR}/src/modules/software/protonauth.sh"
+source "${SCRIPT_DIR}/src/modules/software/yubicoauth.sh"
+source "${SCRIPT_DIR}/src/modules/software/authenticators.sh"
+# Security > Hardware Keys
+source "${SCRIPT_DIR}/src/modules/software/yubikey.sh"
+source "${SCRIPT_DIR}/src/modules/software/nitrokey.sh"
+source "${SCRIPT_DIR}/src/modules/software/hwkeys.sh"
+# Security
+source "${SCRIPT_DIR}/src/modules/software/openpgp.sh"
+source "${SCRIPT_DIR}/src/modules/software/security.sh"
 source "${SCRIPT_DIR}/src/modules/software/main.sh"
 source "${SCRIPT_DIR}/src/modules/settings/logs.sh"
 source "${SCRIPT_DIR}/src/modules/settings/main.sh"
