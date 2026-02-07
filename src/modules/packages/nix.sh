@@ -158,16 +158,23 @@ nix::apply() {
                 ui::flush_input
                 sudo mkdir -p /etc/nix
                 printf 'experimental-features = nix-command flakes\n' | sudo tee -a /etc/nix/nix.conf > /dev/null
-                sudo systemctl restart nix-daemon.socket </dev/tty
-                log::ok "Flakes enabled"
+                if sudo systemctl restart nix-daemon.service </dev/tty; then
+                    log::ok "Flakes enabled"
+                else
+                    log::warn "Flakes config written but daemon restart failed"
+                    log::warn "Try: sudo systemctl restart nix-daemon.service"
+                fi
                 ;;
             "Disable flakes")
                 log::break
                 log::info "Disabling flakes"
                 ui::flush_input
                 sudo sed -i '/experimental-features/d' /etc/nix/nix.conf
-                sudo systemctl restart nix-daemon.socket </dev/tty
-                log::ok "Flakes disabled"
+                if sudo systemctl restart nix-daemon.service </dev/tty; then
+                    log::ok "Flakes disabled"
+                else
+                    log::warn "Flakes config removed but daemon restart failed"
+                fi
                 ;;
             "Remove Nix")
                 log::break
@@ -185,6 +192,13 @@ _nix::_remove() {
     sudo systemctl disable nix-daemon.socket nix-daemon.service 2>/dev/null
     sudo systemctl daemon-reload
     log::ok "Nix daemon stopped"
+
+    # Remove flakes config if present
+    if _nix::flakes_enabled; then
+        log::info "Removing flakes configuration"
+        sudo rm -f /etc/nix/nix.conf
+        log::ok "Flakes configuration removed"
+    fi
 
     # Remove files and directories
     log::info "Removing Nix files"
