@@ -2,7 +2,7 @@
   <img src="https://www.debian.org/logos/openlogo-nd.svg" alt="Debian" width="100">
 </p>
 
-# debian-setup
+# Debian Setup Script
 
 ![Version](https://img.shields.io/badge/version-0.4.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
