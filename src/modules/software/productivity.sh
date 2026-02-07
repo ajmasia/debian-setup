@@ -1,57 +1,53 @@
-# Software module
+# Productivity sub-module
 
-[[ -n "${_MOD_SOFTWARE_LOADED:-}" ]] && return 0
-_MOD_SOFTWARE_LOADED=1
+[[ -n "${_MOD_PRODUCTIVITY_LOADED:-}" ]] && return 0
+_MOD_PRODUCTIVITY_LOADED=1
+
+_PRODUCTIVITY_LABEL="Configure Productivity"
+_PRODUCTIVITY_DESC="Install and configure productivity apps."
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
-_SOFTWARE_TASKS=(
-    "${_UTILS_LABEL}|_UTILS_DESC|utils::check|utils::apply|utils::status"
-    "${_MEDIA_LABEL}|_MEDIA_DESC|media::check|media::apply|media::status"
-    "${_EDITORS_LABEL}|_EDITORS_DESC|editors::check|editors::run|editors::status"
-    "${_TERMINALS_LABEL}|_TERMINALS_DESC|terminals::check|terminals::run|terminals::status"
-    "${_BROWSERS_LABEL}|_BROWSERS_DESC|browsers::check|browsers::run|browsers::status"
-    "${_SECURITY_LABEL}|_SECURITY_DESC|security::check|security::run|security::status"
-    "${_MESSAGING_LABEL}|_MESSAGING_DESC|messaging::check|messaging::run|messaging::status"
-    "${_PRODUCTIVITY_LABEL}|_PRODUCTIVITY_DESC|productivity::check|productivity::run|productivity::status"
+_PRODUCTIVITY_TASKS=(
+    "${_GIMP_LABEL}|_GIMP_DESC|gimp::check|gimp::apply|gimp::status"
+    "${_INKSCAPE_LABEL}|_INKSCAPE_DESC|inkscape::check|inkscape::apply|inkscape::status"
+    "${_ONLYOFFICE_LABEL}|_ONLYOFFICE_DESC|onlyoffice::check|onlyoffice::apply|onlyoffice::status"
+    "${_LIBREOFFICE_LABEL}|_LIBREOFFICE_DESC|libreoffice::check|libreoffice::apply|libreoffice::status"
 )
 
-software::log_status() {
+productivity::check() {
     local task label desc_var check_fn apply_fn status_fn
-    _log::to_file "info" "Software status"
-    for task in "${_SOFTWARE_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-        if "$check_fn"; then
-            _log::to_file "ok" "${label}"
-        else
-            local detail
-            detail="$($status_fn)"
-            _log::to_file "warn" "${label} (${detail})"
-        fi
-    done
-}
-
-software::has_pending() {
-    local task label desc_var check_fn apply_fn status_fn
-    for task in "${_SOFTWARE_TASKS[@]}"; do
+    for task in "${_PRODUCTIVITY_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if ! "$check_fn"; then
-            return 0
+            return 1
         fi
     done
-    return 1
+    return 0
 }
 
-software::run() {
+productivity::status() {
+    local task label desc_var check_fn apply_fn status_fn
+    local pending=0
+    for task in "${_PRODUCTIVITY_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        "$check_fn" || pending=$((pending + 1))
+    done
+    if [[ $pending -gt 0 ]]; then
+        printf '%s productivity apps pending' "$pending"
+    fi
+}
+
+productivity::run() {
     local task label desc_var check_fn apply_fn status_fn choice
 
     while true; do
         ui::clear_content
-        log::nav "Software"
+        log::nav "Software > Productivity"
         log::break
 
         # Build menu items (strip "Configure " prefix)
         local items=() apply_fns=()
-        for task in "${_SOFTWARE_TASKS[@]}"; do
+        for task in "${_PRODUCTIVITY_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
             items+=("${label#Configure }")
             apply_fns+=("$apply_fn")
@@ -78,7 +74,6 @@ software::run() {
                 ui::goodbye
                 ;;
             *)
-                # Find and run selected task by display label
                 local i
                 for i in "${!items[@]}"; do
                     if [[ "${items[$i]}" == "$choice" ]]; then
