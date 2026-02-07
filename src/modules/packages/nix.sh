@@ -203,7 +203,7 @@ _nix::_remove() {
     # Remove files and directories
     log::info "Removing Nix files"
     sudo rm -rf /nix /etc/nix /etc/profile.d/nix.sh /etc/tmpfiles.d/nix-daemon.conf \
-        ~root/.nix-channels ~root/.nix-defexpr ~root/.nix-profile ~root/.cache/nix
+        /root/.nix-channels /root/.nix-defexpr /root/.nix-profile /root/.cache/nix
     rm -rf "$HOME/.nix-channels" "$HOME/.nix-defexpr" "$HOME/.nix-profile" "$HOME/.cache/nix"
     log::ok "Nix files removed"
 
