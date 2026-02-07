@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.8.1-blue)
+![Version](https://img.shields.io/badge/version-0.9.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -55,7 +55,17 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
   - **Hardware Keys** -- YubiKey Manager, Nitrokey App2 (Flatpak)
   - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
 - **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
-- **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT)
+- **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak + Nautilus plugin)
+
+### GNOME
+- **Appearance**
+  - **GTK Theme** -- Catppuccin Mocha GTK theme with accent color selection, dark mode toggle, GTK4/libadwaita symlinks
+  - **Icons** -- Papirus icons with Catppuccin folder colors
+  - **Cursors** -- Catppuccin Mocha cursors (variant selection)
+  - **Terminal Profile** -- Catppuccin color profiles for GNOME Terminal
+- **Keyboard** -- English intl layout (AltGr dead keys), 4 fixed workspaces, Super+W close, Super+Return terminal, Super+1-4/Shift+1-4 workspace switching
+- **Terminal CSS** -- VTE terminal padding for GTK3 and GTK4
+- **Extensions** -- Extension Manager (APT), Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes
 
 ### Settings
 - **Health check** -- System info, dependency status, and task overview
@@ -118,13 +128,18 @@ debian-setup/
 │   │   │   ├── ...
 │   │   ├── software/
 │   │   │   ├── main.sh            # Utilities, Media, Editors, Terminals,
-│   │   │   ├── ...                # Browsers, Security
+│   │   │   ├── ...                # Browsers, Security, Messaging, Productivity
+│   │   ├── gnome/
+│   │   │   ├── main.sh            # Appearance, Keyboard, Terminal CSS, Extensions
+│   │   │   ├── ...                # GTK Theme, Icons, Cursors, Terminal Profile
 │   │   └── settings/
 │   │       ├── main.sh
 │   │       └── logs.sh
 │   └── menu.sh
 ├── packages/
 │   ├── apt/                        # Package lists (build, utils, media, openpgp)
+│   ├── gnome/
+│   │   └── extensions.txt          # GNOME Shell extensions (uuid|label)
 │   └── vscode/
 │       └── extensions.txt          # VS Code extensions (id|label)
 ```
