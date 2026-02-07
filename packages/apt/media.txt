@@ -1,0 +1,9 @@
+# Media tools & codecs
+vlc
+mpv
+ffmpeg
+mediainfo
+audacity
+libavcodec-extra
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-ugly

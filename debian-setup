@@ -13,6 +13,7 @@ source "${SCRIPT_DIR}/src/lib/log.sh"
 source "${SCRIPT_DIR}/src/lib/system.sh"
 source "${SCRIPT_DIR}/src/lib/gum.sh"
 source "${SCRIPT_DIR}/src/lib/ui.sh"
+source "${SCRIPT_DIR}/src/lib/apt.sh"
 
 # Source menu and modules
 source "${SCRIPT_DIR}/src/menu.sh"

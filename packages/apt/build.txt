@@ -1,0 +1,8 @@
+# Build essentials - core compilation tools
+build-essential
+pkg-config
+cmake
+libssl-dev
+curl
+wget
+git

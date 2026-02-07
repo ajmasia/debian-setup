@@ -1,0 +1,14 @@
+# CLI utilities
+fzf
+bat
+ripgrep
+fd-find
+htop
+btop
+tree
+jq
+ncdu
+trash-cli
+xclip
+unzip
+p7zip-full
