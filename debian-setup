@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+trap 'printf "\n"; exit 130' INT
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VERSION="$(cat "${SCRIPT_DIR}/VERSION")"
 
@@ -24,6 +26,12 @@ source "${SCRIPT_DIR}/src/modules/packages/apt.sh"
 source "${SCRIPT_DIR}/src/modules/packages/flatpak.sh"
 source "${SCRIPT_DIR}/src/modules/packages/nix.sh"
 source "${SCRIPT_DIR}/src/modules/packages/main.sh"
+source "${SCRIPT_DIR}/src/modules/ssh/server.sh"
+source "${SCRIPT_DIR}/src/modules/ssh/access.sh"
+source "${SCRIPT_DIR}/src/modules/ssh/keys.sh"
+source "${SCRIPT_DIR}/src/modules/ssh/config.sh"
+source "${SCRIPT_DIR}/src/modules/ssh/signing.sh"
+source "${SCRIPT_DIR}/src/modules/ssh/main.sh"
 source "${SCRIPT_DIR}/src/modules/settings/logs.sh"
 source "${SCRIPT_DIR}/src/modules/settings/main.sh"
 

@@ -7,7 +7,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System core" "Package managers" "Settings" "Exit")
+        items=("System core" "Package managers" "SSH" "Settings" "Exit")
 
         choice="$(gum::choose \
             --header "Select an option:" \
@@ -24,6 +24,10 @@ menu::main() {
                 ;;
             "Package managers")
                 packages::run
+                ui::clear_content
+                ;;
+            "SSH")
+                ssh::run
                 ui::clear_content
                 ;;
             "Settings")
