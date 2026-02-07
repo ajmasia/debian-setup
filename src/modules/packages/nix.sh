@@ -17,7 +17,8 @@ _nix::session_ready() {
 }
 
 _nix::daemon_active() {
-    systemctl is-active nix-daemon.service &>/dev/null
+    systemctl is-active nix-daemon.socket &>/dev/null \
+        || systemctl is-active nix-daemon.service &>/dev/null
 }
 
 # Shell config files that the Nix installer may modify
