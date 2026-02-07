@@ -21,6 +21,10 @@ _nix::daemon_active() {
         || systemctl is-active nix-daemon.service &>/dev/null
 }
 
+_nix::flakes_enabled() {
+    grep -q 'flakes' /etc/nix/nix.conf 2>/dev/null
+}
+
 # Shell config files that the Nix installer may modify
 _NIX_SHELL_CONFIGS=(
     /etc/bash.bashrc
@@ -31,7 +35,7 @@ _NIX_SHELL_CONFIGS=(
 )
 
 nix::check() {
-    _nix::is_installed && _nix::session_ready && _nix::daemon_active
+    _nix::is_installed && _nix::session_ready && _nix::daemon_active && _nix::flakes_enabled
 }
 
 nix::status() {
@@ -39,6 +43,7 @@ nix::status() {
     _nix::is_installed || issues+=("not installed")
     _nix::is_installed && ! _nix::session_ready && issues+=("restart needed")
     _nix::is_installed && _nix::session_ready && ! _nix::daemon_active && issues+=("daemon not running")
+    _nix::is_installed && ! _nix::flakes_enabled && issues+=("flakes not enabled")
     if [[ ${#issues[@]} -gt 0 ]]; then
         local IFS=", "
         printf '%s' "${issues[*]}"
@@ -75,6 +80,12 @@ nix::apply() {
             else
                 log::warn "Daemon: not running"
             fi
+
+            if _nix::flakes_enabled; then
+                log::ok "Flakes: enabled"
+            else
+                log::warn "Flakes: not enabled"
+            fi
         else
             log::warn "Nix: not installed"
         fi
@@ -87,6 +98,11 @@ nix::apply() {
         if $installed; then
             if ! $daemon; then
                 options+=("Start daemon")
+            fi
+            if _nix::flakes_enabled; then
+                options+=("Disable flakes")
+            else
+                options+=("Enable flakes")
             fi
             options+=("Remove Nix")
         else
@@ -135,6 +151,23 @@ nix::apply() {
                 else
                     log::error "Failed to start nix daemon"
                 fi
+                ;;
+            "Enable flakes")
+                log::break
+                log::info "Enabling flakes and nix-command"
+                ui::flush_input
+                sudo mkdir -p /etc/nix
+                printf 'experimental-features = nix-command flakes\n' | sudo tee -a /etc/nix/nix.conf > /dev/null
+                sudo systemctl restart nix-daemon.socket </dev/tty
+                log::ok "Flakes enabled"
+                ;;
+            "Disable flakes")
+                log::break
+                log::info "Disabling flakes"
+                ui::flush_input
+                sudo sed -i '/experimental-features/d' /etc/nix/nix.conf
+                sudo systemctl restart nix-daemon.socket </dev/tty
+                log::ok "Flakes disabled"
                 ;;
             "Remove Nix")
                 log::break
