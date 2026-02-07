@@ -4,9 +4,8 @@
 _MOD_EXTENSIONS_LOADED=1
 
 _EXTENSIONS_LABEL="Configure Extensions"
-_EXTENSIONS_DESC="Install Extension Manager and GNOME Shell extensions."
+_EXTENSIONS_DESC="Manage GNOME Shell extensions."
 
-_EXTENSIONS_MANAGER_PKG="extension-manager"
 _EXTENSIONS_LIST_FILE="${SCRIPT_DIR}/packages/gnome/extensions.txt"
 _EXTENSIONS_API_BASE="https://extensions.gnome.org"
 
@@ -20,18 +19,23 @@ _extensions::read_list() {
     done < "$_EXTENSIONS_LIST_FILE"
 }
 
-_extensions::manager_installed() {
-    dpkg -l "$_EXTENSIONS_MANAGER_PKG" 2>/dev/null | grep -q '^ii'
+# Extension cache (avoids repeated gnome-extensions calls)
+_EXTENSIONS_INSTALLED_CACHE=""
+_EXTENSIONS_ENABLED_CACHE=""
+
+_extensions::refresh() {
+    _EXTENSIONS_INSTALLED_CACHE="$(gnome-extensions list 2>/dev/null || true)"
+    _EXTENSIONS_ENABLED_CACHE="$(gnome-extensions list --enabled 2>/dev/null || true)"
 }
 
 _extensions::is_installed() {
     local uuid="$1"
-    gnome-extensions show "$uuid" &>/dev/null
+    printf '%s\n' "$_EXTENSIONS_INSTALLED_CACHE" | grep -qF "$uuid"
 }
 
 _extensions::is_enabled() {
     local uuid="$1"
-    gnome-extensions list --enabled 2>/dev/null | grep -qF "$uuid"
+    printf '%s\n' "$_EXTENSIONS_ENABLED_CACHE" | grep -qF "$uuid"
 }
 
 _extensions::shell_version() {
@@ -41,8 +45,7 @@ _extensions::shell_version() {
 # ── Checks ──────────────────────────────────────────────
 
 extensions::check() {
-    _extensions::manager_installed || return 1
-
+    _extensions::refresh
     local uuid label
     while IFS='|' read -r uuid label; do
         _extensions::is_enabled "$uuid" || return 1
@@ -54,15 +57,14 @@ extensions::check() {
 extensions::status() {
     local pending=0
 
-    _extensions::manager_installed || pending=$((pending + 1))
-
+    _extensions::refresh
     local uuid label
     while IFS='|' read -r uuid label; do
         _extensions::is_enabled "$uuid" || pending=$((pending + 1))
     done < <(_extensions::read_list)
 
     if [[ $pending -gt 0 ]]; then
-        printf '%s items pending' "$pending"
+        printf '%s extensions pending' "$pending"
     fi
 }
 
@@ -76,51 +78,41 @@ extensions::apply() {
         log::nav "GNOME > Extensions"
         log::break
 
-        log::info "GNOME Shell Extensions"
+        log::info "Shell Extensions"
 
-        if _extensions::manager_installed; then
-            log::ok "Extension Manager: installed"
-        else
-            log::warn "Extension Manager: not installed"
-        fi
-
+        _extensions::refresh
         local uuid label
+        local ext_total=0 ext_enabled=0
         while IFS='|' read -r uuid label; do
-            if _extensions::is_enabled "$uuid"; then
-                log::ok "${label}: enabled"
-            elif _extensions::is_installed "$uuid"; then
-                log::warn "${label}: installed (not enabled)"
-            else
-                log::warn "${label}: not installed"
-            fi
+            ext_total=$((ext_total + 1))
+            _extensions::is_enabled "$uuid" && ext_enabled=$((ext_enabled + 1))
         done < <(_extensions::read_list)
+
+        if [[ $ext_enabled -eq $ext_total ]]; then
+            log::ok "Extensions: ${ext_enabled}/${ext_total} enabled"
+        else
+            log::warn "Extensions: ${ext_enabled}/${ext_total} enabled"
+        fi
 
         log::break
 
         local options=()
-        local all_ok=true
-        extensions::check || all_ok=false
 
-        if ! $all_ok; then
-            options+=("Install All")
+        options+=("Show extensions")
+
+        if [[ $ext_enabled -lt $ext_total ]]; then
+            options+=("Install all pending" "Select extensions to install")
         fi
 
-        local any_enabled=false
-        while IFS='|' read -r uuid label; do
-            if _extensions::is_enabled "$uuid"; then
-                any_enabled=true
-                break
-            fi
-        done < <(_extensions::read_list)
-
-        if $any_enabled; then
-            options+=("Disable All Extensions")
+        if [[ $ext_enabled -gt 0 ]]; then
+            options+=("Disable extensions")
         fi
 
+        options+=("Edit extensions list")
         options+=("Back" "Exit")
 
         choice="$(gum::choose \
-            --header "Select a change to apply:" \
+            --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
             --cursor.foreground "$HEX_BLUE" \
             --item.foreground "$HEX_TEXT" \
@@ -135,41 +127,49 @@ extensions::apply() {
                 ui::clear_content
                 ui::goodbye
                 ;;
-            "Install All")
+            "Show extensions")
                 log::break
-                _extensions::install_all
+                _extensions::ext_show
                 ;;
-            "Disable All Extensions")
+            "Install all pending")
                 log::break
-                _extensions::disable_all
+                _extensions::ext_install_pending
+                ;;
+            "Select extensions to install")
+                log::break
+                _extensions::ext_select_install
+                ;;
+            "Disable extensions")
+                log::break
+                _extensions::ext_select_disable
+                ;;
+            "Edit extensions list")
+                "${EDITOR:-vi}" "$_EXTENSIONS_LIST_FILE" </dev/tty
                 ;;
         esac
     done
 }
 
-# ── Install ─────────────────────────────────────────────
+# ── Show ─────────────────────────────────────────────────
 
-_extensions::install_all() {
-    if ! command -v gnome-extensions &>/dev/null; then
-        log::error "gnome-extensions command not found. Is GNOME Shell installed?"
-        return
-    fi
-
-    # Install Extension Manager via APT if missing
-    if ! _extensions::manager_installed; then
-        log::info "Installing Extension Manager"
-        ui::flush_input
-        if sudo apt-get install -y "$_EXTENSIONS_MANAGER_PKG" </dev/tty; then
-            hash -r
-            log::ok "Extension Manager installed"
+_extensions::ext_show() {
+    local uuid label
+    while IFS='|' read -r uuid label; do
+        if _extensions::is_enabled "$uuid"; then
+            log::ok "${label} (${uuid})"
+        elif _extensions::is_installed "$uuid"; then
+            log::warn "${label} (${uuid}) — installed, not enabled"
         else
-            log::error "Failed to install Extension Manager"
+            log::warn "${label} (${uuid}) — not installed"
         fi
-    else
-        log::ok "Extension Manager: already installed"
-    fi
+    done < <(_extensions::read_list)
 
-    # Get GNOME Shell version
+    ui::return_or_exit
+}
+
+# ── Install pending ──────────────────────────────────────
+
+_extensions::ext_install_pending() {
     local shell_ver
     shell_ver="$(_extensions::shell_version)"
 
@@ -180,27 +180,131 @@ _extensions::install_all() {
 
     log::info "GNOME Shell version: ${shell_ver}"
 
-    # Install and enable each extension
     local uuid label
+    local count=0
+
     while IFS='|' read -r uuid label; do
         if _extensions::is_enabled "$uuid"; then
             log::ok "${label}: already enabled"
             continue
         fi
 
-        if ! _extensions::is_installed "$uuid"; then
+        if ! _extensions::is_installed "$uuid" && ! gnome-extensions show "$uuid" &>/dev/null; then
             _extensions::download_and_install "$uuid" "$label" "$shell_ver"
         fi
 
-        if _extensions::is_installed "$uuid"; then
+        if gnome-extensions show "$uuid" &>/dev/null; then
             gnome-extensions enable "$uuid" 2>/dev/null || true
             log::ok "${label}: enabled"
+            count=$((count + 1))
         fi
     done < <(_extensions::read_list)
 
-    log::break
-    log::info "Newly installed extensions activate after re-login"
+    if [[ $count -gt 0 ]]; then
+        log::break
+        log::ok "${count} extension(s) installed"
+        log::info "Newly installed extensions activate after re-login"
+    fi
 }
+
+# ── Select install ───────────────────────────────────────
+
+_extensions::ext_select_install() {
+    local uuid label
+    local pending_labels=()
+    local -A id_map=()
+
+    while IFS='|' read -r uuid label; do
+        if ! _extensions::is_enabled "$uuid"; then
+            local display="${label} (${uuid})"
+            pending_labels+=("$display")
+            id_map["$display"]="$uuid"
+        fi
+    done < <(_extensions::read_list)
+
+    if [[ ${#pending_labels[@]} -eq 0 ]]; then
+        log::ok "All extensions already enabled"
+        return
+    fi
+
+    local selected
+    selected="$(gum::choose --no-limit \
+        --header "Select extensions to install:" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "${pending_labels[@]}")"
+
+    if [[ -z "$selected" ]]; then
+        return
+    fi
+
+    local shell_ver
+    shell_ver="$(_extensions::shell_version)"
+
+    if [[ -z "$shell_ver" ]]; then
+        log::error "Could not detect GNOME Shell version"
+        return
+    fi
+
+    local display ext_uuid
+    while IFS= read -r display; do
+        ext_uuid="${id_map[$display]}"
+
+        if ! gnome-extensions show "$ext_uuid" &>/dev/null; then
+            _extensions::download_and_install "$ext_uuid" "$display" "$shell_ver"
+        fi
+
+        if gnome-extensions show "$ext_uuid" &>/dev/null; then
+            gnome-extensions enable "$ext_uuid" 2>/dev/null || true
+            log::ok "${display}: enabled"
+        fi
+    done <<< "$selected"
+}
+
+# ── Disable ──────────────────────────────────────────────
+
+_extensions::ext_select_disable() {
+    local uuid label
+    local enabled_labels=()
+    local -A id_map=()
+
+    while IFS='|' read -r uuid label; do
+        if _extensions::is_enabled "$uuid"; then
+            local display="${label} (${uuid})"
+            enabled_labels+=("$display")
+            id_map["$display"]="$uuid"
+        fi
+    done < <(_extensions::read_list)
+
+    if [[ ${#enabled_labels[@]} -eq 0 ]]; then
+        log::ok "No extensions enabled"
+        return
+    fi
+
+    local selected
+    selected="$(gum::choose --no-limit \
+        --header "Select extensions to disable:" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "${enabled_labels[@]}")"
+
+    if [[ -z "$selected" ]]; then
+        return
+    fi
+
+    local display ext_uuid
+    while IFS= read -r display; do
+        ext_uuid="${id_map[$display]}"
+        gnome-extensions disable "$ext_uuid" 2>/dev/null || true
+        log::ok "${display}: disabled"
+    done <<< "$selected"
+}
+
+# ── Download and install (from GNOME extensions API) ─────
 
 _extensions::download_and_install() {
     local uuid="$1" label="$2" shell_ver="$3"
@@ -229,12 +333,12 @@ _extensions::download_and_install() {
     # Download zip
     local tmpfile
     tmpfile="$(mktemp --suffix=.zip)"
+    trap "rm -f '$tmpfile'" RETURN
 
     local url="${_EXTENSIONS_API_BASE}/download-extension/${uuid}.shell-extension.zip?version_tag=${pk}"
 
     if ! curl -fsSL "$url" -o "$tmpfile" 2>/dev/null; then
         log::error "Failed to download ${label}"
-        rm -f "$tmpfile"
         return
     fi
 
@@ -244,20 +348,4 @@ _extensions::download_and_install() {
     else
         log::error "Failed to install ${label}"
     fi
-
-    rm -f "$tmpfile"
-}
-
-# ── Disable ─────────────────────────────────────────────
-
-_extensions::disable_all() {
-    log::info "Disabling managed extensions"
-
-    local uuid label
-    while IFS='|' read -r uuid label; do
-        if _extensions::is_enabled "$uuid"; then
-            gnome-extensions disable "$uuid" 2>/dev/null || true
-            log::ok "${label}: disabled"
-        fi
-    done < <(_extensions::read_list)
 }
