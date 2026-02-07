@@ -18,8 +18,8 @@ ui::clear() {
 }
 
 ui::clear_content() {
-    clear
-    ui::header "$_UI_VERSION"
+    tput cup "$((_UI_CONTENT_ROW - 1))" 0
+    tput ed
 }
 
 ui::header() {
