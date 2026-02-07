@@ -145,7 +145,7 @@ _gnome_icons::install() {
 
     rm -rf "$tmpdir"
 
-    gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark"
+    gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark" || true
     log::ok "Papirus-Dark icon theme applied"
 }
 

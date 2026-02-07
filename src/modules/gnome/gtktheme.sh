@@ -114,12 +114,12 @@ gtktheme::apply() {
                 ;;
             "Enable Dark Mode")
                 log::break
-                gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+                gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
                 log::ok "Dark mode enabled"
                 ;;
             "Disable Dark Mode")
                 log::break
-                gsettings set org.gnome.desktop.interface color-scheme 'default'
+                gsettings set org.gnome.desktop.interface color-scheme 'default' || true
                 log::ok "Dark mode disabled"
                 ;;
             "Install Catppuccin GTK Theme")
@@ -128,7 +128,7 @@ gtktheme::apply() {
                 ;;
             "Apply Catppuccin GTK Theme")
                 log::break
-                gsettings set org.gnome.desktop.interface gtk-theme "$theme_name"
+                gsettings set org.gnome.desktop.interface gtk-theme "$theme_name" || true
                 log::ok "GTK theme applied: ${theme_name}"
                 ;;
             "Remove Catppuccin GTK Theme")
@@ -249,12 +249,12 @@ _gtktheme::install() {
     fi
 
     # Apply theme
-    gsettings set org.gnome.desktop.interface gtk-theme "$theme_name"
+    gsettings set org.gnome.desktop.interface gtk-theme "$theme_name" || true
     log::ok "GTK theme applied: ${theme_name}"
 
     # Enable dark mode if not already
     if ! _gtktheme::dark_mode_enabled; then
-        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
         log::ok "Dark mode enabled"
     fi
 }

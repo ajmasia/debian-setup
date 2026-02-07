@@ -179,39 +179,39 @@ keyboard::apply() {
 _keyboard::apply_all() {
     # Layout
     log::info "Setting layout: English (intl, AltGr dead keys)"
-    gsettings set org.gnome.desktop.input-sources sources "[('xkb', '$_KEYBOARD_LAYOUT')]"
+    gsettings set org.gnome.desktop.input-sources sources "[('xkb', '$_KEYBOARD_LAYOUT')]" || true
     log::ok "Layout configured"
 
     # Fixed workspaces
     log::info "Setting ${_KEYBOARD_NUM_WORKSPACES} fixed workspaces"
-    gsettings set org.gnome.mutter dynamic-workspaces false
-    gsettings set org.gnome.desktop.wm.preferences num-workspaces "$_KEYBOARD_NUM_WORKSPACES"
+    gsettings set org.gnome.mutter dynamic-workspaces false || true
+    gsettings set org.gnome.desktop.wm.preferences num-workspaces "$_KEYBOARD_NUM_WORKSPACES" || true
     log::ok "Workspaces configured"
 
     # Clear conflicting app-switcher bindings (Super+N defaults)
     log::info "Clearing conflicting app-switcher bindings"
     local i
     for i in 1 2 3 4 5 6 7 8 9; do
-        gsettings set org.gnome.shell.keybindings switch-to-application-$i "[]"
+        gsettings set org.gnome.shell.keybindings switch-to-application-$i "[]" || true
     done
     log::ok "App-switcher bindings cleared"
 
     # Close window
     log::info "Setting keybinding: Super+W → Close window"
-    gsettings set org.gnome.desktop.wm.keybindings close "['<Super>w']"
+    gsettings set org.gnome.desktop.wm.keybindings close "['<Super>w']" || true
     log::ok "Close window binding set"
 
     # Switch workspace 1-4
     log::info "Setting keybindings: Super+1..4 → Switch workspace"
     for i in 1 2 3 4; do
-        gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-$i "['<Super>$i']"
+        gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-$i "['<Super>$i']" || true
     done
     log::ok "Switch workspace bindings set"
 
     # Move to workspace 1-4
     log::info "Setting keybindings: Super+Shift+1..4 → Move to workspace"
     for i in 1 2 3 4; do
-        gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-$i "['<Super><Shift>$i']"
+        gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-$i "['<Super><Shift>$i']" || true
     done
     log::ok "Move to workspace bindings set"
 
@@ -222,9 +222,9 @@ _keyboard::apply_all() {
 }
 
 _keyboard::apply_terminal_binding() {
-    dconf write "${_KEYBOARD_CUSTOM_PATH}name" "'Launch Terminal'"
-    dconf write "${_KEYBOARD_CUSTOM_PATH}command" "'$_KEYBOARD_TERMINAL_CMD'"
-    dconf write "${_KEYBOARD_CUSTOM_PATH}binding" "'<Super>Return'"
+    dconf write "${_KEYBOARD_CUSTOM_PATH}name" "'Launch Terminal'" || true
+    dconf write "${_KEYBOARD_CUSTOM_PATH}command" "'$_KEYBOARD_TERMINAL_CMD'" || true
+    dconf write "${_KEYBOARD_CUSTOM_PATH}binding" "'<Super>Return'" || true
 
     # Add to custom keybindings list if not already there
     local current
@@ -233,10 +233,10 @@ _keyboard::apply_terminal_binding() {
     if [[ "$current" != *"debian-setup-terminal"* ]]; then
         local our_path="'${_KEYBOARD_CUSTOM_PATH}'"
         if [[ "$current" == "@as []" || "$current" == "[]" ]]; then
-            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[$our_path]"
+            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[$our_path]" || true
         else
             local new_list="${current%]*}, $our_path]"
-            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_list"
+            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_list" || true
         fi
     fi
 }
@@ -246,20 +246,20 @@ _keyboard::apply_terminal_binding() {
 _keyboard::reset_all() {
     log::info "Resetting keyboard settings to defaults"
 
-    gsettings reset org.gnome.desktop.input-sources sources
-    gsettings reset org.gnome.mutter dynamic-workspaces
-    gsettings reset org.gnome.desktop.wm.preferences num-workspaces
-    gsettings reset org.gnome.desktop.wm.keybindings close
+    gsettings reset org.gnome.desktop.input-sources sources || true
+    gsettings reset org.gnome.mutter dynamic-workspaces || true
+    gsettings reset org.gnome.desktop.wm.preferences num-workspaces || true
+    gsettings reset org.gnome.desktop.wm.keybindings close || true
 
     local i
     for i in 1 2 3 4; do
-        gsettings reset org.gnome.desktop.wm.keybindings switch-to-workspace-$i
-        gsettings reset org.gnome.desktop.wm.keybindings move-to-workspace-$i
+        gsettings reset org.gnome.desktop.wm.keybindings switch-to-workspace-$i || true
+        gsettings reset org.gnome.desktop.wm.keybindings move-to-workspace-$i || true
     done
 
     # Restore app-switcher defaults
     for i in 1 2 3 4 5 6 7 8 9; do
-        gsettings reset org.gnome.shell.keybindings switch-to-application-$i
+        gsettings reset org.gnome.shell.keybindings switch-to-application-$i || true
     done
 
     _keyboard::remove_terminal_binding
@@ -268,7 +268,7 @@ _keyboard::reset_all() {
 }
 
 _keyboard::remove_terminal_binding() {
-    dconf reset -f "$_KEYBOARD_CUSTOM_PATH"
+    dconf reset -f "$_KEYBOARD_CUSTOM_PATH" || true
 
     local current
     current="$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || true)"
@@ -280,6 +280,6 @@ _keyboard::remove_terminal_binding() {
             -e "s|, *${our_path}||" \
             -e "s|${our_path}, *||" \
             -e "s|${our_path}||")"
-        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$cleaned"
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$cleaned" || true
     fi
 }

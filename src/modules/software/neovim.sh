@@ -371,10 +371,15 @@ _neovim::install_deps() {
         log::info "Installing ${missing[*]}"
         log::break
         ui::flush_input
-        sudo apt-get install -y "${missing[@]}" </dev/tty
-        hash -r
-        log::break
-        log::ok "Dependencies installed"
+        if sudo apt-get install -y "${missing[@]}" </dev/tty; then
+            hash -r
+            log::break
+            log::ok "Dependencies installed"
+        else
+            hash -r
+            log::break
+            log::error "Failed to install dependencies"
+        fi
     fi
 }
 

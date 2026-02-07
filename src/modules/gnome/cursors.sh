@@ -93,7 +93,7 @@ gnome_cursors::apply() {
                 ;;
             "Apply Catppuccin Cursors")
                 log::break
-                gsettings set org.gnome.desktop.interface cursor-theme "$cursor_name"
+                gsettings set org.gnome.desktop.interface cursor-theme "$cursor_name" || true
                 log::ok "Cursor theme applied: ${cursor_name}"
                 ;;
             "Remove Catppuccin Cursors")
@@ -147,7 +147,7 @@ _gnome_cursors::install() {
 
     rm -rf "$tmpdir"
 
-    gsettings set org.gnome.desktop.interface cursor-theme "$cursor_name"
+    gsettings set org.gnome.desktop.interface cursor-theme "$cursor_name" || true
     log::ok "Cursors installed and applied: ${cursor_name}"
 }
 
