@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://www.debian.org/logos/openlogo-nd.svg" alt="Debian" width="100">
+</p>
+
 # debian-setup
 
 ![Version](https://img.shields.io/badge/version-0.4.0-blue)
