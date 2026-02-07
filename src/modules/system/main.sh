@@ -15,7 +15,7 @@ _SYSTEM_TASKS=(
 
 system::log_status() {
     local task label desc_var check_fn apply_fn status_fn
-    _log::to_file "info" "System core status"
+    _log::to_file "info" "System essentials status"
     for task in "${_SYSTEM_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
@@ -44,39 +44,14 @@ system::run() {
 
     while true; do
         ui::clear_content
-        log::nav "System core"
+        log::nav "System essentials"
         log::break
 
-        # Show warnings for tasks that need attention
-        local has_warnings=false
-        for task in "${_SYSTEM_TASKS[@]}"; do
-            IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-            if ! "$check_fn"; then
-                has_warnings=true
-                local detail
-                detail="$($status_fn)"
-                log::warn "${label} (${detail})"
-            fi
-        done
-
-        if $has_warnings; then
-            log::break
-        fi
-
-        # Build menu: "Edit X" if configured, "Configure X" if not
+        # Build menu items (strip "Configure " prefix)
         local items=() apply_fns=()
         for task in "${_SYSTEM_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-            local display_label="$label"
-            if "$check_fn" || [[ "$($status_fn)" != *"not "* ]]; then
-                local base="${label#Configure }"
-                if [[ "$base" == *" "* ]]; then
-                    display_label="Edit ${base}"
-                else
-                    display_label="Edit ${base} config"
-                fi
-            fi
-            items+=("$display_label")
+            items+=("${label#Configure }")
             apply_fns+=("$apply_fn")
         done
         items+=("Back" "Exit")
