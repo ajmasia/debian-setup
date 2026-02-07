@@ -12,6 +12,7 @@ _PRODUCTIVITY_TASKS=(
     "${_INKSCAPE_LABEL}|_INKSCAPE_DESC|inkscape::check|inkscape::apply|inkscape::status"
     "${_ONLYOFFICE_LABEL}|_ONLYOFFICE_DESC|onlyoffice::check|onlyoffice::apply|onlyoffice::status"
     "${_LIBREOFFICE_LABEL}|_LIBREOFFICE_DESC|libreoffice::check|libreoffice::apply|libreoffice::status"
+    "${_NEXTCLOUD_LABEL}|_NEXTCLOUD_DESC|nextcloud::check|nextcloud::apply|nextcloud::status"
 )
 
 productivity::check() {
