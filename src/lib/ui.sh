@@ -75,6 +75,7 @@ ui::session_info() {
     date_str="$(date '+%Y-%m-%d %H:%M:%S')"
 
     log_file="$(xdg::log_file)"
+    touch "$log_file"
     _UI_SESSION_LOG_START="$(wc -l < "$log_file")"
 
     log::info "${date_str} - Session started by ${user}@${hostname} running ${os_name}"
