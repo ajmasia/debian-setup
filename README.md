@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.7.0-blue)
+![Version](https://img.shields.io/badge/version-0.8.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -54,6 +54,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
   - **Authenticators** -- Proton Authenticator, Yubico Authenticator (Flatpak)
   - **Hardware Keys** -- YubiKey Manager, Nitrokey App2 (Flatpak)
   - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
+- **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
 
 ### Settings
 - **Health check** -- System info, dependency status, and task overview
