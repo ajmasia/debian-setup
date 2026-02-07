@@ -124,12 +124,17 @@ _mullvad::remove() {
         return
     fi
 
-    if [[ -f "$_MULLVAD_SOURCES" ]]; then
-        sudo rm -f "$_MULLVAD_SOURCES"
-        log::ok "Mullvad repository removed"
-    fi
-    if [[ -f "$_MULLVAD_GPG_KEY" ]]; then
-        sudo rm -f "$_MULLVAD_GPG_KEY"
-        log::ok "Mullvad GPG key removed"
+    # Only clean repo/key if Mullvad VPN is not installed
+    if ! dpkg -l mullvad-vpn 2>/dev/null | grep -q '^ii'; then
+        if [[ -f "$_MULLVAD_SOURCES" ]]; then
+            sudo rm -f "$_MULLVAD_SOURCES"
+            log::ok "Mullvad repository removed"
+        fi
+        if [[ -f "$_MULLVAD_GPG_KEY" ]]; then
+            sudo rm -f "$_MULLVAD_GPG_KEY"
+            log::ok "Mullvad GPG key removed"
+        fi
+    else
+        log::info "Keeping Mullvad repository (Mullvad VPN still installed)"
     fi
 }
