@@ -1,6 +1,6 @@
 # debian-setup
 
-![Version](https://img.shields.io/badge/version-0.3.0-blue)
+![Version](https://img.shields.io/badge/version-0.4.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -16,6 +16,8 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Password feedback** -- Enable/disable asterisks on sudo password prompt
 - **Default editor** -- Configure vim as system editor with `EDITOR`/`SUDO_EDITOR`
 - **Zram swap** -- Install and configure compressed swap in RAM (zstd)
+- **Kernel** -- Switch between stable and backports kernel with safe removal and reboot
+- **Slimbook EVO** -- Install Slimbook repository and EVO/GNOME meta-packages
 
 ### Package managers
 - **APT sources** -- Modernize to DEB822, toggle non-free/backports/deb-src/testing
@@ -80,7 +82,9 @@ debian-setup/
 │   │   │   ├── sudoers.sh
 │   │   │   ├── pwfeedback.sh
 │   │   │   ├── editor.sh
-│   │   │   └── zram.sh
+│   │   │   ├── zram.sh
+│   │   │   ├── kernel.sh
+│   │   │   └── slimbook.sh
 │   │   ├── packages/
 │   │   │   ├── main.sh
 │   │   │   ├── apt.sh
