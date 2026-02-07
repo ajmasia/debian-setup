@@ -43,7 +43,7 @@ ssh_access::apply() {
 
     while true; do
         ui::clear_content
-        log::nav "SSH > Configure SSH access"
+        log::nav "OpenSSH server > Configure SSH access"
         log::break
 
         if ! _ssh_server::installed; then

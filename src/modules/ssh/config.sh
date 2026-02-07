@@ -41,7 +41,7 @@ ssh_config::apply() {
 
     while true; do
         ui::clear_content
-        log::nav "SSH > Configure SSH config"
+        log::nav "OpenSSH server > Configure SSH config"
         log::break
 
         log::info "Current SSH config entries"

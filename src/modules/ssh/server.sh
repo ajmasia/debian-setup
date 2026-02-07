@@ -3,7 +3,7 @@
 [[ -n "${_MOD_SSH_SERVER_LOADED:-}" ]] && return 0
 _MOD_SSH_SERVER_LOADED=1
 
-_SSH_SERVER_LABEL="Configure SSH server"
+_SSH_SERVER_LABEL="Configure OpenSSH server"
 _SSH_SERVER_DESC="Install and manage OpenSSH server service."
 
 _SSH_SSHD_CONFIG="/etc/ssh/sshd_config"
@@ -45,7 +45,7 @@ ssh_server::apply() {
         _ssh_server::running && running=true
 
         ui::clear_content
-        log::nav "SSH > Configure SSH server"
+        log::nav "OpenSSH server > Configure OpenSSH server"
         log::break
 
         log::info "Current SSH server configuration"
