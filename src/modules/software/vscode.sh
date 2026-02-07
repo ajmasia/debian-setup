@@ -22,9 +22,15 @@ _vscode::read_ext_list() {
     grep -v '^\s*#' "$_VSCODE_EXT_LIST" | grep -v '^\s*$' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
 }
 
+_VSCODE_EXT_CACHE=""
+
+_vscode::ext_refresh() {
+    _VSCODE_EXT_CACHE="$(code --list-extensions 2>/dev/null || true)"
+}
+
 _vscode::ext_installed() {
     local ext_id="$1"
-    code --list-extensions 2>/dev/null | grep -qiF "$ext_id"
+    printf '%s\n' "$_VSCODE_EXT_CACHE" | grep -qiF "$ext_id"
 }
 
 # --- Public API ---
@@ -72,7 +78,8 @@ vscode::apply() {
 
         # Show extension summary if code is usable
         if $installed && $session_ready; then
-            local ext_total=0 ext_installed=0 line ext_id ext_label
+            _vscode::ext_refresh
+            local ext_total=0 ext_installed=0 ext_id ext_label
             while IFS='|' read -r ext_id ext_label; do
                 ext_total=$((ext_total + 1))
                 _vscode::ext_installed "$ext_id" && ext_installed=$((ext_installed + 1))
@@ -199,27 +206,31 @@ _vscode::ext_wizard() {
 
         log::info "VS Code Extensions"
 
-        local line ext_id ext_label
-        local all_installed=true has_installed=false
+        _vscode::ext_refresh
+        local ext_id ext_label
+        local ext_total=0 ext_installed_count=0
         while IFS='|' read -r ext_id ext_label; do
-            if _vscode::ext_installed "$ext_id"; then
-                log::ok "${ext_label} (${ext_id})"
-                has_installed=true
-            else
-                log::warn "${ext_label} (${ext_id}) — not installed"
-                all_installed=false
-            fi
+            ext_total=$((ext_total + 1))
+            _vscode::ext_installed "$ext_id" && ext_installed_count=$((ext_installed_count + 1))
         done < <(_vscode::read_ext_list)
+
+        if [[ $ext_installed_count -eq $ext_total ]]; then
+            log::ok "Extensions: ${ext_installed_count}/${ext_total} configured"
+        else
+            log::warn "Extensions: ${ext_installed_count}/${ext_total} configured"
+        fi
 
         log::break
 
         local options=()
 
-        if ! $all_installed; then
+        options+=("Show extensions")
+
+        if [[ $ext_installed_count -lt $ext_total ]]; then
             options+=("Install all pending" "Select extensions to install")
         fi
 
-        if $has_installed; then
+        if [[ $ext_installed_count -gt 0 ]]; then
             options+=("Remove extensions")
         fi
 
@@ -242,6 +253,10 @@ _vscode::ext_wizard() {
                 ui::clear_content
                 ui::goodbye
                 ;;
+            "Show extensions")
+                log::break
+                _vscode::ext_show
+                ;;
             "Install all pending")
                 log::break
                 _vscode::ext_install_pending
@@ -259,6 +274,19 @@ _vscode::ext_wizard() {
                 ;;
         esac
     done
+}
+
+_vscode::ext_show() {
+    local ext_id ext_label
+    while IFS='|' read -r ext_id ext_label; do
+        if _vscode::ext_installed "$ext_id"; then
+            log::ok "${ext_label} (${ext_id})"
+        else
+            log::warn "${ext_label} (${ext_id}) — not installed"
+        fi
+    done < <(_vscode::read_ext_list)
+
+    ui::return_or_exit
 }
 
 _vscode::ext_install_pending() {
