@@ -40,7 +40,7 @@ rust::apply() {
         _rust::session_ready && session_ready=true
 
         ui::clear_content
-        log::nav "Developer tools > Configure Rust"
+        log::nav "Development > Environments > Rust"
         log::break
 
         log::info "Current Rust configuration"

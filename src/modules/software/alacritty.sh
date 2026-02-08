@@ -109,7 +109,7 @@ _alacritty::install() {
 
     if [[ -z "$cargo_bin" ]]; then
         log::error "Rust/cargo is required to build Alacritty"
-        log::warn "Install Rust first via Developer tools"
+        log::warn "Install Rust first via Development > Environments"
         return
     fi
 
