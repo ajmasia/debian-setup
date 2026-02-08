@@ -39,7 +39,3 @@ log::nav() {
 log::break() {
     printf "\n"
 }
-
-log::section_break() {
-    printf "\n\n"
-}
