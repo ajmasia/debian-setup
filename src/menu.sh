@@ -7,7 +7,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System essentials" "Package managers" "OpenSSH server" "Developer tools" "Software" "GNOME" "Settings" "Exit")
+        items=("System Essentials" "Package managers" "OpenSSH server" "Developer tools" "Shell" "Hardware" "Software" "GNOME" "Settings" "Exit")
 
         choice="$(gum::filter \
             --height 12 \
@@ -21,7 +21,7 @@ menu::main() {
             "${items[@]}")"
 
         case "$choice" in
-            "System essentials")
+            "System Essentials")
                 system::run
                 ui::clear_content
                 ;;
@@ -35,6 +35,14 @@ menu::main() {
                 ;;
             "Developer tools")
                 devtools::run
+                ui::clear_content
+                ;;
+            "Shell")
+                shell::run
+                ui::clear_content
+                ;;
+            "Hardware")
+                hardware::run
                 ui::clear_content
                 ;;
             "Software")
