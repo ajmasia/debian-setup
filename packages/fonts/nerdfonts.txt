@@ -1,0 +1,7 @@
+# Nerd Fonts
+# Format: archive_name|label
+NerdFontsSymbolsOnly|Symbols Only
+Noto|Noto
+Hack|Hack
+CascadiaCode|CaskaydiaCove
+FiraCode|FiraCode
