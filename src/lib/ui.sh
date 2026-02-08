@@ -6,6 +6,7 @@ _LIB_UI_LOADED=1
 _UI_CONTENT_ROW=0
 _UI_SESSION_LOG_START=0
 _UI_VERSION=""
+_UI_DIRTY=0
 
 ui::_cursor_row() {
     local row col
@@ -17,22 +18,14 @@ ui::clear() {
     clear
 }
 
-ui::clear_content() {
-    tput cup "$((_UI_CONTENT_ROW - 1))" 0
-    tput ed
-}
-
-ui::header() {
-    local version="$1"
-    _UI_VERSION="$version"
-
+ui::_paint_header() {
     gum::style \
         --foreground "$HEX_MAUVE" \
         --border "rounded" \
         --border-foreground "$HEX_LAVENDER" \
         --padding "0 2" \
         --bold \
-        "debian-setup v${version}"
+        "debian-setup v${_UI_VERSION}"
 
     gum::style \
         --foreground "$HEX_OVERLAY1" \
@@ -43,7 +36,29 @@ ui::header() {
     _UI_CONTENT_ROW="$(ui::_cursor_row)"
 }
 
+ui::clear_content() {
+    if [[ $_UI_DIRTY -eq 1 ]]; then
+        # Terminal likely scrolled past header — full repaint
+        _UI_DIRTY=0
+        tput cup 0 0
+        tput ed
+        log::break
+        ui::_paint_header
+    else
+        # Fast path — header still visible, clear content area only
+        tput cup "$((_UI_CONTENT_ROW - 1))" 0
+        tput ed
+    fi
+}
+
+ui::header() {
+    local version="$1"
+    _UI_VERSION="$version"
+    ui::_paint_header
+}
+
 ui::flush_input() {
+    _UI_DIRTY=1
     sleep 0.5
     stty sane </dev/tty 2>/dev/null || true
     while read -rs -t 0.1 -n 1 </dev/tty 2>/dev/null; do :; done
