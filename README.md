@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.9.0-blue)
+![Version](https://img.shields.io/badge/version-0.9.1-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -45,7 +45,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 ### Software
 - **Utilities** -- CLI utilities (fzf, bat, ripgrep, fd, htop, btop, jq, etc.)
 - **Media** -- Media tools and codecs
-- **Editors** -- VS Code (with extensions management) and Neovim (LazyVim)
+- **Editors** -- VS Code (with extensions management) and Neovim (LazyVim + dependencies wizard)
 - **Terminals** -- Alacritty (build from source), Kitty (user-space installer), Ptyxis (APT)
 - **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium
 - **Security**
@@ -65,7 +65,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
   - **Terminal Profile** -- Catppuccin color profiles for GNOME Terminal
 - **Keyboard** -- English intl layout (AltGr dead keys), 4 fixed workspaces, Super+W close, Super+Return terminal, Super+1-4/Shift+1-4 workspace switching
 - **Terminal CSS** -- VTE terminal padding for GTK3 and GTK4
-- **Extensions** -- Extension Manager (APT), Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes
+- **Extensions** -- Manage GNOME Shell extensions (Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes)
 
 ### Settings
 - **Health check** -- System info, dependency status, and task overview
