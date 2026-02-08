@@ -7,7 +7,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System Essentials" "Package managers" "OpenSSH server" "Developer tools" "Shell" "Hardware" "Software" "GNOME" "Settings" "Exit")
+        items=("System Essentials" "Package managers" "OpenSSH server" "Development" "Shell" "Hardware" "Virtualization" "Software" "GNOME" "Diagnostics" "Exit")
 
         choice="$(gum::filter \
             --height 12 \
@@ -33,8 +33,8 @@ menu::main() {
                 ssh::run
                 ui::clear_content
                 ;;
-            "Developer tools")
-                devtools::run
+            "Development")
+                development::run
                 ui::clear_content
                 ;;
             "Shell")
@@ -45,6 +45,10 @@ menu::main() {
                 hardware::run
                 ui::clear_content
                 ;;
+            "Virtualization")
+                virtualization::run
+                ui::clear_content
+                ;;
             "Software")
                 software::run
                 ui::clear_content
@@ -53,8 +57,8 @@ menu::main() {
                 gnome::run
                 ui::clear_content
                 ;;
-            "Settings")
-                settings::run
+            "Diagnostics")
+                diagnostics::run
                 ui::clear_content
                 ;;
             ""|"Exit")
