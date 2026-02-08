@@ -113,6 +113,10 @@ neovim::apply() {
         fi
 
         if $installed; then
+            options+=("Install dependencies")
+        fi
+
+        if $installed; then
             options+=("Remove Neovim")
         fi
 
@@ -144,6 +148,9 @@ neovim::apply() {
                 ;;
             "Configure LazyVim")
                 _neovim::configure_lazyvim
+                ;;
+            "Install dependencies")
+                _neovim::deps_wizard
                 ;;
             "Remove Neovim")
                 log::break
@@ -272,13 +279,16 @@ _neovim::configure_lazyvim() {
     # Step 3: Install missing APT dependencies
     _neovim::install_deps
 
-    # Step 4: Install lazygit
+    # Step 4: Install npm packages (neovim, tree-sitter-cli)
+    _neovim::install_npm_deps
+
+    # Step 5: Install pynvim
+    _neovim::install_pynvim
+
+    # Step 6: Install lazygit
     _neovim::install_lazygit
 
-    # Step 5: Install tree-sitter-cli
-    _neovim::install_treesitter
-
-    # Step 6: Clone LazyVim starter
+    # Step 7: Clone LazyVim starter
     log::break
     log::info "Cloning LazyVim starter"
 
@@ -290,10 +300,10 @@ _neovim::configure_lazyvim() {
         return
     fi
 
-    # Step 7: Catppuccin colorscheme
+    # Step 8: Catppuccin colorscheme
     _neovim::setup_colorscheme "$config_dir"
 
-    # Step 8: NVIM_APPNAME instructions
+    # Step 9: NVIM_APPNAME instructions
     if [[ "$config_name" != "nvim" ]]; then
         log::break
         log::info "Custom config directory: ${config_name}"
@@ -326,19 +336,181 @@ _neovim::configure_lazyvim() {
     log::ok "LazyVim configuration complete"
 }
 
-# --- Install APT dependencies for LazyVim ---
+# --- Dependencies wizard (standalone) ---
 
-_neovim::install_deps() {
+_neovim::deps_wizard() {
+    ui::clear_content
+    log::nav "Software > Neovim > Dependencies"
     log::break
-    log::info "Checking LazyVim dependencies"
 
-    local deps=("python3-venv" "python3-pip" "luarocks")
+    # --- APT ---
+    log::info "APT packages"
+
+    local apt_deps=("python3-venv" "python3-pip" "luarocks" "luajit" "imagemagick" "sqlite3")
 
     # Auto-detect clipboard tool
     if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
-        if ! apt::is_installed "wl-clipboard"; then
-            deps+=("wl-clipboard")
+        apt_deps+=("wl-clipboard")
+    fi
+
+    local apt_missing=()
+    local dep
+    for dep in "${apt_deps[@]}"; do
+        if apt::is_installed "$dep"; then
+            log::ok "$dep"
+        else
+            log::warn "${dep} (not installed)"
+            apt_missing+=("$dep")
         fi
+    done
+
+    # --- npm ---
+    log::break
+    log::info "npm packages"
+
+    local npm_deps=("neovim" "tree-sitter-cli")
+    local npm_missing=()
+
+    if command -v npm &>/dev/null; then
+        local npm_global_list
+        npm_global_list="$(npm list -g --depth=0 2>/dev/null || true)"
+        for dep in "${npm_deps[@]}"; do
+            if printf '%s' "$npm_global_list" | grep -qF "$dep"; then
+                log::ok "$dep"
+            else
+                log::warn "${dep} (not installed)"
+                npm_missing+=("$dep")
+            fi
+        done
+    else
+        for dep in "${npm_deps[@]}"; do
+            log::warn "${dep} (npm not available)"
+        done
+    fi
+
+    # --- pip ---
+    log::break
+    log::info "Python packages"
+
+    local pip_deps=("pynvim")
+    local pip_missing=()
+
+    if command -v python3 &>/dev/null; then
+        for dep in "${pip_deps[@]}"; do
+            if python3 -c "import ${dep}" 2>/dev/null; then
+                log::ok "$dep"
+            else
+                log::warn "${dep} (not installed)"
+                pip_missing+=("$dep")
+            fi
+        done
+    else
+        for dep in "${pip_deps[@]}"; do
+            log::warn "${dep} (python3 not available)"
+        done
+    fi
+
+    # --- lazygit ---
+    log::break
+    log::info "External tools"
+
+    local lazygit_missing=false
+    if command -v lazygit &>/dev/null; then
+        log::ok "lazygit"
+    else
+        log::warn "lazygit (not installed)"
+        lazygit_missing=true
+    fi
+
+    # --- Summary ---
+    local total_missing=${#apt_missing[@]}
+    total_missing=$((total_missing + ${#npm_missing[@]} + ${#pip_missing[@]}))
+    $lazygit_missing && total_missing=$((total_missing + 1))
+
+    if [[ $total_missing -eq 0 ]]; then
+        log::break
+        log::ok "All dependencies installed"
+        log::break
+        gum::choose \
+            --header "Press enter to go back" \
+            --header.foreground "$HEX_LAVENDER" \
+            --cursor.foreground "$HEX_BLUE" \
+            --item.foreground "$HEX_TEXT" \
+            --selected.foreground "$HEX_GREEN" \
+            "OK" > /dev/null
+        return
+    fi
+
+    log::break
+
+    local install
+    install="$(gum::choose \
+        --header "${total_missing} missing dependencies. Install all?" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "Yes" "No")"
+
+    if [[ "$install" != "Yes" ]]; then
+        return
+    fi
+
+    # Install APT
+    if [[ ${#apt_missing[@]} -gt 0 ]]; then
+        log::break
+        log::info "Installing APT packages: ${apt_missing[*]}"
+        ui::flush_input
+        if sudo apt-get install -y "${apt_missing[@]}" </dev/tty; then
+            hash -r
+            log::ok "APT packages installed"
+        else
+            hash -r
+            log::error "Failed to install APT packages"
+        fi
+    fi
+
+    # Install npm
+    if [[ ${#npm_missing[@]} -gt 0 ]] && command -v npm &>/dev/null; then
+        log::break
+        log::info "Installing npm packages: ${npm_missing[*]}"
+        if npm install -g "${npm_missing[@]}" 2>/dev/null; then
+            hash -r
+            log::ok "npm packages installed"
+        else
+            log::error "Failed to install npm packages"
+        fi
+    fi
+
+    # Install pip
+    if [[ ${#pip_missing[@]} -gt 0 ]] && command -v python3 &>/dev/null; then
+        log::break
+        log::info "Installing Python packages: ${pip_missing[*]}"
+        if python3 -m pip install --user --break-system-packages "${pip_missing[@]}" 2>/dev/null; then
+            hash -r
+            log::ok "Python packages installed"
+        else
+            log::error "Failed to install Python packages"
+        fi
+    fi
+
+    # Install lazygit
+    if $lazygit_missing; then
+        _neovim::install_lazygit
+    fi
+}
+
+# --- Install APT dependencies (called during Configure LazyVim) ---
+
+_neovim::install_deps() {
+    log::break
+    log::info "Checking LazyVim APT dependencies"
+
+    local deps=("python3-venv" "python3-pip" "luarocks" "luajit" "imagemagick" "sqlite3")
+
+    # Auto-detect clipboard tool
+    if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
+        deps+=("wl-clipboard")
     fi
 
     local missing=()
@@ -353,14 +525,14 @@ _neovim::install_deps() {
     done
 
     if [[ ${#missing[@]} -eq 0 ]]; then
-        log::ok "All dependencies installed"
+        log::ok "All APT dependencies installed"
         return
     fi
 
     log::break
     local install
     install="$(gum::choose \
-        --header "Install ${#missing[@]} missing dependencies?" \
+        --header "Install ${#missing[@]} missing APT dependencies?" \
         --header.foreground "$HEX_LAVENDER" \
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
@@ -374,11 +546,11 @@ _neovim::install_deps() {
         if sudo apt-get install -y "${missing[@]}" </dev/tty; then
             hash -r
             log::break
-            log::ok "Dependencies installed"
+            log::ok "APT dependencies installed"
         else
             hash -r
             log::break
-            log::error "Failed to install dependencies"
+            log::error "Failed to install APT dependencies"
         fi
     fi
 }
@@ -456,21 +628,34 @@ _neovim::install_lazygit() {
     log::ok "lazygit ${version} installed"
 }
 
-# --- Install tree-sitter-cli ---
+# --- Install npm dependencies ---
 
-_neovim::install_treesitter() {
-    if command -v tree-sitter &>/dev/null; then
+_neovim::install_npm_deps() {
+    if ! command -v npm &>/dev/null; then
         return
     fi
 
-    if ! command -v npm &>/dev/null; then
+    local npm_global_list
+    npm_global_list="$(npm list -g --depth=0 2>/dev/null || true)"
+
+    local npm_deps=("neovim" "tree-sitter-cli")
+    local missing=()
+    local dep
+
+    for dep in "${npm_deps[@]}"; do
+        if ! printf '%s' "$npm_global_list" | grep -qF "$dep"; then
+            missing+=("$dep")
+        fi
+    done
+
+    if [[ ${#missing[@]} -eq 0 ]]; then
         return
     fi
 
     log::break
     local install
     install="$(gum::choose \
-        --header "Install tree-sitter-cli via npm (recommended)?" \
+        --header "Install npm packages: ${missing[*]}?" \
         --header.foreground "$HEX_LAVENDER" \
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
@@ -478,12 +663,43 @@ _neovim::install_treesitter() {
         "Yes" "No")"
 
     if [[ "$install" == "Yes" ]]; then
-        log::info "Installing tree-sitter-cli"
-        if npm install -g tree-sitter-cli 2>/dev/null; then
+        log::info "Installing ${missing[*]}"
+        if npm install -g "${missing[@]}" 2>/dev/null; then
             hash -r
-            log::ok "tree-sitter-cli installed"
+            log::ok "npm packages installed"
         else
-            log::error "Failed to install tree-sitter-cli"
+            log::error "Failed to install npm packages"
+        fi
+    fi
+}
+
+# --- Install pynvim ---
+
+_neovim::install_pynvim() {
+    if ! command -v python3 &>/dev/null; then
+        return
+    fi
+
+    if python3 -c "import pynvim" 2>/dev/null; then
+        return
+    fi
+
+    log::break
+    local install
+    install="$(gum::choose \
+        --header "Install pynvim (Python Neovim client)?" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "Yes" "No")"
+
+    if [[ "$install" == "Yes" ]]; then
+        log::info "Installing pynvim"
+        if python3 -m pip install --user --break-system-packages pynvim 2>/dev/null; then
+            log::ok "pynvim installed"
+        else
+            log::error "Failed to install pynvim"
         fi
     fi
 }
