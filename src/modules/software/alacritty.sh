@@ -217,12 +217,18 @@ _alacritty::check_deps() {
     log::info "Installing ${missing[*]}"
     log::break
     ui::flush_input
-    sudo apt-get install -y "${missing[@]}" </dev/tty
-    hash -r
-    log::break
-    log::ok "Build dependencies installed"
-    log::break
-    return 0
+    if sudo apt-get install -y "${missing[@]}" </dev/tty; then
+        hash -r
+        log::break
+        log::ok "Build dependencies installed"
+        log::break
+        return 0
+    else
+        hash -r
+        log::break
+        log::error "Failed to install build dependencies"
+        return 1
+    fi
 }
 
 _alacritty::desktop_integration() {

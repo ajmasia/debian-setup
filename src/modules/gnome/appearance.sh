@@ -9,8 +9,8 @@ _APPEARANCE_DESC="Install Catppuccin Mocha theme, icons, cursors and terminal pr
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _APPEARANCE_TASKS=(
     "${_GTKTHEME_LABEL}|_GTKTHEME_DESC|gtktheme::check|gtktheme::apply|gtktheme::status"
-    "${_GNOME_ICONS_LABEL}|_GNOME_ICONS_DESC|gnome_icons::check|gnome_icons::apply|gnome_icons::status"
-    "${_GNOME_CURSORS_LABEL}|_GNOME_CURSORS_DESC|gnome_cursors::check|gnome_cursors::apply|gnome_cursors::status"
+    "${_ICONS_LABEL}|_ICONS_DESC|icons::check|icons::apply|icons::status"
+    "${_CURSORS_LABEL}|_CURSORS_DESC|cursors::check|cursors::apply|cursors::status"
     "${_TERMPROFILE_LABEL}|_TERMPROFILE_DESC|termprofile::check|termprofile::apply|termprofile::status"
 )
 
@@ -54,15 +54,12 @@ appearance::run() {
         done
         items+=("Back" "Exit")
 
-        choice="$(gum::filter \
-            --height 12 \
+        choice="$(gum::choose \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
-            --indicator.foreground "$HEX_BLUE" \
-            --text.foreground "$HEX_TEXT" \
-            --cursor-text.foreground "$HEX_GREEN" \
-            --match.foreground "$HEX_MAUVE" \
-            --placeholder "Type to filter..." \
+            --cursor.foreground "$HEX_BLUE" \
+            --item.foreground "$HEX_TEXT" \
+            --selected.foreground "$HEX_GREEN" \
             "${items[@]}")"
 
         case "$choice" in

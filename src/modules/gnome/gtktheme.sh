@@ -114,12 +114,12 @@ gtktheme::apply() {
                 ;;
             "Enable Dark Mode")
                 log::break
-                gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+                gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
                 log::ok "Dark mode enabled"
                 ;;
             "Disable Dark Mode")
                 log::break
-                gsettings set org.gnome.desktop.interface color-scheme 'default'
+                gsettings set org.gnome.desktop.interface color-scheme 'default' || true
                 log::ok "Dark mode disabled"
                 ;;
             "Install Catppuccin GTK Theme")
@@ -128,7 +128,7 @@ gtktheme::apply() {
                 ;;
             "Apply Catppuccin GTK Theme")
                 log::break
-                gsettings set org.gnome.desktop.interface gtk-theme "$theme_name"
+                gsettings set org.gnome.desktop.interface gtk-theme "$theme_name" || true
                 log::ok "GTK theme applied: ${theme_name}"
                 ;;
             "Remove Catppuccin GTK Theme")
@@ -223,24 +223,38 @@ _gtktheme::install() {
         return
     fi
 
-    # Setup GTK4/libadwaita symlinks
+    # Setup GTK4/libadwaita (assets+dark as symlinks, gtk.css as copy for termcss compat)
     local theme_path="$_GTKTHEME_THEMES_DIR/$theme_name"
     if [[ -d "$theme_path/gtk-4.0" ]]; then
-        log::info "Setting up GTK4/libadwaita symlinks"
+        log::info "Setting up GTK4/libadwaita"
         mkdir -p "$_GTKTHEME_GTK4_DIR"
         ln -sf "$theme_path/gtk-4.0/assets" "$_GTKTHEME_GTK4_DIR/assets"
-        ln -sf "$theme_path/gtk-4.0/gtk.css" "$_GTKTHEME_GTK4_DIR/gtk.css"
         ln -sf "$theme_path/gtk-4.0/gtk-dark.css" "$_GTKTHEME_GTK4_DIR/gtk-dark.css"
-        log::ok "GTK4 symlinks created"
+
+        # Preserve terminal CSS snippet if present in existing gtk.css
+        local termcss_snippet=""
+        if [[ -f "$_GTKTHEME_GTK4_DIR/gtk.css" ]] || [[ -L "$_GTKTHEME_GTK4_DIR/gtk.css" ]]; then
+            termcss_snippet="$(sed -n '/debian-setup: vte padding/,/^}/p' "$_GTKTHEME_GTK4_DIR/gtk.css" 2>/dev/null || true)"
+            rm -f "$_GTKTHEME_GTK4_DIR/gtk.css"
+        fi
+
+        cp "$theme_path/gtk-4.0/gtk.css" "$_GTKTHEME_GTK4_DIR/gtk.css"
+
+        # Re-append terminal CSS if it was present
+        if [[ -n "$termcss_snippet" ]]; then
+            printf '\n%s\n' "$termcss_snippet" >> "$_GTKTHEME_GTK4_DIR/gtk.css"
+        fi
+
+        log::ok "GTK4 theme applied"
     fi
 
     # Apply theme
-    gsettings set org.gnome.desktop.interface gtk-theme "$theme_name"
+    gsettings set org.gnome.desktop.interface gtk-theme "$theme_name" || true
     log::ok "GTK theme applied: ${theme_name}"
 
     # Enable dark mode if not already
     if ! _gtktheme::dark_mode_enabled; then
-        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
         log::ok "Dark mode enabled"
     fi
 }
@@ -256,10 +270,10 @@ _gtktheme::remove() {
         log::ok "Theme files removed"
     fi
 
-    # Remove GTK4 symlinks
-    if [[ -L "$_GTKTHEME_GTK4_DIR/gtk.css" ]]; then
+    # Remove GTK4 files
+    if [[ -L "$_GTKTHEME_GTK4_DIR/assets" ]]; then
         rm -f "$_GTKTHEME_GTK4_DIR/assets" "$_GTKTHEME_GTK4_DIR/gtk.css" "$_GTKTHEME_GTK4_DIR/gtk-dark.css"
-        log::ok "GTK4 symlinks removed"
+        log::ok "GTK4 theme files removed"
     fi
 
     # Reset to default theme

@@ -54,15 +54,12 @@ messaging::run() {
         done
         items+=("Back" "Exit")
 
-        choice="$(gum::filter \
-            --height 12 \
+        choice="$(gum::choose \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
-            --indicator.foreground "$HEX_BLUE" \
-            --text.foreground "$HEX_TEXT" \
-            --cursor-text.foreground "$HEX_GREEN" \
-            --match.foreground "$HEX_MAUVE" \
-            --placeholder "Type to filter..." \
+            --cursor.foreground "$HEX_BLUE" \
+            --item.foreground "$HEX_TEXT" \
+            --selected.foreground "$HEX_GREEN" \
             "${items[@]}")"
 
         case "$choice" in

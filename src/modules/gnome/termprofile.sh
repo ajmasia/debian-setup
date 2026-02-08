@@ -15,13 +15,13 @@ _termprofile::is_installed() {
     [[ "$profiles" == *":"* ]] || return 1
     # Check if any profile has catppuccin in its name
     local profile_id
-    for profile_id in $(dconf list /org/gnome/terminal/legacy/profiles:/ 2>/dev/null | grep '^:'); do
+    while IFS= read -r profile_id; do
         local name
         name="$(dconf read "/org/gnome/terminal/legacy/profiles:/${profile_id}visible-name" 2>/dev/null || true)"
         if [[ "${name,,}" == *"catppuccin"* ]]; then
             return 0
         fi
-    done
+    done < <(dconf list /org/gnome/terminal/legacy/profiles:/ 2>/dev/null | grep '^:')
     return 1
 }
 

@@ -67,12 +67,7 @@ apt::list_status() {
 # --- .deb package functions (name|url format) ---
 
 apt::read_deb_list() {
-    local file="$1"
-    if [[ ! -f "$file" ]]; then
-        log::error "Package list not found: ${file}"
-        return 1
-    fi
-    grep -v '^\s*#' "$file" | grep -v '^\s*$' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+    apt::read_list "$1"
 }
 
 apt::deb_pending() {
@@ -100,15 +95,14 @@ apt::deb_install() {
     log::info "Installing ${name}..."
     log::break
     ui::flush_input
-    sudo apt-get install -y "$tmpfile" </dev/tty
-    local rc=$?
-    rm -f "$tmpfile"
-    hash -r
-
-    if [[ $rc -eq 0 ]]; then
+    if sudo apt-get install -y "$tmpfile" </dev/tty; then
+        rm -f "$tmpfile"
+        hash -r
         log::break
         log::ok "${name} installed"
     else
+        rm -f "$tmpfile"
+        hash -r
         log::break
         log::error "Failed to install ${name}"
         return 1
@@ -320,6 +314,7 @@ apt::deb_wizard() {
             options+=("Remove packages")
         fi
 
+        options+=("Edit packages list")
         options+=("Back" "Exit")
 
         choice="$(gum::choose \
@@ -396,6 +391,9 @@ apt::deb_wizard() {
                     log::break
                     log::ok "Packages removed"
                 fi
+                ;;
+            "Edit packages list")
+                "${EDITOR:-vi}" "$file" </dev/tty
                 ;;
         esac
     done

@@ -182,7 +182,10 @@ apt::apply() {
                 log::break
                 log::info "Modernizing sources to DEB822 format"
                 ui::flush_input
-                sudo apt modernize-sources </dev/tty
+                if ! sudo apt modernize-sources </dev/tty; then
+                    log::error "Failed to modernize sources"
+                    break
+                fi
                 log::ok "Sources modernized to DEB822"
                 is_modern=true
                 # Rewrite to consolidate and add Signed-By
@@ -288,7 +291,10 @@ Signed-By: ${_APT_KEYRING}"
 
     log::info "Writing DEB822 sources"
     ui::flush_input
-    printf '%s\n' "$content" | sudo tee /etc/apt/sources.list.d/debian.sources > /dev/null
+    if ! printf '%s\n' "$content" | sudo tee /etc/apt/sources.list.d/debian.sources > /dev/null; then
+        log::error "Failed to write DEB822 sources"
+        return
+    fi
 
     # Remove separate backports file if exists (consolidated into debian.sources)
     if [[ -f /etc/apt/sources.list.d/debian-backports.sources ]]; then
@@ -344,6 +350,9 @@ deb-src http://deb.debian.org/debian ${codename}-backports ${components}"
 
     log::info "Writing classic sources"
     ui::flush_input
-    printf '%s\n' "$content" | sudo tee /etc/apt/sources.list > /dev/null
+    if ! printf '%s\n' "$content" | sudo tee /etc/apt/sources.list > /dev/null; then
+        log::error "Failed to write classic sources"
+        return
+    fi
     log::ok "Classic sources updated"
 }

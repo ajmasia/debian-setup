@@ -24,7 +24,15 @@ gum::_install() {
     log::break
 
     sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+    local tmpkey
+    tmpkey="$(mktemp)"
+    if ! curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o "$tmpkey" 2>/dev/null; then
+        rm -f "$tmpkey"
+        log::error "Failed to download GPG key"
+        exit 1
+    fi
+    sudo mv "$tmpkey" /etc/apt/keyrings/charm.gpg
+    sudo chmod 644 /etc/apt/keyrings/charm.gpg
     echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list > /dev/null
     sudo apt-get update -qq
     sudo apt-get install -y gum

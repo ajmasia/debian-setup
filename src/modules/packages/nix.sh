@@ -156,7 +156,7 @@ nix::apply() {
                 log::break
                 log::info "Enabling flakes and nix-command"
                 ui::flush_input
-                sudo mkdir -p /etc/nix
+                sudo mkdir -p /etc/nix </dev/tty
                 printf 'experimental-features = nix-command flakes\n' | sudo tee -a /etc/nix/nix.conf > /dev/null
                 if sudo systemctl restart nix-daemon.service </dev/tty; then
                     log::ok "Flakes enabled"
@@ -169,7 +169,7 @@ nix::apply() {
                 log::break
                 log::info "Disabling flakes"
                 ui::flush_input
-                sudo sed -i '/experimental-features/d' /etc/nix/nix.conf
+                sudo sed -i '/experimental-features/d' /etc/nix/nix.conf </dev/tty
                 if sudo systemctl restart nix-daemon.service </dev/tty; then
                     log::ok "Flakes disabled"
                 else
@@ -203,7 +203,7 @@ _nix::_remove() {
     # Remove files and directories
     log::info "Removing Nix files"
     sudo rm -rf /nix /etc/nix /etc/profile.d/nix.sh /etc/tmpfiles.d/nix-daemon.conf \
-        ~root/.nix-channels ~root/.nix-defexpr ~root/.nix-profile ~root/.cache/nix
+        /root/.nix-channels /root/.nix-defexpr /root/.nix-profile /root/.cache/nix
     rm -rf "$HOME/.nix-channels" "$HOME/.nix-defexpr" "$HOME/.nix-profile" "$HOME/.cache/nix"
     log::ok "Nix files removed"
 
