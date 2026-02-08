@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.3] - 2026-02-08
+
+### Added
+
+- **Fonts sub-module** under Software -- Nerd Fonts management with individual install/remove
+  - Noto, Symbols Only, Hack, CaskaydiaCove, FiraCode
+  - Downloads from GitHub releases as `.tar.xz`, installs to `~/.local/share/fonts/`
+  - Wizard pattern with show, install all, select install, remove, edit list
+
 ## [0.10.2] - 2026-02-08
 
 ### Fixed

@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.10.2-blue)
+![Version](https://img.shields.io/badge/version-0.10.3-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -84,6 +84,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
   - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
 - **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
 - **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak + Nautilus plugin)
+- **Fonts** -- Nerd Fonts (Noto, Symbols Only, Hack, CaskaydiaCove, FiraCode) from GitHub releases
 
 ### GNOME
 - **Appearance**
@@ -166,7 +167,7 @@ debian-setup/
 │   │   ├── virtualization/         # QEMU/KVM
 │   │   │   ├── ...
 │   │   ├── software/               # Utilities, Media, Editors, Terminals,
-│   │   │   ├── ...                 # Browsers, Security, Messaging, Productivity
+│   │   │   ├── ...                 # Browsers, Security, Messaging, Productivity, Fonts
 │   │   ├── gnome/                  # Appearance, Keyboard, Terminal CSS, Extensions
 │   │   │   ├── ...
 │   │   └── diagnostics/            # Health check, Logs
@@ -176,6 +177,8 @@ debian-setup/
 │   ├── apt/                        # Package lists (build, utils, media, openpgp)
 │   ├── gnome/
 │   │   └── extensions.txt          # GNOME Shell extensions (uuid|label)
+│   ├── fonts/
+│   │   └── nerdfonts.txt           # Nerd Fonts (archive_name|label)
 │   └── vscode/
 │       └── extensions.txt          # VS Code extensions (id|label)
 ```
