@@ -314,6 +314,7 @@ apt::deb_wizard() {
             options+=("Remove packages")
         fi
 
+        options+=("Edit packages list")
         options+=("Back" "Exit")
 
         choice="$(gum::choose \
@@ -390,6 +391,9 @@ apt::deb_wizard() {
                     log::break
                     log::ok "Packages removed"
                 fi
+                ;;
+            "Edit packages list")
+                "${EDITOR:-vi}" "$file" </dev/tty
                 ;;
         esac
     done
