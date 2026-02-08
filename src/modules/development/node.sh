@@ -40,7 +40,7 @@ node::apply() {
         _node::session_ready && session_ready=true
 
         ui::clear_content
-        log::nav "Developer tools > Configure Node.js"
+        log::nav "Development > Environments > Node.js"
         log::break
 
         log::info "Current Node.js configuration"

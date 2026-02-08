@@ -59,7 +59,7 @@ go::apply() {
         method="$(_go::install_method)"
 
         ui::clear_content
-        log::nav "Developer tools > Configure Go"
+        log::nav "Development > Environments > Go"
         log::break
 
         log::info "Current Go configuration"

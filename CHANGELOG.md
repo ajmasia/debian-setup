@@ -1,0 +1,171 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [0.10.0] - 2026-02-08
+
+### Added
+
+- **Development module** -- restructured from "Developer tools" into three subcategories:
+  - **Environments** -- Node.js, Python, Rust, Go
+  - **Tools** -- Build Essentials, GitHub CLI, AWS CLI, Docker, HTTPie, MongoDB Compass
+  - **AI** -- Claude Code, OpenCode, GitHub Copilot CLI, AI Resources
+- **Virtualization module** -- QEMU/KVM with virt-manager, user groups, libvirtd service, and default network management
+- **Hardware module** -- top-level module for hardware-specific tasks (Slimbook EVO)
+- Inotify watchers module with RAM detection, multiple instances support, and custom input
+- Docker module with post-install group management and three-state detection (not in group / restart needed / active)
+- yq added to CLI utilities package list
+
+### Changed
+
+- Settings renamed to **Diagnostics**
+- Slimbook EVO moved from System to Hardware module
+- Main menu now shows: System Essentials, Package Managers, OpenSSH Server, Development, Shell, Hardware, Virtualization, Software, GNOME, Diagnostics
+
+### Fixed
+
+- Persistent header recovery after terminal scroll (dirty flag approach)
+- Docker installer no longer blocks on sudo (removed pipe + `</dev/tty` conflict)
+
+## [0.9.1] - 2026-02-08
+
+### Added
+
+- Standalone dependencies wizard for Neovim module
+- CLAUDE.md with project conventions and architecture documentation
+
+### Changed
+
+- GNOME extensions module rewritten with VS Code wizard pattern
+- Normalized gum::choose for menus with fewer than 5 items
+- Deduplicated apt::read_deb_list by delegating to apt::read_list
+- Renamed gnome_icons/gnome_cursors to icons/cursors namespace
+
+### Fixed
+
+- Critical bugs found in code review (multiple fixes)
+- Protected gsettings/dconf commands and sudo apt-get against set -e
+- Missing `</dev/tty` on first sudo after ui::flush_input in Nix module
+- Guarded apt modernize-sources against failure with set -e
+- Validated user input in SSH config to prevent sed/grep injection
+- Replaced wget with curl in Element GPG key download
+- Escaped dots in shell version for regex in extensions API parsing
+- Used while-read instead of for loop on command substitution
+- Used absolute /root path instead of ~root tilde in Nix removal
+- Separated zram enable and restart into independent operations
+- Used trap RETURN for tmpfile cleanup in Slimbook repo setup
+- Added error handling to pipe+tee APT sources write operations
+- Added missing "Edit packages list" option to apt::deb_wizard
+- Removed unused log::section_break function
+
+## [0.9.0] - 2026-02-07
+
+### Added
+
+- **GNOME module** with four sub-modules:
+  - **Appearance** -- GTK theme (Catppuccin Mocha with accent colors), icons (Papirus), cursors (Catppuccin), terminal profile
+  - **Keyboard** -- English intl layout, 4 fixed workspaces, custom keybindings
+  - **Terminal CSS** -- VTE terminal padding for GTK3 and GTK4
+  - **Extensions** -- Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes
+- Nextcloud Desktop with Nautilus integration added to Productivity
+
+## [0.8.1] - 2026-02-07
+
+### Added
+
+- **Productivity sub-module** -- GIMP, Inkscape, OnlyOffice (Flatpak), LibreOffice (APT)
+
+## [0.8.0] - 2026-02-07
+
+### Added
+
+- **Messaging sub-module** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
+
+## [0.7.0] - 2026-02-07
+
+### Added
+
+- **Security sub-module** with five categories:
+  - **VPN** -- Mullvad VPN, Proton VPN
+  - **Password Managers** -- Proton Pass, Proton Pass CLI, KeePassXC, Bitwarden CLI
+  - **Authenticators** -- Proton Authenticator, Yubico Authenticator
+  - **Hardware Keys** -- YubiKey Manager, Nitrokey App2
+  - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
+- gum::filter wrapper for filterable menu lists
+
+### Fixed
+
+- Preserved Mullvad repo when VPN is still installed on browser removal
+
+## [0.6.2] - 2026-02-07
+
+### Fixed
+
+- Added Developer tools and Software to health check
+
+## [0.6.0] - 2026-02-07
+
+### Added
+
+- **Browsers sub-module** -- Brave, LibreWolf, Mullvad Browser, Chromium
+
+### Changed
+
+- Renamed System core to System essentials
+- Title Case for all menu labels
+- Compact package list display in APT wizards
+- Cached VS Code extensions list with compact display
+- Removed status checks from module menus for faster navigation
+
+### Fixed
+
+- Nix flakes daemon restart and cleanup on remove
+- Restored tput-based content clearing
+
+## [0.5.0] - 2026-02-07
+
+### Added
+
+- **Developer tools module** -- Build essentials, Node.js (fnm), Python (uv), Rust (rustup), Go
+- **Software module** with four sub-modules:
+  - **Utilities** -- CLI utilities (fzf, bat, ripgrep, fd, htop, btop, jq, etc.)
+  - **Media** -- Media tools and codecs
+  - **Editors** -- VS Code (with extensions management), Neovim
+  - **Terminals** -- Alacritty (build from source), Kitty (user-space installer), Ptyxis (APT)
+- APT package list library for declarative package management
+- Kernel management task (stable/backports switch with safe removal)
+- Slimbook EVO setup task
+- Nix flakes toggle
+- GNOME Software Flatpak plugin
+
+### Changed
+
+- Renamed SSH to OpenSSH server in main menu
+
+## [0.3.0] - 2026-02-07
+
+### Added
+
+- **SSH module** with five tasks:
+  - SSH server configuration
+  - SSH access mode (pubkey-only, pubkey+password, password-only)
+  - SSH key generation (ED25519 with suffix support)
+  - SSH config management (GitHub, GitLab, custom servers)
+  - Git commit signing with SSH keys
+- Ctrl+C handling in gum wrappers (SIGINT propagation)
+
+## [0.2.0] - 2026-02-06
+
+### Added
+
+- Initial release with core infrastructure:
+  - Catppuccin Mocha color palette
+  - XDG-compliant logging system
+  - Gum dependency check and wrappers
+  - Persistent UI header with version display
+  - Health check module
+  - Session log management
+- **System module** -- Sudoers, password feedback, default editor, zram swap
+- **Package managers** -- APT sources (DEB822), Flatpak, Nix
+- Interactive wizard pattern with dynamic menu options
+- Escape key as Back navigation in all menus

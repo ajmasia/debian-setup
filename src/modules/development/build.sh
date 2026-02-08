@@ -12,6 +12,6 @@ build::check() { apt::list_check "$_BUILD_LIST"; }
 build::status() { apt::list_status "$_BUILD_LIST"; }
 
 build::apply() {
-    apt::list_wizard "Developer tools > Configure Build essentials" \
+    apt::list_wizard "Development > Tools > Build Essentials" \
         "Build essentials packages" "$_BUILD_LIST"
 }

@@ -1,69 +1,65 @@
-# Developer tools module
+# AI sub-module
 
-[[ -n "${_MOD_DEVTOOLS_LOADED:-}" ]] && return 0
-_MOD_DEVTOOLS_LOADED=1
+[[ -n "${_MOD_AI_LOADED:-}" ]] && return 0
+_MOD_AI_LOADED=1
+
+_AI_LABEL="Configure AI"
+_AI_DESC="Install and configure AI tools."
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
-_DEVTOOLS_TASKS=(
-    "${_BUILD_LABEL}|_BUILD_DESC|build::check|build::apply|build::status"
-    "${_NODE_LABEL}|_NODE_DESC|node::check|node::apply|node::status"
-    "${_PYTHON_LABEL}|_PYTHON_DESC|python::check|python::apply|python::status"
-    "${_RUST_LABEL}|_RUST_DESC|rust::check|rust::apply|rust::status"
-    "${_GO_LABEL}|_GO_DESC|go::check|go::apply|go::status"
+_AI_TASKS=(
+    "${_CLAUDECODE_LABEL}|_CLAUDECODE_DESC|claudecode::check|claudecode::apply|claudecode::status"
+    "${_OPENCODE_LABEL}|_OPENCODE_DESC|opencode::check|opencode::apply|opencode::status"
+    "${_COPILOT_LABEL}|_COPILOT_DESC|copilot::check|copilot::apply|copilot::status"
+    "${_AIRESOURCES_LABEL}|_AIRESOURCES_DESC|airesources::check|airesources::apply|airesources::status"
 )
 
-devtools::log_status() {
+ai::check() {
     local task label desc_var check_fn apply_fn status_fn
-    _log::to_file "info" "Developer tools status"
-    for task in "${_DEVTOOLS_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-        if "$check_fn"; then
-            _log::to_file "ok" "${label}"
-        else
-            local detail
-            detail="$($status_fn)"
-            _log::to_file "warn" "${label} (${detail})"
-        fi
-    done
-}
-
-devtools::has_pending() {
-    local task label desc_var check_fn apply_fn status_fn
-    for task in "${_DEVTOOLS_TASKS[@]}"; do
+    for task in "${_AI_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if ! "$check_fn"; then
-            return 0
+            return 1
         fi
     done
-    return 1
+    return 0
 }
 
-devtools::run() {
+ai::status() {
+    local task label desc_var check_fn apply_fn status_fn
+    local pending=0
+    for task in "${_AI_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        "$check_fn" || pending=$((pending + 1))
+    done
+    if [[ $pending -gt 0 ]]; then
+        printf '%s AI tools pending' "$pending"
+    fi
+}
+
+ai::run() {
     local task label desc_var check_fn apply_fn status_fn choice
 
     while true; do
         ui::clear_content
-        log::nav "Developer tools"
+        log::nav "Development > AI"
         log::break
 
         # Build menu items (strip "Configure " prefix)
         local items=() apply_fns=()
-        for task in "${_DEVTOOLS_TASKS[@]}"; do
+        for task in "${_AI_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
             items+=("${label#Configure }")
             apply_fns+=("$apply_fn")
         done
         items+=("Back" "Exit")
 
-        choice="$(gum::filter \
-            --height 12 \
+        choice="$(gum::choose \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
-            --indicator.foreground "$HEX_BLUE" \
-            --text.foreground "$HEX_TEXT" \
-            --cursor-text.foreground "$HEX_GREEN" \
-            --match.foreground "$HEX_MAUVE" \
-            --placeholder "Type to filter..." \
+            --cursor.foreground "$HEX_BLUE" \
+            --item.foreground "$HEX_TEXT" \
+            --selected.foreground "$HEX_GREEN" \
             "${items[@]}")"
 
         case "$choice" in
@@ -75,7 +71,6 @@ devtools::run() {
                 ui::goodbye
                 ;;
             *)
-                # Find and run selected task by display label
                 local i
                 for i in "${!items[@]}"; do
                     if [[ "${items[$i]}" == "$choice" ]]; then

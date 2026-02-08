@@ -48,6 +48,12 @@ health::run() {
     log::break
     health::_check_devtools_tasks
     log::break
+    health::_check_shell_tasks
+    log::break
+    health::_check_hardware_tasks
+    log::break
+    health::_check_virtualization_tasks
+    log::break
     health::_check_software_tasks
     log::break
     health::_check_gnome_tasks
@@ -58,7 +64,7 @@ health::run() {
 health::_check_system_tasks() {
     local task label desc_var check_fn apply_fn status_fn
 
-    log::info "System essentials tasks"
+    log::info "System Essentials tasks"
     for task in "${_SYSTEM_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
@@ -106,8 +112,60 @@ health::_check_ssh_tasks() {
 health::_check_devtools_tasks() {
     local task label desc_var check_fn apply_fn status_fn
 
-    log::info "Developer tools tasks"
-    for task in "${_DEVTOOLS_TASKS[@]}"; do
+    log::info "Development tasks"
+    local sub_tasks
+    for sub_tasks in _ENVIRONMENTS_TASKS _DEVTOOLS_TASKS _AI_TASKS; do
+        local -n tasks_ref="$sub_tasks"
+        for task in "${tasks_ref[@]}"; do
+            IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+            if "$check_fn"; then
+                log::ok "${label}"
+            else
+                local detail
+                detail="$($status_fn)"
+                log::warn "${label} (${detail})"
+            fi
+        done
+    done
+}
+
+health::_check_shell_tasks() {
+    local task label desc_var check_fn apply_fn status_fn
+
+    log::info "Shell tools tasks"
+    for task in "${_SHELL_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        if "$check_fn"; then
+            log::ok "${label}"
+        else
+            local detail
+            detail="$($status_fn)"
+            log::warn "${label} (${detail})"
+        fi
+    done
+}
+
+health::_check_hardware_tasks() {
+    local task label desc_var check_fn apply_fn status_fn
+
+    log::info "Hardware tasks"
+    for task in "${_HARDWARE_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        if "$check_fn"; then
+            log::ok "${label}"
+        else
+            local detail
+            detail="$($status_fn)"
+            log::warn "${label} (${detail})"
+        fi
+    done
+}
+
+health::_check_virtualization_tasks() {
+    local task label desc_var check_fn apply_fn status_fn
+
+    log::info "Virtualization tasks"
+    for task in "${_VIRTUALIZATION_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
             log::ok "${label}"

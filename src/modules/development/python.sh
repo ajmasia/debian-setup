@@ -39,7 +39,7 @@ python::apply() {
         _python::session_ready && session_ready=true
 
         ui::clear_content
-        log::nav "Developer tools > Configure Python"
+        log::nav "Development > Environments > Python"
         log::break
 
         log::info "Current Python (uv) configuration"

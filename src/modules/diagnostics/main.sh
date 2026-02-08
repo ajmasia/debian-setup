@@ -1,14 +1,14 @@
-# Settings module
+# Diagnostics module
 
-[[ -n "${_MOD_SETTINGS_LOADED:-}" ]] && return 0
-_MOD_SETTINGS_LOADED=1
+[[ -n "${_MOD_DIAGNOSTICS_LOADED:-}" ]] && return 0
+_MOD_DIAGNOSTICS_LOADED=1
 
-settings::run() {
+diagnostics::run() {
     local choice
 
     while true; do
         ui::clear_content
-        log::nav "Settings"
+        log::nav "Diagnostics"
         log::break
 
         choice="$(gum::choose \

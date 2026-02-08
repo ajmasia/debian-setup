@@ -74,7 +74,7 @@ logs::run() {
 
     while true; do
         ui::clear_content
-        log::nav "Settings > Logs"
+        log::nav "Diagnostics > Logs"
         log::break
 
         choice="$(gum::choose \

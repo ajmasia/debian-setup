@@ -1,55 +1,55 @@
-# System settings module
+# Tools sub-module
 
-[[ -n "${_MOD_SYSTEM_LOADED:-}" ]] && return 0
-_MOD_SYSTEM_LOADED=1
+[[ -n "${_MOD_DEVTOOLS_LOADED:-}" ]] && return 0
+_MOD_DEVTOOLS_LOADED=1
+
+_DEVTOOLS_LABEL="Configure Tools"
+_DEVTOOLS_DESC="Install and configure development tools."
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
-_SYSTEM_TASKS=(
-    "${_SUDOERS_LABEL}|_SUDOERS_DESC|sudoers::check|sudoers::apply|sudoers::status"
-    "${_PWFEEDBACK_LABEL}|_PWFEEDBACK_DESC|pwfeedback::check|pwfeedback::apply|pwfeedback::status"
-    "${_EDITOR_LABEL}|_EDITOR_DESC|editor::check|editor::apply|editor::status"
-    "${_ZRAM_LABEL}|_ZRAM_DESC|zram::check|zram::apply|zram::status"
-    "${_KERNEL_LABEL}|_KERNEL_DESC|kernel::check|kernel::apply|kernel::status"
-    "${_WATCHERS_LABEL}|_WATCHERS_DESC|watchers::check|watchers::apply|watchers::status"
+_DEVTOOLS_TASKS=(
+    "${_BUILD_LABEL}|_BUILD_DESC|build::check|build::apply|build::status"
+    "${_GHCLI_LABEL}|_GHCLI_DESC|ghcli::check|ghcli::apply|ghcli::status"
+    "${_AWSCLI_LABEL}|_AWSCLI_DESC|awscli::check|awscli::apply|awscli::status"
+    "${_DOCKER_LABEL}|_DOCKER_DESC|docker::check|docker::apply|docker::status"
+    "${_HTTPIE_LABEL}|_HTTPIE_DESC|httpie::check|httpie::apply|httpie::status"
+    "${_COMPASS_LABEL}|_COMPASS_DESC|compass::check|compass::apply|compass::status"
 )
 
-system::log_status() {
+devtools::check() {
     local task label desc_var check_fn apply_fn status_fn
-    _log::to_file "info" "System Essentials status"
-    for task in "${_SYSTEM_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-        if "$check_fn"; then
-            _log::to_file "ok" "${label}"
-        else
-            local detail
-            detail="$($status_fn)"
-            _log::to_file "warn" "${label} (${detail})"
-        fi
-    done
-}
-
-system::has_pending() {
-    local task label desc_var check_fn apply_fn status_fn
-    for task in "${_SYSTEM_TASKS[@]}"; do
+    for task in "${_DEVTOOLS_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if ! "$check_fn"; then
-            return 0
+            return 1
         fi
     done
-    return 1
+    return 0
 }
 
-system::run() {
+devtools::status() {
+    local task label desc_var check_fn apply_fn status_fn
+    local pending=0
+    for task in "${_DEVTOOLS_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        "$check_fn" || pending=$((pending + 1))
+    done
+    if [[ $pending -gt 0 ]]; then
+        printf '%s tools pending' "$pending"
+    fi
+}
+
+devtools::run() {
     local task label desc_var check_fn apply_fn status_fn choice
 
     while true; do
         ui::clear_content
-        log::nav "System Essentials"
+        log::nav "Development > Tools"
         log::break
 
         # Build menu items (strip "Configure " prefix)
         local items=() apply_fns=()
-        for task in "${_SYSTEM_TASKS[@]}"; do
+        for task in "${_DEVTOOLS_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
             items+=("${label#Configure }")
             apply_fns+=("$apply_fn")
@@ -76,7 +76,6 @@ system::run() {
                 ui::goodbye
                 ;;
             *)
-                # Find and run selected task by display label
                 local i
                 for i in "${!items[@]}"; do
                     if [[ "${items[$i]}" == "$choice" ]]; then

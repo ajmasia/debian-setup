@@ -55,7 +55,7 @@ slimbook::apply() {
         _slimbook::all_installed && all_ok=true
 
         ui::clear_content
-        log::nav "System core > Slimbook EVO setup"
+        log::nav "Hardware > Slimbook EVO setup"
         log::break
 
         log::info "Current Slimbook configuration"
