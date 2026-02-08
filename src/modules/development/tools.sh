@@ -1,0 +1,89 @@
+# Tools sub-module
+
+[[ -n "${_MOD_DEVTOOLS_LOADED:-}" ]] && return 0
+_MOD_DEVTOOLS_LOADED=1
+
+_DEVTOOLS_LABEL="Configure Tools"
+_DEVTOOLS_DESC="Install and configure development tools."
+
+# Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
+_DEVTOOLS_TASKS=(
+    "${_BUILD_LABEL}|_BUILD_DESC|build::check|build::apply|build::status"
+    "${_GHCLI_LABEL}|_GHCLI_DESC|ghcli::check|ghcli::apply|ghcli::status"
+    "${_AWSCLI_LABEL}|_AWSCLI_DESC|awscli::check|awscli::apply|awscli::status"
+    "${_DOCKER_LABEL}|_DOCKER_DESC|docker::check|docker::apply|docker::status"
+    "${_HTTPIE_LABEL}|_HTTPIE_DESC|httpie::check|httpie::apply|httpie::status"
+    "${_COMPASS_LABEL}|_COMPASS_DESC|compass::check|compass::apply|compass::status"
+)
+
+devtools::check() {
+    local task label desc_var check_fn apply_fn status_fn
+    for task in "${_DEVTOOLS_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        if ! "$check_fn"; then
+            return 1
+        fi
+    done
+    return 0
+}
+
+devtools::status() {
+    local task label desc_var check_fn apply_fn status_fn
+    local pending=0
+    for task in "${_DEVTOOLS_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        "$check_fn" || pending=$((pending + 1))
+    done
+    if [[ $pending -gt 0 ]]; then
+        printf '%s tools pending' "$pending"
+    fi
+}
+
+devtools::run() {
+    local task label desc_var check_fn apply_fn status_fn choice
+
+    while true; do
+        ui::clear_content
+        log::nav "Development > Tools"
+        log::break
+
+        # Build menu items (strip "Configure " prefix)
+        local items=() apply_fns=()
+        for task in "${_DEVTOOLS_TASKS[@]}"; do
+            IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+            items+=("${label#Configure }")
+            apply_fns+=("$apply_fn")
+        done
+        items+=("Back" "Exit")
+
+        choice="$(gum::filter \
+            --height 12 \
+            --header "Select an option:" \
+            --header.foreground "$HEX_LAVENDER" \
+            --indicator.foreground "$HEX_BLUE" \
+            --text.foreground "$HEX_TEXT" \
+            --cursor-text.foreground "$HEX_GREEN" \
+            --match.foreground "$HEX_MAUVE" \
+            --placeholder "Type to filter..." \
+            "${items[@]}")"
+
+        case "$choice" in
+            ""|"Back")
+                return
+                ;;
+            "Exit")
+                ui::clear_content
+                ui::goodbye
+                ;;
+            *)
+                local i
+                for i in "${!items[@]}"; do
+                    if [[ "${items[$i]}" == "$choice" ]]; then
+                        "${apply_fns[$i]}"
+                        break
+                    fi
+                done
+                ;;
+        esac
+    done
+}
