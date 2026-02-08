@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.1] - 2026-02-08
+
+### Added
+
+- **Installer script** (`install.sh`) -- one-line install via `curl | bash`
+  - Clones repo to `$XDG_DATA_HOME/debian-setup`, symlinks to `~/.local/bin`
+  - HTTPS clone with SSH fallback
+  - Ensures `~/.local/bin` is in PATH (`.bashrc` with marker comment)
+- `--update` flag -- pull latest version with `git pull --ff-only`
+- `--uninstall` flag -- remove repo, symlink, PATH entry, and optionally logs
+
 ## [0.10.0] - 2026-02-08
 
 ### Added

@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.10.0-blue)
+![Version](https://img.shields.io/badge/version-0.10.1-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -107,11 +107,12 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 ## Install
 
 ```bash
-git clone ssh://git.qwertee.link:2022/ajmasia.dev/debian-setup.git
-cd debian-setup
-chmod +x debian-setup
-./debian-setup
+curl -fsSL https://git.qwertee.link/ajmasia.dev/debian-setup/raw/branch/main/install.sh | bash
 ```
+
+This clones the repo to `~/.local/share/debian-setup` and creates a symlink in `~/.local/bin`.
+
+Requires `git`, `curl`, and `bash >= 4` (pre-installed on Debian).
 
 ## Usage
 
@@ -121,6 +122,8 @@ debian-setup [options]
 Options:
   -v, --version    Show version
   -h, --help       Show this help message
+  --update         Update to latest version
+  --uninstall      Remove debian-setup
 ```
 
 Run without options to start the interactive menu. Navigate with arrow keys, confirm with Enter, go back with Escape, exit with Ctrl+C.
@@ -130,6 +133,7 @@ Run without options to start the interactive menu. Navigate with arrow keys, con
 ```
 debian-setup/
 ├── debian-setup                    # Entry point
+├── install.sh                      # Installer (curl | bash)
 ├── VERSION
 ├── CHANGELOG.md
 ├── src/
