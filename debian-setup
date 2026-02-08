@@ -139,6 +139,8 @@ show_help() {
     printf "Options:\n"
     printf "  -v, --version    Show version\n"
     printf "  -h, --help       Show this help message\n"
+    printf "  --update         Update to latest version\n"
+    printf "  --uninstall      Remove debian-setup\n"
 }
 
 main() {
@@ -152,6 +154,12 @@ main() {
         -h|--help)
             show_help
             return 0
+            ;;
+        --update)
+            exec "${SCRIPT_DIR}/install.sh" --update
+            ;;
+        --uninstall)
+            exec "${SCRIPT_DIR}/install.sh" --uninstall
             ;;
     esac
 
