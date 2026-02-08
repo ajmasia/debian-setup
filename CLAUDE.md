@@ -23,7 +23,7 @@ CLI en Bash para automatizar tareas post-instalacion en Debian.
 ## Architecture
 
 ### Header persistente
-Se pinta una vez. `_UI_CONTENT_ROW` guarda la fila del cursor (via `\033[6n`, 1-indexed). `ui::clear_content` usa `tput cup $((_UI_CONTENT_ROW - 1)) 0` + `tput ed` (0-indexed).
+Se pinta una vez. `_UI_CONTENT_ROW` guarda la fila del cursor (via `\033[6n`, 1-indexed). `ui::clear_content` usa `tput cup $((_UI_CONTENT_ROW - 1)) 0` + `tput ed` (0-indexed). Si el terminal ha hecho scroll (tras apt-get, sudo, etc.), `_UI_DIRTY=1` dispara un repaint completo del header. El flag se activa en `ui::flush_input`.
 
 ### Logging
 - `log::info` — terminal + fichero
@@ -58,13 +58,21 @@ Se pinta una vez. `_UI_CONTENT_ROW` guarda la fila del cursor (via `\033[6n`, 1-
 - Permite detectar "restart needed"
 
 ### Modulos siempre visibles
-System essentials, Package managers, SSH, Developer tools, Software, GNOME siempre en menu principal. Sin status logging al inicio.
+System essentials, Package managers, OpenSSH server, Development, Shell, Hardware, Virtualization, Software, GNOME, Diagnostics siempre en menu principal. Sin status logging al inicio.
 
 ### gum wrappers
 `gum::choose`, `gum::filter`, `gum::input` — todos capturan exit code y propagan SIGINT (130) con `exit 130`. NO usar `2>/dev/null` (gum renderiza UI en stderr).
 
 ### Sub-aggregators
-Modulos agrupados (VPN, Passwords, Browsers, etc.) usan registry pattern con `gum::choose` o `gum::filter` segun cantidad.
+Modulos agrupados (VPN, Passwords, Browsers, Environments, Tools, AI, etc.) usan registry pattern con `gum::choose` o `gum::filter` segun cantidad.
+
+### Top-level aggregators
+Modulos con sub-registries (Development, Software, etc.) implementan `log_status()` y `has_pending()` iterando sobre las sub-registries con `local -n tasks_ref`.
+
+### Group membership detection
+- `_xxx::user_in_group()` — check en disco via `getent group`
+- `_xxx::session_ready()` — check en sesion via `id -nG`
+- Permite detectar "restart needed" (grupo asignado pero no activo en sesion)
 
 ### Repo compartido Mullvad
 Browser y VPN comparten repo/GPG key. Ambos `remove()` verifican si el otro esta instalado antes de limpiar.
