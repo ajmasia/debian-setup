@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.2] - 2026-02-08
+
+### Fixed
+
+- Entry point now resolves symlinks for `SCRIPT_DIR` (fixes `VERSION: No such file` when invoked via `~/.local/bin/debian-setup`)
+
 ## [0.10.1] - 2026-02-08
 
 ### Added
