@@ -1,15 +1,19 @@
-# Balena Etcher task (deb from GitHub releases)
+# Balena Etcher task (AppImage from GitHub releases)
 
 [[ -n "${_MOD_ETCHER_LOADED:-}" ]] && return 0
 _MOD_ETCHER_LOADED=1
 
 _ETCHER_LABEL="Configure Balena Etcher"
 _ETCHER_DESC="Install Balena Etcher USB/SD card flasher."
-_ETCHER_PKG="balena-etcher"
 _ETCHER_GH_API="https://api.github.com/repos/balena-io/etcher/releases/latest"
+_ETCHER_ICON_URL="https://raw.githubusercontent.com/balena-io/etcher/master/assets/icon.png"
+_ETCHER_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/balena-etcher"
+_ETCHER_APPIMAGE="${_ETCHER_DIR}/balena-etcher.AppImage"
+_ETCHER_DESKTOP="${XDG_DATA_HOME:-$HOME/.local/share}/applications/balena-etcher.desktop"
+_ETCHER_ICON="${XDG_DATA_HOME:-$HOME/.local/share}/icons/balena-etcher.png"
 
 _etcher::is_installed() {
-    dpkg -l "$_ETCHER_PKG" 2>/dev/null | grep -q '^ii'
+    [[ -x "$_ETCHER_APPIMAGE" ]]
 }
 
 etcher::check() {
@@ -34,9 +38,8 @@ etcher::apply() {
         log::info "Balena Etcher"
 
         if $installed; then
-            local version
-            version="$(dpkg -l "$_ETCHER_PKG" 2>/dev/null | awk '/^ii/{print $3}' || true)"
-            log::ok "Balena Etcher: ${version}"
+            log::ok "Balena Etcher: installed"
+            log::ok "Path: ${_ETCHER_APPIMAGE}"
         else
             log::warn "Balena Etcher (not installed)"
         fi
@@ -83,56 +86,86 @@ etcher::apply() {
 
 _etcher::install() {
     log::info "Fetching latest release URL"
-    ui::flush_input
 
-    local deb_url
-    deb_url="$(curl -fsSL "$_ETCHER_GH_API" | grep -oP '"browser_download_url":\s*"\K[^"]*amd64\.deb' || true)"
+    local zip_url
+    zip_url="$(curl -fsSL "$_ETCHER_GH_API" | grep -oP '"browser_download_url":\s*"\K[^"]*linux-x64[^"]*\.zip' || true)"
 
-    if [[ -z "$deb_url" ]]; then
-        log::error "Failed to find .deb download URL"
+    if [[ -z "$zip_url" ]]; then
+        log::error "Failed to find download URL"
         ui::return_or_exit
         return
     fi
 
     log::info "Downloading Balena Etcher"
 
-    local tmpfile
-    tmpfile="$(mktemp --suffix=.deb)"
+    local tmpdir
+    tmpdir="$(mktemp -d)"
 
-    if ! curl -fSL -o "$tmpfile" "$deb_url"; then
+    if ! curl -fSL -o "${tmpdir}/etcher.zip" "$zip_url"; then
         log::error "Failed to download Balena Etcher"
-        rm -f "$tmpfile"
+        rm -rf "$tmpdir"
         ui::return_or_exit
         return
     fi
 
-    chmod 644 "$tmpfile"
-
-    log::info "Installing Balena Etcher"
-    if sudo dpkg -i "$tmpfile" </dev/tty; then
-        hash -r
-        log::ok "Balena Etcher installed"
-    else
-        log::warn "Resolving dependencies"
-        if sudo apt-get install -f -y </dev/tty; then
-            hash -r
-            log::ok "Balena Etcher installed"
-        else
-            log::error "Failed to install Balena Etcher"
-        fi
+    log::info "Extracting"
+    if ! unzip -qo "${tmpdir}/etcher.zip" -d "$tmpdir"; then
+        log::error "Failed to extract archive"
+        rm -rf "$tmpdir"
+        ui::return_or_exit
+        return
     fi
-    rm -f "$tmpfile"
+
+    # Find extracted directory
+    local extracted_dir
+    extracted_dir="$(find "$tmpdir" -maxdepth 1 -type d -name 'balenaEtcher*' | head -1)"
+
+    if [[ -z "$extracted_dir" || ! -f "${extracted_dir}/balena-etcher" ]]; then
+        log::error "Unexpected archive structure"
+        rm -rf "$tmpdir"
+        ui::return_or_exit
+        return
+    fi
+
+    # Install to XDG_DATA_HOME
+    mkdir -p "$_ETCHER_DIR"
+    rm -rf "${_ETCHER_DIR:?}/"*
+    cp -a "${extracted_dir}/." "$_ETCHER_DIR/"
+    mv "${_ETCHER_DIR}/balena-etcher" "$_ETCHER_APPIMAGE"
+    chmod +x "$_ETCHER_APPIMAGE"
+
+    # Download icon
+    log::info "Downloading icon"
+    mkdir -p "$(dirname "$_ETCHER_ICON")"
+    curl -fsSL -o "$_ETCHER_ICON" "$_ETCHER_ICON_URL" || true
+
+    # Create .desktop entry
+    log::info "Creating desktop entry"
+    mkdir -p "$(dirname "$_ETCHER_DESKTOP")"
+    cat > "$_ETCHER_DESKTOP" <<EOF
+[Desktop Entry]
+Name=Balena Etcher
+Comment=Flash OS images to SD cards and USB drives
+Exec=${_ETCHER_APPIMAGE} --no-sandbox %U
+Icon=${_ETCHER_ICON}
+Terminal=false
+Type=Application
+Categories=Utility;
+StartupWMClass=balena-etcher
+EOF
+
+    rm -rf "$tmpdir"
+    log::ok "Balena Etcher installed"
     ui::return_or_exit
 }
 
 _etcher::remove() {
     log::info "Removing Balena Etcher"
-    ui::flush_input
-    if sudo apt-get remove -y "$_ETCHER_PKG" </dev/tty; then
-        hash -r
-        log::ok "Balena Etcher removed"
-    else
-        log::error "Failed to remove Balena Etcher"
-    fi
+
+    rm -rf "$_ETCHER_DIR"
+    rm -f "$_ETCHER_DESKTOP"
+    rm -f "$_ETCHER_ICON"
+
+    log::ok "Balena Etcher removed"
     ui::return_or_exit
 }
