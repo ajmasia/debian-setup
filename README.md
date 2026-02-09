@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.11.7-blue)
+![Version](https://img.shields.io/badge/version-0.12.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -135,13 +135,16 @@ The first thing to do after launching is **System Essentials > Sudoers** to gran
 debian-setup [options]
 
 Options:
-  -v, --version    Show version
-  -h, --help       Show this help message
-  --update         Update to latest version
-  --uninstall      Remove debian-setup
+  -v, --version             Show version
+  -h, --help                Show this help message
+  -s, --search              Start in global search mode
+  -si, --search-to-install  Search only available (not installed) options
+  -sr, --search-to-remove   Search only installed (removable) options
+  --update                  Update to latest version
+  --uninstall               Remove debian-setup
 ```
 
-Run without options to start the interactive menu. Navigate with arrow keys, confirm with Enter, go back with Escape, exit with Ctrl+C.
+Run without options to start the interactive menu by categories. Use `--search` to start in global search mode where all options are available in a single flat, filterable list. Use `--search-to-install` to show only items not yet installed, or `--search-to-remove` to show only installed items. Navigate with arrow keys, confirm with Enter, go back with Escape, exit with Ctrl+C.
 
 ## Project structure
 
