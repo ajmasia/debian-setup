@@ -119,10 +119,123 @@ menu::search() {
         done
 
         all_items+=("Exit")
+        local header="Search all options (${#all_apply_fns[@]}):"
 
         choice="$(gum::filter \
             --height 20 \
-            --header "Search all options:" \
+            --header "$header" \
+            --header.foreground "$HEX_LAVENDER" \
+            --indicator.foreground "$HEX_BLUE" \
+            --text.foreground "$HEX_TEXT" \
+            --cursor-text.foreground "$HEX_GREEN" \
+            --match.foreground "$HEX_MAUVE" \
+            --placeholder "Type to search..." \
+            "${all_items[@]}")"
+
+        case "$choice" in
+            ""|"Exit")
+                ui::clear_content
+                ui::goodbye
+                ;;
+            *)
+                local i
+                for i in "${!all_items[@]}"; do
+                    if [[ "${all_items[$i]}" == "$choice" ]]; then
+                        "${all_apply_fns[$i]}"
+                        ui::clear_content
+                        break
+                    fi
+                done
+                ;;
+        esac
+    done
+}
+
+menu::search_to_install() {
+    local choice
+
+    while true; do
+        ui::clear_content
+
+        # Collect non-installed leaf tasks from all registries
+        local all_items=() all_apply_fns=() total=0
+        local arr_name task label desc_var check_fn apply_fn status_fn
+
+        for arr_name in "${_SEARCH_ARRAYS[@]}"; do
+            local -n tasks_ref="$arr_name"
+            for task in "${tasks_ref[@]}"; do
+                IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+                [[ "$apply_fn" == *"::run" ]] && continue
+                total=$((total + 1))
+                # Skip already installed (check_fn returns 0)
+                "$check_fn" && continue
+                all_items+=("${label#Configure }")
+                all_apply_fns+=("$apply_fn")
+            done
+        done
+
+        all_items+=("Exit")
+        local header="Available to install (${#all_apply_fns[@]}/${total}):"
+
+        choice="$(gum::filter \
+            --height 20 \
+            --header "$header" \
+            --header.foreground "$HEX_LAVENDER" \
+            --indicator.foreground "$HEX_BLUE" \
+            --text.foreground "$HEX_TEXT" \
+            --cursor-text.foreground "$HEX_GREEN" \
+            --match.foreground "$HEX_MAUVE" \
+            --placeholder "Type to search..." \
+            "${all_items[@]}")"
+
+        case "$choice" in
+            ""|"Exit")
+                ui::clear_content
+                ui::goodbye
+                ;;
+            *)
+                local i
+                for i in "${!all_items[@]}"; do
+                    if [[ "${all_items[$i]}" == "$choice" ]]; then
+                        "${all_apply_fns[$i]}"
+                        ui::clear_content
+                        break
+                    fi
+                done
+                ;;
+        esac
+    done
+}
+
+menu::search_to_remove() {
+    local choice
+
+    while true; do
+        ui::clear_content
+
+        # Collect installed leaf tasks from all registries
+        local all_items=() all_apply_fns=() total=0
+        local arr_name task label desc_var check_fn apply_fn status_fn
+
+        for arr_name in "${_SEARCH_ARRAYS[@]}"; do
+            local -n tasks_ref="$arr_name"
+            for task in "${tasks_ref[@]}"; do
+                IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+                [[ "$apply_fn" == *"::run" ]] && continue
+                total=$((total + 1))
+                # Skip not installed (check_fn returns non-zero)
+                "$check_fn" || continue
+                all_items+=("${label#Configure }")
+                all_apply_fns+=("$apply_fn")
+            done
+        done
+
+        all_items+=("Exit")
+        local header="Installed (${#all_apply_fns[@]}/${total}):"
+
+        choice="$(gum::filter \
+            --height 20 \
+            --header "$header" \
             --header.foreground "$HEX_LAVENDER" \
             --indicator.foreground "$HEX_BLUE" \
             --text.foreground "$HEX_TEXT" \
