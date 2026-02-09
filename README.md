@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.10.3-blue)
+![Version](https://img.shields.io/badge/version-0.10.4-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -107,13 +107,21 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 
 ## Install
 
+On a fresh Debian install, `curl` and `git` are not available and the user has no sudo access. Install them as root first:
+
+```bash
+su -c 'apt-get install -y curl git'
+```
+
+Then install debian-setup:
+
 ```bash
 curl -fsSL https://git.qwertee.link/ajmasia.dev/debian-setup/raw/branch/main/install.sh | bash
 ```
 
 This clones the repo to `~/.local/share/debian-setup` and creates a symlink in `~/.local/bin`.
 
-Requires `git`, `curl`, and `bash >= 4` (pre-installed on Debian).
+The first thing to do after launching is **System Essentials > Sudoers** to grant sudo access to your user (uses `su` with root password).
 
 ## Usage
 

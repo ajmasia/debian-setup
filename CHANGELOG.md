@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.4] - 2026-02-09
+
+### Fixed
+
+- Flatpak install/remove results now pause for user confirmation instead of being cleared instantly (11 modules)
+- Install instructions updated for fresh Debian without sudo (`su -c` instead of `sudo`)
+
+### Changed
+
+- Removed backports kernel installation from Slimbook EVO module (handled separately via Kernel module)
+
 ## [0.10.3] - 2026-02-08
 
 ### Added

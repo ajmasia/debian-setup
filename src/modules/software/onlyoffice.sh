@@ -83,6 +83,7 @@ onlyoffice::apply() {
 _onlyoffice::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _onlyoffice::install() {
     else
         log::error "Failed to install OnlyOffice"
     fi
+    ui::return_or_exit
 }
 
 _onlyoffice::remove() {
@@ -101,4 +103,5 @@ _onlyoffice::remove() {
     else
         log::error "Failed to remove OnlyOffice"
     fi
+    ui::return_or_exit
 }

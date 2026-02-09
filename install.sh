@@ -49,7 +49,7 @@ check_prereqs() {
         for dep in "${missing[@]}"; do
             printf "  - %s\n" "$dep" >&2
         done
-        printf "\nInstall them with: sudo apt-get install -y git curl\n" >&2
+        printf "\nInstall them as root with: su -c 'apt-get install -y git curl'\n" >&2
         exit 1
     fi
 }

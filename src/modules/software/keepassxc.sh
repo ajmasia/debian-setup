@@ -83,6 +83,7 @@ keepassxc::apply() {
 _keepassxc::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _keepassxc::install() {
     else
         log::error "Failed to install KeePassXC"
     fi
+    ui::return_or_exit
 }
 
 _keepassxc::remove() {
@@ -101,4 +103,5 @@ _keepassxc::remove() {
     else
         log::error "Failed to remove KeePassXC"
     fi
+    ui::return_or_exit
 }

@@ -106,6 +106,7 @@ _nextcloud::install() {
     if ! _nextcloud::app_installed; then
         if ! command -v flatpak &>/dev/null; then
             log::error "Flatpak not installed. Install via Package managers first"
+            ui::return_or_exit
             return
         fi
 
@@ -133,6 +134,7 @@ _nextcloud::install() {
     else
         log::ok "Nautilus plugin: already installed"
     fi
+    ui::return_or_exit
 }
 
 _nextcloud::remove() {
@@ -155,4 +157,5 @@ _nextcloud::remove() {
             log::error "Failed to remove Nextcloud Desktop"
         fi
     fi
+    ui::return_or_exit
 }

@@ -83,6 +83,7 @@ inkscape::apply() {
 _inkscape::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _inkscape::install() {
     else
         log::error "Failed to install Inkscape"
     fi
+    ui::return_or_exit
 }
 
 _inkscape::remove() {
@@ -101,4 +103,5 @@ _inkscape::remove() {
     else
         log::error "Failed to remove Inkscape"
     fi
+    ui::return_or_exit
 }

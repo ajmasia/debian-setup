@@ -83,6 +83,7 @@ nitrokey::apply() {
 _nitrokey::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _nitrokey::install() {
     else
         log::error "Failed to install Nitrokey App2"
     fi
+    ui::return_or_exit
 }
 
 _nitrokey::remove() {
@@ -101,4 +103,5 @@ _nitrokey::remove() {
     else
         log::error "Failed to remove Nitrokey App2"
     fi
+    ui::return_or_exit
 }

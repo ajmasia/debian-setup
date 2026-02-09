@@ -83,6 +83,7 @@ compass::apply() {
 _compass::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _compass::install() {
     else
         log::error "Failed to install MongoDB Compass"
     fi
+    ui::return_or_exit
 }
 
 _compass::remove() {
@@ -101,4 +103,5 @@ _compass::remove() {
     else
         log::error "Failed to remove MongoDB Compass"
     fi
+    ui::return_or_exit
 }

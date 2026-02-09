@@ -83,6 +83,7 @@ discord::apply() {
 _discord::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _discord::install() {
     else
         log::error "Failed to install Discord"
     fi
+    ui::return_or_exit
 }
 
 _discord::remove() {
@@ -101,4 +103,5 @@ _discord::remove() {
     else
         log::error "Failed to remove Discord"
     fi
+    ui::return_or_exit
 }
