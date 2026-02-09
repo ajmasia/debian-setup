@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.8] - 2026-02-09
+
+### Added
+
+- **System Upgrade module** under Package Managers -- apt-get update, dist-upgrade and autoremove with upgradable package count
+- **Homebrew module** under Package Managers -- install, update and remove Homebrew on Linux with automatic dependency setup
+
 ## [0.10.7] - 2026-02-09
 
 ### Fixed
