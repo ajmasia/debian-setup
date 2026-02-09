@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.10.9-blue)
+![Version](https://img.shields.io/badge/version-0.11.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -91,7 +91,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak + Nautilus plugin)
 - **Fonts** -- Nerd Fonts (Noto, Symbols Only, Hack, CaskaydiaCove, FiraCode) from GitHub releases
 
-### GNOME
+### UI
 - **Appearance**
   - **GTK Theme** -- Catppuccin Mocha GTK theme with accent color selection, dark mode toggle, GTK4/libadwaita symlinks
   - **Icons** -- Papirus icons with Catppuccin folder colors
@@ -100,6 +100,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Keyboard** -- English intl layout (AltGr dead keys), 4 fixed workspaces, Super+W close, Super+Return terminal, Super+1-4/Shift+1-4 workspace switching
 - **Terminal CSS** -- VTE terminal padding for GTK3 and GTK4
 - **Extensions** -- Manage GNOME Shell extensions (Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes)
+- **Browser Themes** -- Catppuccin Mocha install guide for Brave, Chromium, Firefox, LibreWolf
 
 ### Diagnostics
 - **Health check** -- System info, dependency status, and task overview
@@ -181,7 +182,7 @@ debian-setup/
 │   │   │   ├── ...
 │   │   ├── software/               # Utilities, Media, Editors, Terminals,
 │   │   │   ├── ...                 # Browsers, Security, Messaging, Productivity, Fonts
-│   │   ├── gnome/                  # Appearance, Keyboard, Terminal CSS, Extensions
+│   │   ├── gnome/                  # Appearance, Keyboard, Terminal CSS, Extensions, Browser Themes
 │   │   │   ├── ...
 │   │   └── diagnostics/            # Health check, Logs
 │   │       ├── ...
