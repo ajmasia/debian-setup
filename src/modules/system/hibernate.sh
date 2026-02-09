@@ -4,41 +4,70 @@
 _MOD_HIBERNATE_LOADED=1
 
 _HIBERNATE_LABEL="Configure Hibernate"
-_HIBERNATE_DESC="Configure swap file and suspend-then-hibernate."
+_HIBERNATE_DESC="Configure swap and suspend-then-hibernate."
 
-_HIBERNATE_SWAPFILE="/swapfile"
+_HIBERNATE_DEFAULT_SWAPFILE="/swapfile"
 _HIBERNATE_SLEEP_CONF="/etc/systemd/sleep.conf.d/hibernate.conf"
 _HIBERNATE_LOGIND_CONF="/etc/systemd/logind.conf.d/hibernate.conf"
 _HIBERNATE_RESUME_CONF="/etc/initramfs-tools/conf.d/resume"
 _HIBERNATE_DELAY="30min"
 
+# Populated by _hibernate::detect_swap()
+_HIBERNATE_SWAP_DEVICE=""
+_HIBERNATE_SWAP_TYPE=""
+_HIBERNATE_SWAP_SIZE_KIB=0
+
 # ── Helpers ─────────────────────────────────────────────
 
-_hibernate::ram_bytes() {
-    awk '/^MemTotal:/ {print $2 * 1024}' /proc/meminfo
+_hibernate::ram_kib() {
+    awk '/^MemTotal:/ {print $2}' /proc/meminfo
 }
 
 _hibernate::ram_gb() {
     awk '/^MemTotal:/ {gb = $2 / 1048576; printf "%d", (gb == int(gb)) ? gb : int(gb) + 1}' /proc/meminfo
 }
 
-_hibernate::swapfile_exists() {
-    [[ -f "$_HIBERNATE_SWAPFILE" ]]
+# Parse /proc/swaps for a usable (non-zram) swap device.
+# Sets _HIBERNATE_SWAP_DEVICE, _HIBERNATE_SWAP_TYPE, _HIBERNATE_SWAP_SIZE_KIB.
+# Returns 1 if no usable swap found.
+_hibernate::detect_swap() {
+    _HIBERNATE_SWAP_DEVICE=""
+    _HIBERNATE_SWAP_TYPE=""
+    _HIBERNATE_SWAP_SIZE_KIB=0
+
+    local dev type size _rest
+    while read -r dev type size _rest; do
+        # Skip header line
+        [[ "$dev" == "Filename" ]] && continue
+        # Skip zram devices
+        [[ "$dev" == /dev/zram* ]] && continue
+
+        _HIBERNATE_SWAP_DEVICE="$dev"
+        _HIBERNATE_SWAP_TYPE="$type"
+        _HIBERNATE_SWAP_SIZE_KIB="$size"
+        return 0
+    done < /proc/swaps
+
+    return 1
 }
 
-_hibernate::swapfile_active() {
-    grep -qF "$_HIBERNATE_SWAPFILE" /proc/swaps 2>/dev/null
+_hibernate::swap_sufficient() {
+    local ram_kib
+    ram_kib="$(_hibernate::ram_kib)"
+    [[ "$_HIBERNATE_SWAP_SIZE_KIB" -ge "$ram_kib" ]]
 }
 
-_hibernate::swapfile_in_fstab() {
-    grep -qF "$_HIBERNATE_SWAPFILE" /etc/fstab 2>/dev/null
+_hibernate::swap_is_partition() {
+    [[ "$_HIBERNATE_SWAP_TYPE" == "partition" ]]
 }
 
-_hibernate::swapfile_size_gb() {
-    if _hibernate::swapfile_exists; then
-        local bytes
-        bytes="$(stat -c %s "$_HIBERNATE_SWAPFILE" 2>/dev/null || echo 0)"
-        echo $((bytes / 1073741824))
+_hibernate::swap_uuid() {
+    lsblk -no UUID "$_HIBERNATE_SWAP_DEVICE" 2>/dev/null
+}
+
+_hibernate::swap_size_gb() {
+    if [[ "$_HIBERNATE_SWAP_SIZE_KIB" -gt 0 ]]; then
+        echo $(( (_HIBERNATE_SWAP_SIZE_KIB + 1048575) / 1048576 ))
     else
         echo 0
     fi
@@ -49,8 +78,8 @@ _hibernate::root_uuid() {
 }
 
 _hibernate::swap_offset() {
-    if _hibernate::swapfile_exists; then
-        sudo filefrag -v "$_HIBERNATE_SWAPFILE" 2>/dev/null | awk 'NR==4{gsub(/\.\./,""); print $4}'
+    if [[ -f "$_HIBERNATE_SWAP_DEVICE" ]]; then
+        sudo filefrag -v "$_HIBERNATE_SWAP_DEVICE" 2>/dev/null | awk 'NR==4{gsub(/\.\./,""); print $4}'
     fi
 }
 
@@ -73,7 +102,10 @@ _hibernate::logind_configured() {
 # ── Public API ──────────────────────────────────────────
 
 hibernate::check() {
-    _hibernate::swapfile_active \
+    local has_swap=false
+    _hibernate::detect_swap && has_swap=true
+    $has_swap \
+        && _hibernate::swap_sufficient \
         && _hibernate::grub_has_resume \
         && _hibernate::resume_configured \
         && _hibernate::sleep_configured \
@@ -82,7 +114,17 @@ hibernate::check() {
 
 hibernate::status() {
     local issues=()
-    _hibernate::swapfile_active || issues+=("no swap file")
+    local has_swap=false
+    _hibernate::detect_swap && has_swap=true
+
+    if ! $has_swap; then
+        issues+=("no swap")
+    elif ! _hibernate::swap_sufficient; then
+        local swap_gb
+        swap_gb="$(_hibernate::swap_size_gb)"
+        issues+=("swap too small (${swap_gb}G)")
+    fi
+
     _hibernate::grub_has_resume || issues+=("no resume in GRUB")
     _hibernate::resume_configured || issues+=("no initramfs resume")
     _hibernate::sleep_configured || issues+=("sleep not configured")
@@ -99,8 +141,8 @@ hibernate::apply() {
     local choice
 
     while true; do
-        local swap_active=false grub_ok=false resume_ok=false sleep_ok=false logind_ok=false
-        _hibernate::swapfile_active && swap_active=true
+        local has_swap=false grub_ok=false resume_ok=false sleep_ok=false logind_ok=false
+        _hibernate::detect_swap && has_swap=true
         _hibernate::grub_has_resume && grub_ok=true
         _hibernate::resume_configured && resume_ok=true
         _hibernate::sleep_configured && sleep_ok=true
@@ -112,15 +154,22 @@ hibernate::apply() {
 
         log::info "Suspend-then-hibernate"
 
-        # Swap file status
-        if $swap_active; then
+        # Swap status
+        if $has_swap; then
             local swap_gb
-            swap_gb="$(_hibernate::swapfile_size_gb)"
-            log::ok "Swap file: ${_HIBERNATE_SWAPFILE} (${swap_gb}G, active)"
-        elif _hibernate::swapfile_exists; then
-            log::warn "Swap file: exists but not active"
+            swap_gb="$(_hibernate::swap_size_gb)"
+            local ram_gb
+            ram_gb="$(_hibernate::ram_gb)"
+            local type_label="file"
+            _hibernate::swap_is_partition && type_label="partition"
+
+            if _hibernate::swap_sufficient; then
+                log::ok "Swap ${type_label}: ${_HIBERNATE_SWAP_DEVICE} (${swap_gb}G, active)"
+            else
+                log::warn "Swap ${type_label}: ${_HIBERNATE_SWAP_DEVICE} (${swap_gb}G < ${ram_gb}G RAM)"
+            fi
         else
-            log::warn "Swap file: not created"
+            log::warn "Swap: none detected (zram excluded)"
         fi
 
         # Zram coexistence info
@@ -160,11 +209,11 @@ hibernate::apply() {
 
         local options=()
 
-        if ! $swap_active || ! $grub_ok || ! $resume_ok || ! $sleep_ok || ! $logind_ok; then
+        if ! $has_swap || ! _hibernate::swap_sufficient || ! $grub_ok || ! $resume_ok || ! $sleep_ok || ! $logind_ok; then
             options+=("Configure all")
         fi
 
-        if $swap_active || _hibernate::swapfile_exists; then
+        if $grub_ok || $resume_ok || $sleep_ok || $logind_ok || [[ -f "$_HIBERNATE_DEFAULT_SWAPFILE" ]]; then
             options+=("Remove hibernate config")
         fi
 
@@ -198,116 +247,176 @@ hibernate::apply() {
     done
 }
 
+# ── Create swapfile ────────────────────────────────────
+
+_hibernate::create_swapfile() {
+    local ram_gb swap_size
+    ram_gb="$(_hibernate::ram_gb)"
+    swap_size="${ram_gb}"
+
+    log::info "RAM detected: ${ram_gb}G — swap needs to be >= RAM for hibernate"
+
+    local size_choice
+    size_choice="$(gum::choose \
+        --header "Swap file size:" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "${ram_gb}G (match RAM)" \
+        "Custom")"
+
+    if [[ "$size_choice" == "Custom" ]]; then
+        swap_size="$(gum::input \
+            --header "Enter swap size in GB (>= ${ram_gb}):" \
+            --header.foreground "$HEX_LAVENDER" \
+            --placeholder "e.g. ${ram_gb}")"
+    fi
+
+    if [[ -z "$swap_size" ]]; then
+        log::warn "No size selected, skipped"
+        return 1
+    fi
+
+    # Remove existing swapfile if present
+    if [[ -f "$_HIBERNATE_DEFAULT_SWAPFILE" ]]; then
+        log::info "Removing existing swap file"
+        ui::flush_input
+        sudo /sbin/swapoff "$_HIBERNATE_DEFAULT_SWAPFILE" </dev/tty 2>/dev/null || true
+        sudo rm -f "$_HIBERNATE_DEFAULT_SWAPFILE" </dev/tty
+    fi
+
+    log::info "Creating ${swap_size}G swap file (this may take a moment)"
+    ui::flush_input
+    if ! sudo fallocate -l "${swap_size}G" "$_HIBERNATE_DEFAULT_SWAPFILE" </dev/tty; then
+        log::error "Failed to create swap file"
+        return 1
+    fi
+    sudo chmod 600 "$_HIBERNATE_DEFAULT_SWAPFILE" </dev/tty
+    sudo mkswap "$_HIBERNATE_DEFAULT_SWAPFILE" </dev/tty
+    log::ok "Swap file created: ${swap_size}G"
+
+    # Activate with low priority (zram keeps priority 100)
+    sudo /sbin/swapon -p 1 "$_HIBERNATE_DEFAULT_SWAPFILE" </dev/tty
+    log::ok "Swap file activated (priority 1)"
+
+    # Add to fstab if not present
+    if ! grep -qF "$_HIBERNATE_DEFAULT_SWAPFILE" /etc/fstab 2>/dev/null; then
+        printf '%s none swap sw,pri=1 0 0\n' "$_HIBERNATE_DEFAULT_SWAPFILE" | sudo tee -a /etc/fstab > /dev/null
+        log::ok "Added to /etc/fstab (priority 1)"
+    fi
+
+    # Re-detect swap after creation
+    _hibernate::detect_swap || true
+}
+
+# ── Configure GRUB ─────────────────────────────────────
+
+_hibernate::configure_grub() {
+    if _hibernate::grub_has_resume; then
+        log::ok "GRUB resume already configured"
+        return
+    fi
+
+    local resume_uuid resume_offset=""
+
+    if _hibernate::swap_is_partition; then
+        resume_uuid="$(_hibernate::swap_uuid)"
+        if [[ -z "$resume_uuid" ]]; then
+            log::error "Could not determine swap partition UUID"
+            return
+        fi
+        log::info "Adding resume to GRUB (swap partition UUID=${resume_uuid})"
+    else
+        resume_uuid="$(_hibernate::root_uuid)"
+        ui::flush_input
+        resume_offset="$(_hibernate::swap_offset)"
+        if [[ -z "$resume_uuid" || -z "$resume_offset" ]]; then
+            log::error "Could not determine root UUID or swap offset"
+            return
+        fi
+        log::info "Adding resume to GRUB (UUID=${resume_uuid}, offset=${resume_offset})"
+    fi
+
+    local resume_params="resume=UUID=${resume_uuid}"
+    [[ -n "$resume_offset" ]] && resume_params+=" resume_offset=${resume_offset}"
+
+    ui::flush_input
+    sudo sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 ${resume_params}\"|" /etc/default/grub </dev/tty
+    # Clean up double spaces
+    sudo sed -i 's/  */ /g' /etc/default/grub
+
+    log::info "Updating GRUB"
+    if sudo update-grub </dev/tty; then
+        log::ok "GRUB updated with resume parameters"
+    else
+        log::error "Failed to update GRUB"
+    fi
+}
+
+# ── Configure initramfs ───────────────────────────────
+
+_hibernate::configure_initramfs() {
+    if _hibernate::resume_configured; then
+        log::ok "Initramfs resume already configured"
+        return
+    fi
+
+    local resume_uuid
+
+    if _hibernate::swap_is_partition; then
+        resume_uuid="$(_hibernate::swap_uuid)"
+    else
+        resume_uuid="$(_hibernate::root_uuid)"
+    fi
+
+    if [[ -z "$resume_uuid" ]]; then
+        log::error "Could not determine resume UUID"
+        return
+    fi
+
+    log::info "Configuring initramfs resume"
+    ui::flush_input
+    printf 'RESUME=UUID=%s\n' "$resume_uuid" | sudo tee "$_HIBERNATE_RESUME_CONF" > /dev/null
+
+    log::info "Updating initramfs"
+    if sudo update-initramfs -u </dev/tty; then
+        log::ok "Initramfs updated"
+    else
+        log::error "Failed to update initramfs"
+    fi
+}
+
 # ── Configure ───────────────────────────────────────────
 
 _hibernate::configure() {
     local ram_gb
     ram_gb="$(_hibernate::ram_gb)"
 
-    # 1. Create swap file if needed
-    if ! _hibernate::swapfile_active; then
-        local swap_size="${ram_gb}"
+    # 1. Ensure usable swap exists
+    local has_swap=false
+    _hibernate::detect_swap && has_swap=true
 
-        log::info "RAM detected: ${ram_gb}G — swap file needs to be >= RAM"
-
-        local size_choice
-        size_choice="$(gum::choose \
-            --header "Swap file size:" \
-            --header.foreground "$HEX_LAVENDER" \
-            --cursor.foreground "$HEX_BLUE" \
-            --item.foreground "$HEX_TEXT" \
-            --selected.foreground "$HEX_GREEN" \
-            "${ram_gb}G (match RAM)" \
-            "Custom")"
-
-        if [[ "$size_choice" == "Custom" ]]; then
-            swap_size="$(gum::input \
-                --header "Enter swap size in GB (>= ${ram_gb}):" \
-                --header.foreground "$HEX_LAVENDER" \
-                --placeholder "e.g. ${ram_gb}")"
-        fi
-
-        if [[ -z "$swap_size" ]]; then
-            log::warn "No size selected, skipped"
-            return
-        fi
-
-        if _hibernate::swapfile_exists; then
-            log::info "Removing existing swap file"
-            ui::flush_input
-            sudo /sbin/swapoff "$_HIBERNATE_SWAPFILE" </dev/tty 2>/dev/null || true
-            sudo rm -f "$_HIBERNATE_SWAPFILE" </dev/tty
-        fi
-
-        log::info "Creating ${swap_size}G swap file (this may take a moment)"
-        ui::flush_input
-        if ! sudo fallocate -l "${swap_size}G" "$_HIBERNATE_SWAPFILE" </dev/tty; then
-            log::error "Failed to create swap file"
-            return
-        fi
-        sudo chmod 600 "$_HIBERNATE_SWAPFILE" </dev/tty
-        sudo mkswap "$_HIBERNATE_SWAPFILE" </dev/tty
-        log::ok "Swap file created: ${swap_size}G"
-
-        # Activate with low priority (zram keeps priority 100)
-        sudo /sbin/swapon -p 1 "$_HIBERNATE_SWAPFILE" </dev/tty
-        log::ok "Swap file activated (priority 1)"
-
-        # Add to fstab if not present
-        if ! _hibernate::swapfile_in_fstab; then
-            printf '%s none swap sw,pri=1 0 0\n' "$_HIBERNATE_SWAPFILE" | sudo tee -a /etc/fstab > /dev/null
-            log::ok "Added to /etc/fstab (priority 1)"
-        fi
+    if $has_swap && _hibernate::swap_sufficient; then
+        local swap_gb
+        swap_gb="$(_hibernate::swap_size_gb)"
+        local type_label="file"
+        _hibernate::swap_is_partition && type_label="partition"
+        log::ok "Using existing swap ${type_label}: ${_HIBERNATE_SWAP_DEVICE} (${swap_gb}G)"
     else
-        log::ok "Swap file already active"
+        if $has_swap; then
+            local swap_gb
+            swap_gb="$(_hibernate::swap_size_gb)"
+            log::warn "Existing swap too small (${swap_gb}G < ${ram_gb}G RAM)"
+        fi
+        _hibernate::create_swapfile || return
     fi
 
     # 2. Configure GRUB resume
-    if ! _hibernate::grub_has_resume; then
-        local root_uuid swap_offset
-        root_uuid="$(_hibernate::root_uuid)"
-        ui::flush_input
-        swap_offset="$(_hibernate::swap_offset)"
-
-        if [[ -z "$root_uuid" || -z "$swap_offset" ]]; then
-            log::error "Could not determine root UUID or swap offset"
-            return
-        fi
-
-        log::info "Adding resume to GRUB (UUID=${root_uuid}, offset=${swap_offset})"
-        ui::flush_input
-        sudo sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\1 resume=UUID=${root_uuid} resume_offset=${swap_offset}\"|" /etc/default/grub </dev/tty
-        # Clean up double spaces
-        sudo sed -i 's/  */ /g' /etc/default/grub
-
-        log::info "Updating GRUB"
-        if sudo update-grub </dev/tty; then
-            log::ok "GRUB updated with resume parameters"
-        else
-            log::error "Failed to update GRUB"
-        fi
-    else
-        log::ok "GRUB resume already configured"
-    fi
+    _hibernate::configure_grub
 
     # 3. Configure initramfs resume
-    if ! _hibernate::resume_configured; then
-        local root_uuid
-        root_uuid="$(_hibernate::root_uuid)"
-
-        log::info "Configuring initramfs resume"
-        ui::flush_input
-        printf 'RESUME=UUID=%s\n' "$root_uuid" | sudo tee "$_HIBERNATE_RESUME_CONF" > /dev/null
-
-        log::info "Updating initramfs"
-        if sudo update-initramfs -u </dev/tty; then
-            log::ok "Initramfs updated"
-        else
-            log::error "Failed to update initramfs"
-        fi
-    else
-        log::ok "Initramfs resume already configured"
-    fi
+    _hibernate::configure_initramfs
 
     # 4. Configure systemd-sleep
     if ! _hibernate::sleep_configured; then
@@ -380,26 +489,26 @@ _hibernate::remove() {
         log::ok "GRUB resume removed"
     fi
 
-    # Remove swap file
-    if _hibernate::swapfile_active; then
+    # Only remove the default swapfile — never touch user's swap partitions
+    if grep -qF "$_HIBERNATE_DEFAULT_SWAPFILE" /proc/swaps 2>/dev/null; then
         log::info "Deactivating swap file"
         ui::flush_input
-        sudo /sbin/swapoff "$_HIBERNATE_SWAPFILE" </dev/tty
+        sudo /sbin/swapoff "$_HIBERNATE_DEFAULT_SWAPFILE" </dev/tty
         log::ok "Swap file deactivated"
     fi
 
-    if _hibernate::swapfile_exists; then
+    if [[ -f "$_HIBERNATE_DEFAULT_SWAPFILE" ]]; then
         log::info "Removing swap file"
         ui::flush_input
-        sudo rm -f "$_HIBERNATE_SWAPFILE" </dev/tty
+        sudo rm -f "$_HIBERNATE_DEFAULT_SWAPFILE" </dev/tty
         log::ok "Swap file removed"
     fi
 
     # Remove from fstab
-    if _hibernate::swapfile_in_fstab; then
+    if grep -qF "$_HIBERNATE_DEFAULT_SWAPFILE" /etc/fstab 2>/dev/null; then
         log::info "Removing swap from fstab"
         ui::flush_input
-        sudo sed -i "\|${_HIBERNATE_SWAPFILE}|d" /etc/fstab </dev/tty
+        sudo sed -i "\|${_HIBERNATE_DEFAULT_SWAPFILE}|d" /etc/fstab </dev/tty
         log::ok "Removed from fstab"
     fi
 
