@@ -7,7 +7,9 @@ _UPGRADE_LABEL="Configure System Upgrade"
 _UPGRADE_DESC="Update and upgrade all system packages."
 
 _upgrade::upgradable_count() {
-    apt list --upgradable 2>/dev/null | grep -c 'upgradable' || echo 0
+    local count
+    count="$(apt list --upgradable 2>/dev/null | grep -c 'upgradable' || true)"
+    printf '%s' "${count:-0}"
 }
 
 upgrade::check() {
