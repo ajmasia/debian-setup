@@ -5,6 +5,7 @@ _MOD_PACKAGES_LOADED=1
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _PACKAGES_TASKS=(
+    "${_UPGRADE_LABEL}|_UPGRADE_DESC|upgrade::check|upgrade::apply|upgrade::status"
     "${_APT_LABEL}|_APT_DESC|apt::check|apt::apply|apt::status"
     "${_FLATPAK_LABEL}|_FLATPAK_DESC|flatpak::check|flatpak::apply|flatpak::status"
     "${_NIX_LABEL}|_NIX_DESC|nix::check|nix::apply|nix::status"
