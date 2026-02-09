@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.6] - 2026-02-09
+
+### Added
+
+- **Dotfiles module** under Shell -- clone and apply dotfiles via GNU Stow
+  - Clone repo to `~/.dotfiles`, apply/remove individual packages
+  - Built-in help with repo structure guide and Stow usage tips
+  - Portable: dotfiles repo works independently on any system with `stow`
+
 ## [0.10.5] - 2026-02-09
 
 ### Added

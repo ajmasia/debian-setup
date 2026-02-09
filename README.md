@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.10.5-blue)
+![Version](https://img.shields.io/badge/version-0.10.6-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -65,6 +65,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Atuin** -- Shell history search
 - **Tmux** -- Terminal multiplexer
 - **Zellij** -- Terminal workspace
+- **Dotfiles** -- Clone and apply dotfiles via GNU Stow (portable, no lock-in)
 
 ### Hardware
 - **Slimbook EVO** -- Install Slimbook repository and EVO/GNOME meta-packages
