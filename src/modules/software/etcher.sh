@@ -154,6 +154,9 @@ Categories=Utility;
 StartupWMClass=balena-etcher
 EOF
 
+    # Refresh desktop database
+    update-desktop-database "$(dirname "$_ETCHER_DESKTOP")" 2>/dev/null || true
+
     rm -rf "$tmpdir"
     log::ok "Balena Etcher installed"
     ui::return_or_exit
@@ -165,6 +168,9 @@ _etcher::remove() {
     rm -rf "$_ETCHER_DIR"
     rm -f "$_ETCHER_DESKTOP"
     rm -f "$_ETCHER_ICON"
+
+    # Refresh desktop database
+    update-desktop-database "$(dirname "$_ETCHER_DESKTOP")" 2>/dev/null || true
 
     log::ok "Balena Etcher removed"
     ui::return_or_exit
