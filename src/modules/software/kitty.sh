@@ -137,6 +137,7 @@ _kitty::install() {
             "$HOME/.local/share/applications/kitty-open.desktop"
     fi
 
+    update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
     log::ok "Desktop integration configured"
     hash -r
 
@@ -156,6 +157,7 @@ _kitty::remove() {
     rm -f "$HOME/.local/bin/kitten"
     rm -f "$HOME/.local/share/applications/kitty.desktop"
     rm -f "$HOME/.local/share/applications/kitty-open.desktop"
+    update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
     hash -r
 
     log::ok "Kitty removed"

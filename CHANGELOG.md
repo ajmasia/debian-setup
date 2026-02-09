@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.6] - 2026-02-09
+
+### Fixed
+
+- Desktop database refresh after install/remove in Balena Etcher and Kitty for GNOME Activities
+
 ## [0.11.5] - 2026-02-09
 
 ### Changed
