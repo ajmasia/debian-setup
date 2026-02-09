@@ -3,6 +3,34 @@
 [[ -n "${_MENU_LOADED:-}" ]] && return 0
 _MENU_LOADED=1
 
+# All task registries for global search (leaf + mixed arrays)
+_SEARCH_ARRAYS=(
+    _SYSTEM_TASKS
+    _PACKAGES_TASKS
+    _SSH_TASKS
+    _SHELL_TASKS
+    _HARDWARE_TASKS
+    _VIRTUALIZATION_TASKS
+    _DEVELOPMENT_TASKS
+    _ENVIRONMENTS_TASKS
+    _DEVTOOLS_TASKS
+    _AI_TASKS
+    _SOFTWARE_TASKS
+    _EDITORS_TASKS
+    _TERMINALS_TASKS
+    _BROWSERS_TASKS
+    _SECURITY_TASKS
+    _VPNS_TASKS
+    _PASSWORDS_TASKS
+    _AUTHENTICATORS_TASKS
+    _HWKEYS_TASKS
+    _MESSAGING_TASKS
+    _PRODUCTIVITY_TASKS
+    _FONTS_TASKS
+    _UI_TASKS
+    _APPEARANCE_TASKS
+)
+
 menu::main() {
     local choice items
 
@@ -64,6 +92,59 @@ menu::main() {
             ""|"Exit")
                 ui::clear_content
                 ui::goodbye
+                ;;
+        esac
+    done
+}
+
+menu::search() {
+    local choice
+
+    while true; do
+        ui::clear_content
+
+        # Collect all leaf tasks from all registries
+        local all_items=() all_apply_fns=()
+        local arr_name task label desc_var check_fn apply_fn status_fn
+
+        for arr_name in "${_SEARCH_ARRAYS[@]}"; do
+            local -n tasks_ref="$arr_name"
+            for task in "${tasks_ref[@]}"; do
+                IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+                # Skip sub-aggregators (::run), only include leaf tasks (::apply)
+                [[ "$apply_fn" == *"::run" ]] && continue
+                all_items+=("${label#Configure }")
+                all_apply_fns+=("$apply_fn")
+            done
+        done
+
+        all_items+=("Exit")
+
+        choice="$(gum::filter \
+            --height 20 \
+            --header "Search all options:" \
+            --header.foreground "$HEX_LAVENDER" \
+            --indicator.foreground "$HEX_BLUE" \
+            --text.foreground "$HEX_TEXT" \
+            --cursor-text.foreground "$HEX_GREEN" \
+            --match.foreground "$HEX_MAUVE" \
+            --placeholder "Type to search..." \
+            "${all_items[@]}")"
+
+        case "$choice" in
+            ""|"Exit")
+                ui::clear_content
+                ui::goodbye
+                ;;
+            *)
+                local i
+                for i in "${!all_items[@]}"; do
+                    if [[ "${all_items[$i]}" == "$choice" ]]; then
+                        "${all_apply_fns[$i]}"
+                        ui::clear_content
+                        break
+                    fi
+                done
                 ;;
         esac
     done

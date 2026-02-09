@@ -156,6 +156,7 @@ show_help() {
     printf "Options:\n"
     printf "  -v, --version    Show version\n"
     printf "  -h, --help       Show this help message\n"
+    printf "  -s, --search     Start in global search mode\n"
     printf "  --update         Update to latest version\n"
     printf "  --uninstall      Remove debian-setup\n"
 }
@@ -178,6 +179,9 @@ main() {
         --uninstall)
             exec "${SCRIPT_DIR}/install.sh" --uninstall
             ;;
+        -s|--search)
+            local _search_mode=1
+            ;;
     esac
 
     gum::check
@@ -187,7 +191,11 @@ main() {
     ui::header "$VERSION"
     ui::session_info
 
-    menu::main
+    if [[ "${_search_mode:-0}" -eq 1 ]]; then
+        menu::search
+    else
+        menu::main
+    fi
 }
 
 main "$@"
