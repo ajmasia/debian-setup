@@ -7,7 +7,7 @@ _LIBREOFFICE_LABEL="Configure LibreOffice"
 _LIBREOFFICE_DESC="Install LibreOffice office suite."
 
 _libreoffice::is_installed() {
-    dpkg -l libreoffice 2>/dev/null | grep -q '^ii'
+    dpkg -l libreoffice-common 2>/dev/null | grep -q '^ii'
 }
 
 libreoffice::check() {
@@ -33,7 +33,7 @@ libreoffice::apply() {
 
         if $installed; then
             local version
-            version="$(dpkg -l libreoffice 2>/dev/null | awk '/^ii/{print $3}' || true)"
+            version="$(dpkg -l libreoffice-common 2>/dev/null | awk '/^ii/{print $3}' || true)"
             log::ok "LibreOffice: ${version}"
         else
             log::warn "LibreOffice (not installed)"
