@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.1] - 2026-02-09
+
+### Fixed
+
+- Plymouth theme detection now reads config file as fallback when `plymouth-set-default-theme` is not in user PATH
+
 ## [0.12.0] - 2026-02-09
 
 ### Added
