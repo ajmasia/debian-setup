@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.4] - 2026-02-09
+
+### Fixed
+
+- Balena Etcher download URL resolved dynamically from GitHub API (fixed 404)
+
 ## [0.11.3] - 2026-02-09
 
 ### Fixed
