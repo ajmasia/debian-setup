@@ -88,7 +88,7 @@ _discord::install() {
     fi
 
     log::info "Installing Discord"
-    if flatpak install -y flathub "$_DISCORD_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_DISCORD_FLATPAK_ID"; then
         log::ok "Discord installed"
     else
         log::error "Failed to install Discord"
@@ -98,7 +98,7 @@ _discord::install() {
 
 _discord::remove() {
     log::info "Removing Discord"
-    if flatpak remove -y "$_DISCORD_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_DISCORD_FLATPAK_ID"; then
         log::ok "Discord removed"
     else
         log::error "Failed to remove Discord"

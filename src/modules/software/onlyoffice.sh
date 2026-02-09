@@ -88,7 +88,7 @@ _onlyoffice::install() {
     fi
 
     log::info "Installing OnlyOffice"
-    if flatpak install -y flathub "$_ONLYOFFICE_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_ONLYOFFICE_FLATPAK_ID"; then
         log::ok "OnlyOffice installed"
     else
         log::error "Failed to install OnlyOffice"
@@ -98,7 +98,7 @@ _onlyoffice::install() {
 
 _onlyoffice::remove() {
     log::info "Removing OnlyOffice"
-    if flatpak remove -y "$_ONLYOFFICE_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_ONLYOFFICE_FLATPAK_ID"; then
         log::ok "OnlyOffice removed"
     else
         log::error "Failed to remove OnlyOffice"

@@ -88,7 +88,7 @@ _inkscape::install() {
     fi
 
     log::info "Installing Inkscape"
-    if flatpak install -y flathub "$_INKSCAPE_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_INKSCAPE_FLATPAK_ID"; then
         log::ok "Inkscape installed"
     else
         log::error "Failed to install Inkscape"
@@ -98,7 +98,7 @@ _inkscape::install() {
 
 _inkscape::remove() {
     log::info "Removing Inkscape"
-    if flatpak remove -y "$_INKSCAPE_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_INKSCAPE_FLATPAK_ID"; then
         log::ok "Inkscape removed"
     else
         log::error "Failed to remove Inkscape"

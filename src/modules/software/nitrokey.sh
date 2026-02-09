@@ -88,7 +88,7 @@ _nitrokey::install() {
     fi
 
     log::info "Installing Nitrokey App2"
-    if flatpak install -y flathub "$_NITROKEY_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_NITROKEY_FLATPAK_ID"; then
         log::ok "Nitrokey App2 installed"
     else
         log::error "Failed to install Nitrokey App2"
@@ -98,7 +98,7 @@ _nitrokey::install() {
 
 _nitrokey::remove() {
     log::info "Removing Nitrokey App2"
-    if flatpak remove -y "$_NITROKEY_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_NITROKEY_FLATPAK_ID"; then
         log::ok "Nitrokey App2 removed"
     else
         log::error "Failed to remove Nitrokey App2"

@@ -88,7 +88,7 @@ _slack::install() {
     fi
 
     log::info "Installing Slack"
-    if flatpak install -y flathub "$_SLACK_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_SLACK_FLATPAK_ID"; then
         log::ok "Slack installed"
     else
         log::error "Failed to install Slack"
@@ -98,7 +98,7 @@ _slack::install() {
 
 _slack::remove() {
     log::info "Removing Slack"
-    if flatpak remove -y "$_SLACK_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_SLACK_FLATPAK_ID"; then
         log::ok "Slack removed"
     else
         log::error "Failed to remove Slack"

@@ -111,7 +111,7 @@ _nextcloud::install() {
         fi
 
         log::info "Installing Nextcloud Desktop"
-        if flatpak install -y flathub "$_NEXTCLOUD_FLATPAK_ID"; then
+        if sudo flatpak install -y flathub "$_NEXTCLOUD_FLATPAK_ID"; then
             log::ok "Nextcloud Desktop installed"
         else
             log::error "Failed to install Nextcloud Desktop"
@@ -151,7 +151,7 @@ _nextcloud::remove() {
 
     if _nextcloud::app_installed; then
         log::info "Removing Nextcloud Desktop"
-        if flatpak remove -y "$_NEXTCLOUD_FLATPAK_ID"; then
+        if sudo flatpak remove -y "$_NEXTCLOUD_FLATPAK_ID"; then
             log::ok "Nextcloud Desktop removed"
         else
             log::error "Failed to remove Nextcloud Desktop"

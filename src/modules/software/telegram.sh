@@ -88,7 +88,7 @@ _telegram::install() {
     fi
 
     log::info "Installing Telegram"
-    if flatpak install -y flathub "$_TELEGRAM_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_TELEGRAM_FLATPAK_ID"; then
         log::ok "Telegram installed"
     else
         log::error "Failed to install Telegram"
@@ -98,7 +98,7 @@ _telegram::install() {
 
 _telegram::remove() {
     log::info "Removing Telegram"
-    if flatpak remove -y "$_TELEGRAM_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_TELEGRAM_FLATPAK_ID"; then
         log::ok "Telegram removed"
     else
         log::error "Failed to remove Telegram"

@@ -88,7 +88,7 @@ _localsend::install() {
     fi
 
     log::info "Installing LocalSend"
-    if flatpak install -y flathub "$_LOCALSEND_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_LOCALSEND_FLATPAK_ID"; then
         log::ok "LocalSend installed"
     else
         log::error "Failed to install LocalSend"
@@ -98,7 +98,7 @@ _localsend::install() {
 
 _localsend::remove() {
     log::info "Removing LocalSend"
-    if flatpak remove -y "$_LOCALSEND_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_LOCALSEND_FLATPAK_ID"; then
         log::ok "LocalSend removed"
     else
         log::error "Failed to remove LocalSend"
