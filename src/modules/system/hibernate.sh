@@ -27,7 +27,7 @@ _hibernate::swapfile_exists() {
 }
 
 _hibernate::swapfile_active() {
-    swapon --show=NAME --noheadings 2>/dev/null | grep -qF "$_HIBERNATE_SWAPFILE"
+    grep -qF "$_HIBERNATE_SWAPFILE" /proc/swaps 2>/dev/null
 }
 
 _hibernate::swapfile_in_fstab() {
@@ -124,7 +124,7 @@ hibernate::apply() {
         fi
 
         # Zram coexistence info
-        if swapon --show=NAME --noheadings 2>/dev/null | grep -q '/dev/zram'; then
+        if grep -q '/dev/zram' /proc/swaps 2>/dev/null; then
             log::ok "Zram: active (high priority for daily use)"
         fi
 
@@ -235,7 +235,7 @@ _hibernate::configure() {
         if _hibernate::swapfile_exists; then
             log::info "Removing existing swap file"
             ui::flush_input
-            sudo swapoff "$_HIBERNATE_SWAPFILE" </dev/tty 2>/dev/null || true
+            sudo /sbin/swapoff "$_HIBERNATE_SWAPFILE" </dev/tty 2>/dev/null || true
             sudo rm -f "$_HIBERNATE_SWAPFILE" </dev/tty
         fi
 
@@ -250,7 +250,7 @@ _hibernate::configure() {
         log::ok "Swap file created: ${swap_size}G"
 
         # Activate with low priority (zram keeps priority 100)
-        sudo swapon -p 1 "$_HIBERNATE_SWAPFILE" </dev/tty
+        sudo /sbin/swapon -p 1 "$_HIBERNATE_SWAPFILE" </dev/tty
         log::ok "Swap file activated (priority 1)"
 
         # Add to fstab if not present
@@ -384,7 +384,7 @@ _hibernate::remove() {
     if _hibernate::swapfile_active; then
         log::info "Deactivating swap file"
         ui::flush_input
-        sudo swapoff "$_HIBERNATE_SWAPFILE" </dev/tty
+        sudo /sbin/swapoff "$_HIBERNATE_SWAPFILE" </dev/tty
         log::ok "Swap file deactivated"
     fi
 
