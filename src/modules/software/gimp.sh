@@ -83,6 +83,7 @@ gimp::apply() {
 _gimp::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _gimp::install() {
     else
         log::error "Failed to install GIMP"
     fi
+    ui::return_or_exit
 }
 
 _gimp::remove() {
@@ -101,4 +103,5 @@ _gimp::remove() {
     else
         log::error "Failed to remove GIMP"
     fi
+    ui::return_or_exit
 }

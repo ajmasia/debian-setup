@@ -83,6 +83,7 @@ yubicoauth::apply() {
 _yubicoauth::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _yubicoauth::install() {
     else
         log::error "Failed to install Yubico Authenticator"
     fi
+    ui::return_or_exit
 }
 
 _yubicoauth::remove() {
@@ -101,4 +103,5 @@ _yubicoauth::remove() {
     else
         log::error "Failed to remove Yubico Authenticator"
     fi
+    ui::return_or_exit
 }

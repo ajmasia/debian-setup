@@ -83,6 +83,7 @@ slack::apply() {
 _slack::install() {
     if ! command -v flatpak &>/dev/null; then
         log::error "Flatpak not installed. Install via Package managers first"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _slack::install() {
     else
         log::error "Failed to install Slack"
     fi
+    ui::return_or_exit
 }
 
 _slack::remove() {
@@ -101,4 +103,5 @@ _slack::remove() {
     else
         log::error "Failed to remove Slack"
     fi
+    ui::return_or_exit
 }
