@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.2] - 2026-02-09
+
+### Added
+
+- **Balena Etcher module** under Software > Productivity -- USB/SD card flasher (deb from GitHub releases)
+
 ## [0.11.1] - 2026-02-09
 
 ### Added
