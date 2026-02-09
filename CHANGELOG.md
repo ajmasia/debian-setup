@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.9] - 2026-02-09
+
+### Fixed
+
+- System Upgrade module: upgradable count produced double output when zero packages available
+
 ## [0.10.8] - 2026-02-09
 
 ### Added
