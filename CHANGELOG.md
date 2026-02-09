@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.1] - 2026-02-09
+
+### Added
+
+- **LocalSend module** under Software > Productivity -- local network file sharing (Flatpak)
+
 ## [0.11.0] - 2026-02-09
 
 ### Added
