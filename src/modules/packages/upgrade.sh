@@ -41,6 +41,12 @@ upgrade::apply() {
             log::ok "System is up to date"
         else
             log::warn "${count} package(s) upgradable"
+            local pkg_list
+            pkg_list="$(apt list --upgradable 2>/dev/null | grep 'upgradable' | cut -d'/' -f1 || true)"
+            local pkg
+            while IFS= read -r pkg; do
+                [[ -n "$pkg" ]] && log::info "  $pkg"
+            done <<< "$pkg_list"
         fi
 
         log::break
