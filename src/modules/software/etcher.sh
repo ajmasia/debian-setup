@@ -6,7 +6,7 @@ _MOD_ETCHER_LOADED=1
 _ETCHER_LABEL="Configure Balena Etcher"
 _ETCHER_DESC="Install Balena Etcher USB/SD card flasher."
 _ETCHER_PKG="balena-etcher"
-_ETCHER_DEB_URL="https://github.com/balena-io/etcher/releases/latest/download/balena-etcher_amd64.deb"
+_ETCHER_GH_API="https://api.github.com/repos/balena-io/etcher/releases/latest"
 
 _etcher::is_installed() {
     dpkg -l "$_ETCHER_PKG" 2>/dev/null | grep -q '^ii'
@@ -82,13 +82,24 @@ etcher::apply() {
 }
 
 _etcher::install() {
-    log::info "Downloading Balena Etcher"
+    log::info "Fetching latest release URL"
     ui::flush_input
+
+    local deb_url
+    deb_url="$(curl -fsSL "$_ETCHER_GH_API" | grep -oP '"browser_download_url":\s*"\K[^"]*amd64\.deb' || true)"
+
+    if [[ -z "$deb_url" ]]; then
+        log::error "Failed to find .deb download URL"
+        ui::return_or_exit
+        return
+    fi
+
+    log::info "Downloading Balena Etcher"
 
     local tmpfile
     tmpfile="$(mktemp --suffix=.deb)"
 
-    if ! curl -fSL -o "$tmpfile" "$_ETCHER_DEB_URL"; then
+    if ! curl -fSL -o "$tmpfile" "$deb_url"; then
         log::error "Failed to download Balena Etcher"
         rm -f "$tmpfile"
         ui::return_or_exit
