@@ -11,6 +11,7 @@ _SYSTEM_TASKS=(
     "${_ZRAM_LABEL}|_ZRAM_DESC|zram::check|zram::apply|zram::status"
     "${_KERNEL_LABEL}|_KERNEL_DESC|kernel::check|kernel::apply|kernel::status"
     "${_WATCHERS_LABEL}|_WATCHERS_DESC|watchers::check|watchers::apply|watchers::status"
+    "${_PLYMOUTH_LABEL}|_PLYMOUTH_DESC|plymouth::check|plymouth::apply|plymouth::status"
 )
 
 system::log_status() {
