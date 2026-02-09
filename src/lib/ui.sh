@@ -7,6 +7,7 @@ _UI_CONTENT_ROW=0
 _UI_SESSION_LOG_START=0
 _UI_VERSION=""
 _UI_DIRTY=0
+_UI_SPIN_PID=0
 
 ui::_cursor_row() {
     local row col
@@ -55,6 +56,31 @@ ui::header() {
     local version="$1"
     _UI_VERSION="$version"
     ui::_paint_header
+}
+
+ui::spin_start() {
+    local title="${1:-Loading...}"
+    (
+        local chars='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+        local i=0 len=${#chars}
+        while true; do
+            printf "\r%b%s%b %b%s%b" \
+                "${COLOR_LAVENDER}" "${chars:i%len:1}" "${COLOR_RESET}" \
+                "${COLOR_SUBTEXT0}" "$title" "${COLOR_RESET}"
+            i=$((i + 1))
+            sleep 0.08
+        done
+    ) &
+    _UI_SPIN_PID=$!
+}
+
+ui::spin_stop() {
+    if [[ $_UI_SPIN_PID -ne 0 ]]; then
+        kill "$_UI_SPIN_PID" 2>/dev/null
+        wait "$_UI_SPIN_PID" 2>/dev/null || true
+        _UI_SPIN_PID=0
+        printf "\r\033[K"
+    fi
 }
 
 ui::flush_input() {
