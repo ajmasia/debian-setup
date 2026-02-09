@@ -1,20 +1,21 @@
-# GNOME module
+# UI module (GNOME customization)
 
-[[ -n "${_MOD_GNOME_LOADED:-}" ]] && return 0
-_MOD_GNOME_LOADED=1
+[[ -n "${_MOD_UI_MODULE_LOADED:-}" ]] && return 0
+_MOD_UI_MODULE_LOADED=1
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
-_GNOME_TASKS=(
+_UI_TASKS=(
     "${_APPEARANCE_LABEL}|_APPEARANCE_DESC|appearance::check|appearance::run|appearance::status"
     "${_KEYBOARD_LABEL}|_KEYBOARD_DESC|keyboard::check|keyboard::apply|keyboard::status"
     "${_TERMCSS_LABEL}|_TERMCSS_DESC|termcss::check|termcss::apply|termcss::status"
     "${_EXTENSIONS_LABEL}|_EXTENSIONS_DESC|extensions::check|extensions::apply|extensions::status"
+    "${_BROWSERTHEMES_LABEL}|_BROWSERTHEMES_DESC|browserthemes::check|browserthemes::apply|browserthemes::status"
 )
 
-gnome::log_status() {
+ui_module::log_status() {
     local task label desc_var check_fn apply_fn status_fn
-    _log::to_file "info" "GNOME status"
-    for task in "${_GNOME_TASKS[@]}"; do
+    _log::to_file "info" "UI status"
+    for task in "${_UI_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
             _log::to_file "ok" "${label}"
@@ -26,9 +27,9 @@ gnome::log_status() {
     done
 }
 
-gnome::has_pending() {
+ui_module::has_pending() {
     local task label desc_var check_fn apply_fn status_fn
-    for task in "${_GNOME_TASKS[@]}"; do
+    for task in "${_UI_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if ! "$check_fn"; then
             return 0
@@ -37,29 +38,32 @@ gnome::has_pending() {
     return 1
 }
 
-gnome::run() {
+ui_module::run() {
     local task label desc_var check_fn apply_fn status_fn choice
 
     while true; do
         ui::clear_content
-        log::nav "GNOME"
+        log::nav "UI"
         log::break
 
         # Build menu items (strip "Configure " prefix)
         local items=() apply_fns=()
-        for task in "${_GNOME_TASKS[@]}"; do
+        for task in "${_UI_TASKS[@]}"; do
             IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
             items+=("${label#Configure }")
             apply_fns+=("$apply_fn")
         done
         items+=("Back" "Exit")
 
-        choice="$(gum::choose \
+        choice="$(gum::filter \
+            --height 8 \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
-            --cursor.foreground "$HEX_BLUE" \
-            --item.foreground "$HEX_TEXT" \
-            --selected.foreground "$HEX_GREEN" \
+            --indicator.foreground "$HEX_BLUE" \
+            --text.foreground "$HEX_TEXT" \
+            --cursor-text.foreground "$HEX_GREEN" \
+            --match.foreground "$HEX_MAUVE" \
+            --placeholder "Type to filter..." \
             "${items[@]}")"
 
         case "$choice" in

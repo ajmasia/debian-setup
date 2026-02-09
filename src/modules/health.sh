@@ -56,7 +56,7 @@ health::run() {
     log::break
     health::_check_software_tasks
     log::break
-    health::_check_gnome_tasks
+    health::_check_ui_tasks
 
     ui::return_or_exit
 }
@@ -193,11 +193,11 @@ health::_check_software_tasks() {
     done
 }
 
-health::_check_gnome_tasks() {
+health::_check_ui_tasks() {
     local task label desc_var check_fn apply_fn status_fn
 
-    log::info "GNOME tasks"
-    for task in "${_GNOME_TASKS[@]}"; do
+    log::info "UI tasks"
+    for task in "${_UI_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
             log::ok "${label}"
