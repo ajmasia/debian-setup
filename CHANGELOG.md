@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.2] - 2026-02-09
+
+### Added
+
+- Loading spinner while collecting task data in search modes (`-s`, `-si`, `-sr`)
+
 ## [0.12.1] - 2026-02-09
 
 ### Fixed
