@@ -107,7 +107,6 @@ menu::search() {
         local all_items=() all_apply_fns=()
         local arr_name task label desc_var check_fn apply_fn status_fn
 
-        ui::spin_start "Loading data..."
         for arr_name in "${_SEARCH_ARRAYS[@]}"; do
             local -n tasks_ref="$arr_name"
             for task in "${tasks_ref[@]}"; do
@@ -118,7 +117,6 @@ menu::search() {
                 all_apply_fns+=("$apply_fn")
             done
         done
-        ui::spin_stop
 
         all_items+=("Exit")
         local header="Search all options (${#all_apply_fns[@]}):"
