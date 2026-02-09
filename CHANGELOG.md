@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.3] - 2026-02-09
+
+### Fixed
+
+- Flatpak install/remove and remote operations now use sudo for system-wide access (13 modules)
+
 ## [0.11.2] - 2026-02-09
 
 ### Added

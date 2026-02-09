@@ -88,7 +88,7 @@ _gimp::install() {
     fi
 
     log::info "Installing GIMP"
-    if flatpak install -y flathub "$_GIMP_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_GIMP_FLATPAK_ID"; then
         log::ok "GIMP installed"
     else
         log::error "Failed to install GIMP"
@@ -98,7 +98,7 @@ _gimp::install() {
 
 _gimp::remove() {
     log::info "Removing GIMP"
-    if flatpak remove -y "$_GIMP_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_GIMP_FLATPAK_ID"; then
         log::ok "GIMP removed"
     else
         log::error "Failed to remove GIMP"

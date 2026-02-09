@@ -88,7 +88,7 @@ _compass::install() {
     fi
 
     log::info "Installing MongoDB Compass"
-    if flatpak install -y flathub "$_COMPASS_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_COMPASS_FLATPAK_ID"; then
         log::ok "MongoDB Compass installed"
     else
         log::error "Failed to install MongoDB Compass"
@@ -98,7 +98,7 @@ _compass::install() {
 
 _compass::remove() {
     log::info "Removing MongoDB Compass"
-    if flatpak remove -y "$_COMPASS_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_COMPASS_FLATPAK_ID"; then
         log::ok "MongoDB Compass removed"
     else
         log::error "Failed to remove MongoDB Compass"

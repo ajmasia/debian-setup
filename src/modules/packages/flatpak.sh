@@ -114,7 +114,7 @@ flatpak::apply() {
                     log::ok "Flatpak installed"
                     log::break
                     log::info "Adding Flathub repository"
-                    flatpak remote-add --if-not-exists flathub "$_FLATPAK_FLATHUB_URL"
+                    sudo flatpak remote-add --if-not-exists flathub "$_FLATPAK_FLATHUB_URL" </dev/tty
                     log::ok "Flathub repository added"
                     log::break
                     log::warn "Log out and back in for GNOME Software to show Flatpak apps"
@@ -125,13 +125,15 @@ flatpak::apply() {
             "Add Flathub repository")
                 log::break
                 log::info "Adding Flathub repository"
-                flatpak remote-add --if-not-exists flathub "$_FLATPAK_FLATHUB_URL"
+                ui::flush_input
+                sudo flatpak remote-add --if-not-exists flathub "$_FLATPAK_FLATHUB_URL" </dev/tty
                 log::ok "Flathub repository added"
                 ;;
             "Remove Flathub repository")
                 log::break
                 log::info "Removing Flathub repository"
-                if flatpak remote-delete flathub; then
+                ui::flush_input
+                if sudo flatpak remote-delete flathub </dev/tty; then
                     log::ok "Flathub repository removed"
                 else
                     log::error "Failed to remove Flathub"

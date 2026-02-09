@@ -88,7 +88,7 @@ _yubicoauth::install() {
     fi
 
     log::info "Installing Yubico Authenticator"
-    if flatpak install -y flathub "$_YUBICOAUTH_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_YUBICOAUTH_FLATPAK_ID"; then
         log::ok "Yubico Authenticator installed"
     else
         log::error "Failed to install Yubico Authenticator"
@@ -98,7 +98,7 @@ _yubicoauth::install() {
 
 _yubicoauth::remove() {
     log::info "Removing Yubico Authenticator"
-    if flatpak remove -y "$_YUBICOAUTH_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_YUBICOAUTH_FLATPAK_ID"; then
         log::ok "Yubico Authenticator removed"
     else
         log::error "Failed to remove Yubico Authenticator"

@@ -88,7 +88,7 @@ _keepassxc::install() {
     fi
 
     log::info "Installing KeePassXC"
-    if flatpak install -y flathub "$_KEEPASSXC_FLATPAK_ID"; then
+    if sudo flatpak install -y flathub "$_KEEPASSXC_FLATPAK_ID"; then
         log::ok "KeePassXC installed"
     else
         log::error "Failed to install KeePassXC"
@@ -98,7 +98,7 @@ _keepassxc::install() {
 
 _keepassxc::remove() {
     log::info "Removing KeePassXC"
-    if flatpak remove -y "$_KEEPASSXC_FLATPAK_ID"; then
+    if sudo flatpak remove -y "$_KEEPASSXC_FLATPAK_ID"; then
         log::ok "KeePassXC removed"
     else
         log::error "Failed to remove KeePassXC"
