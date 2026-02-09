@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.5] - 2026-02-09
+
+### Added
+
+- **Plymouth module** under System Essentials -- boot splash with spinner theme, GRUB splash parameter, initramfs update
+- **Hibernate module** under System Essentials -- swap file creation (priority 1, coexists with zram), GRUB resume, initramfs resume, systemd-sleep suspend-then-hibernate, logind lid switch
+
 ## [0.10.4] - 2026-02-09
 
 ### Fixed
