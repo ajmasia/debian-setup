@@ -9,6 +9,7 @@ _PACKAGES_TASKS=(
     "${_APT_LABEL}|_APT_DESC|apt::check|apt::apply|apt::status"
     "${_FLATPAK_LABEL}|_FLATPAK_DESC|flatpak::check|flatpak::apply|flatpak::status"
     "${_NIX_LABEL}|_NIX_DESC|nix::check|nix::apply|nix::status"
+    "${_HOMEBREW_LABEL}|_HOMEBREW_DESC|homebrew::check|homebrew::apply|homebrew::status"
 )
 
 packages::log_status() {
