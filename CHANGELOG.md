@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.7] - 2026-02-09
+
+### Fixed
+
+- Gum auto-installer now uses `su -c` (root password) when user has no sudo access on fresh installs
+
 ## [0.10.6] - 2026-02-09
 
 ### Added
