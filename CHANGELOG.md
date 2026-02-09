@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.7] - 2026-02-09
+
+### Fixed
+
+- LibreOffice detection now checks `libreoffice-common` instead of metapackage (detects default Debian 13 install)
+
 ## [0.11.6] - 2026-02-09
 
 ### Fixed
