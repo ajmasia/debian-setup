@@ -20,6 +20,9 @@ _plymouth::installed() {
 _plymouth::theme_active() {
     local current
     current="$(plymouth-set-default-theme 2>/dev/null || true)"
+    if [[ -z "$current" && -f /etc/plymouth/plymouthd.conf ]]; then
+        current="$(grep -oP '^\s*Theme=\K.*' /etc/plymouth/plymouthd.conf 2>/dev/null || true)"
+    fi
     [[ "$current" == "$_PLYMOUTH_THEME" ]]
 }
 
@@ -65,6 +68,9 @@ plymouth::apply() {
             log::ok "Plymouth: installed"
             local current
             current="$(plymouth-set-default-theme 2>/dev/null || true)"
+            if [[ -z "$current" && -f /etc/plymouth/plymouthd.conf ]]; then
+                current="$(grep -oP '^\s*Theme=\K.*' /etc/plymouth/plymouthd.conf 2>/dev/null || true)"
+            fi
             if $theme_ok; then
                 log::ok "Theme: ${current}"
             else
