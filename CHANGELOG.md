@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.3] - 2026-02-09
+
+### Fixed
+
+- Header repaint after health check output scrolls past visible area
+
 ## [0.12.2] - 2026-02-09
 
 ### Added

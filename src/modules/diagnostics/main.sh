@@ -26,6 +26,7 @@ diagnostics::run() {
             "Health")
                 ui::clear_content
                 health::run
+                _UI_DIRTY=1
                 ;;
             "Logs")
                 logs::run
