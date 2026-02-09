@@ -75,12 +75,6 @@ slimbook::apply() {
             fi
         done
 
-        if _kernel::has_bpo; then
-            log::ok "Backports kernel: installed"
-        else
-            log::warn "Backports kernel: not installed"
-        fi
-
         log::break
 
         local options=()
@@ -179,16 +173,6 @@ _slimbook::_install() {
         log::ok "Slimbook EVO packages installed"
     else
         log::error "Failed to install Slimbook packages"
-    fi
-
-    # Ensure backports kernel is installed
-    if ! _kernel::has_bpo; then
-        log::break
-        if _kernel::has_backports; then
-            _kernel::_install_bpo
-        else
-            log::warn "Backports not enabled in APT sources — skipping kernel install"
-        fi
     fi
 }
 
