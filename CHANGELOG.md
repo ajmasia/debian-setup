@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.5] - 2026-02-09
+
+### Changed
+
+- Balena Etcher switched from .deb to zip binary install (fixes broken dependency on Debian 13)
+  - Downloads linux-x64 zip from GitHub releases, installs to `~/.local/share/balena-etcher/`
+  - Creates `.desktop` entry and downloads icon for GNOME Activities
+
 ## [0.11.4] - 2026-02-09
 
 ### Fixed
