@@ -14,6 +14,7 @@ _PRODUCTIVITY_TASKS=(
     "${_LIBREOFFICE_LABEL}|_LIBREOFFICE_DESC|libreoffice::check|libreoffice::apply|libreoffice::status"
     "${_NEXTCLOUD_LABEL}|_NEXTCLOUD_DESC|nextcloud::check|nextcloud::apply|nextcloud::status"
     "${_LOCALSEND_LABEL}|_LOCALSEND_DESC|localsend::check|localsend::apply|localsend::status"
+    "${_ETCHER_LABEL}|_ETCHER_DESC|etcher::check|etcher::apply|etcher::status"
 )
 
 productivity::check() {

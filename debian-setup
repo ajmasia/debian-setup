@@ -127,6 +127,7 @@ source "${SCRIPT_DIR}/src/modules/software/onlyoffice.sh"
 source "${SCRIPT_DIR}/src/modules/software/libreoffice.sh"
 source "${SCRIPT_DIR}/src/modules/software/nextcloud.sh"
 source "${SCRIPT_DIR}/src/modules/software/localsend.sh"
+source "${SCRIPT_DIR}/src/modules/software/etcher.sh"
 source "${SCRIPT_DIR}/src/modules/software/productivity.sh"
 # Fonts
 source "${SCRIPT_DIR}/src/modules/software/nerdfonts.sh"
