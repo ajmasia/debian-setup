@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.0] - 2026-02-09
+
+### Added
+
+- **Global search mode** (`--search` / `-s`) -- flat filterable list of all available options across all modules
+- **Search filters** -- `--search-to-install` / `-si` shows only non-installed options, `--search-to-remove` / `-sr` shows only installed options, with dynamic counters in the header
+- **System Upgrade** now lists individual upgradable package names
+
 ## [0.11.7] - 2026-02-09
 
 ### Fixed
