@@ -20,10 +20,18 @@ gum::_install() {
     fi
 
     log::break
-    log::info "Installing gum (sudo may ask for your password)"
+
+    # Detect if user has sudo access
+    local use_sudo=true
+    if ! sudo -n true 2>/dev/null && ! groups | grep -qw sudo; then
+        use_sudo=false
+        log::info "Installing gum (root password required)"
+    else
+        log::info "Installing gum (sudo may ask for your password)"
+    fi
+
     log::break
 
-    sudo mkdir -p /etc/apt/keyrings
     local tmpkey
     tmpkey="$(mktemp)"
     if ! curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o "$tmpkey" 2>/dev/null; then
@@ -31,11 +39,24 @@ gum::_install() {
         log::error "Failed to download GPG key"
         exit 1
     fi
-    sudo mv "$tmpkey" /etc/apt/keyrings/charm.gpg
-    sudo chmod 644 /etc/apt/keyrings/charm.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list > /dev/null
-    sudo apt-get update -qq
-    sudo apt-get install -y gum
+
+    if $use_sudo; then
+        sudo mkdir -p /etc/apt/keyrings
+        sudo mv "$tmpkey" /etc/apt/keyrings/charm.gpg
+        sudo chmod 644 /etc/apt/keyrings/charm.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list > /dev/null
+        sudo apt-get update -qq
+        sudo apt-get install -y gum
+    else
+        su -c "
+            mkdir -p /etc/apt/keyrings
+            mv '$tmpkey' /etc/apt/keyrings/charm.gpg
+            chmod 644 /etc/apt/keyrings/charm.gpg
+            echo 'deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *' > /etc/apt/sources.list.d/charm.list
+            apt-get update -qq
+            apt-get install -y gum
+        " </dev/tty
+    fi
 
     if ! command -v gum &>/dev/null; then
         log::error "gum installation failed"
