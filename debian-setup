@@ -69,6 +69,7 @@ source "${SCRIPT_DIR}/src/modules/shell/zoxide.sh"
 source "${SCRIPT_DIR}/src/modules/shell/atuin.sh"
 source "${SCRIPT_DIR}/src/modules/shell/tmux.sh"
 source "${SCRIPT_DIR}/src/modules/shell/zellij.sh"
+source "${SCRIPT_DIR}/src/modules/shell/dotfiles.sh"
 source "${SCRIPT_DIR}/src/modules/shell/main.sh"
 # Hardware
 source "${SCRIPT_DIR}/src/modules/hardware/slimbook.sh"
