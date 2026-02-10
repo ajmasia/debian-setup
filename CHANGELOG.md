@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.10] - 2026-02-10
+
+### Added
+
+- APT installation method for Nextcloud Desktop (`nextcloud-desktop`) as alternative to Flatpak, with independent install/remove per method
+
 ## [0.12.9] - 2026-02-10
 
 ### Added
