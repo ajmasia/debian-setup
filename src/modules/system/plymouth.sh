@@ -7,7 +7,9 @@ _PLYMOUTH_LABEL="Configure Plymouth"
 _PLYMOUTH_DESC="Configure Plymouth boot splash with spinner theme."
 
 _PLYMOUTH_PACKAGES=("plymouth" "plymouth-themes")
-_PLYMOUTH_SUPPORTED_THEMES=("spinner" "bgrt")
+_PLYMOUTH_SUPPORTED_THEMES=("spinner" "bgrt" "bgrt-luks")
+_PLYMOUTH_BGRT_LUKS_DIR="/usr/share/plymouth/themes/bgrt-luks"
+_PLYMOUTH_BGRT_LUKS_CONF="${_PLYMOUTH_BGRT_LUKS_DIR}/bgrt-luks.plymouth"
 
 _plymouth::installed() {
     local pkg
@@ -143,6 +145,86 @@ plymouth::apply() {
     done
 }
 
+_plymouth::ensure_bgrt_luks() {
+    [[ -f "$_PLYMOUTH_BGRT_LUKS_CONF" ]] && return 0
+
+    log::info "Creating bgrt-luks theme"
+    ui::flush_input
+    sudo mkdir -p "$_PLYMOUTH_BGRT_LUKS_DIR" </dev/tty
+
+    local conf
+    conf="$(cat <<'THEME'
+[Plymouth Theme]
+Name=BGRT LUKS
+Description=BGRT theme with manufacturer logo visible during LUKS password prompt
+ModuleName=two-step
+
+[two-step]
+Font=Cantarell 12
+TitleFont=Cantarell Light 30
+ImageDir=/usr/share/plymouth/themes/spinner
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.382
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.382
+HorizontalAlignment=.5
+VerticalAlignment=.7
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.96
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x000000
+BackgroundEndColor=0x000000
+ProgressBarBackgroundColor=0x606060
+ProgressBarForegroundColor=0xffffff
+DialogClearsFirmwareBackground=false
+MessageBelowAnimation=true
+
+[boot-up]
+UseEndAnimation=false
+UseFirmwareBackground=true
+
+[shutdown]
+UseEndAnimation=false
+UseFirmwareBackground=true
+
+[reboot]
+UseEndAnimation=false
+UseFirmwareBackground=true
+
+[updates]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Installing Updates...
+SubTitle=Do not turn off your computer
+
+[system-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Upgrading System...
+SubTitle=Do not turn off your computer
+
+[firmware-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Upgrading Firmware...
+SubTitle=Do not turn off your computer
+
+[system-reset]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Resetting System...
+SubTitle=Do not turn off your computer
+THEME
+)"
+    printf '%s\n' "$conf" | sudo tee "$_PLYMOUTH_BGRT_LUKS_CONF" > /dev/null
+    log::ok "bgrt-luks theme created"
+}
+
 _plymouth::select_theme() {
     local current
     current="$(_plymouth::current_theme)"
@@ -155,7 +237,8 @@ _plymouth::select_theme() {
         --item.foreground "$HEX_TEXT" \
         --selected.foreground "$HEX_GREEN" \
         "spinner — Generic loading animation" \
-        "bgrt — Manufacturer logo (UEFI)")"
+        "bgrt — Manufacturer logo (UEFI)" \
+        "bgrt-luks — Manufacturer logo visible during LUKS")"
 
     if [[ -z "$theme_choice" ]]; then
         return
@@ -170,6 +253,11 @@ _plymouth::select_theme() {
     fi
 
     log::break
+
+    if [[ "$theme" == "bgrt-luks" ]]; then
+        _plymouth::ensure_bgrt_luks || return
+    fi
+
     log::info "Setting theme to ${theme}"
     ui::flush_input
     if sudo plymouth-set-default-theme "$theme" </dev/tty; then
@@ -253,6 +341,14 @@ _plymouth::remove() {
         else
             log::error "Failed to update GRUB"
         fi
+    fi
+
+    # Remove custom bgrt-luks theme if present
+    if [[ -d "$_PLYMOUTH_BGRT_LUKS_DIR" ]]; then
+        log::info "Removing bgrt-luks theme"
+        ui::flush_input
+        sudo rm -rf "$_PLYMOUTH_BGRT_LUKS_DIR" </dev/tty
+        log::ok "bgrt-luks theme removed"
     fi
 
     log::info "Removing Plymouth"
