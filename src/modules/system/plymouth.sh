@@ -7,7 +7,7 @@ _PLYMOUTH_LABEL="Configure Plymouth"
 _PLYMOUTH_DESC="Configure Plymouth boot splash with spinner theme."
 
 _PLYMOUTH_PACKAGES=("plymouth" "plymouth-themes")
-_PLYMOUTH_THEME="spinner"
+_PLYMOUTH_SUPPORTED_THEMES=("spinner" "bgrt")
 
 _plymouth::installed() {
     local pkg
@@ -17,13 +17,22 @@ _plymouth::installed() {
     return 0
 }
 
-_plymouth::theme_active() {
+_plymouth::current_theme() {
     local current
     current="$(plymouth-set-default-theme 2>/dev/null || true)"
     if [[ -z "$current" && -f /etc/plymouth/plymouthd.conf ]]; then
         current="$(grep -oP '^\s*Theme=\K.*' /etc/plymouth/plymouthd.conf 2>/dev/null || true)"
     fi
-    [[ "$current" == "$_PLYMOUTH_THEME" ]]
+    printf '%s' "$current"
+}
+
+_plymouth::theme_active() {
+    local current theme
+    current="$(_plymouth::current_theme)"
+    for theme in "${_PLYMOUTH_SUPPORTED_THEMES[@]}"; do
+        [[ "$current" == "$theme" ]] && return 0
+    done
+    return 1
 }
 
 _plymouth::grub_has_splash() {
@@ -67,14 +76,11 @@ plymouth::apply() {
         if $installed; then
             log::ok "Plymouth: installed"
             local current
-            current="$(plymouth-set-default-theme 2>/dev/null || true)"
-            if [[ -z "$current" && -f /etc/plymouth/plymouthd.conf ]]; then
-                current="$(grep -oP '^\s*Theme=\K.*' /etc/plymouth/plymouthd.conf 2>/dev/null || true)"
-            fi
+            current="$(_plymouth::current_theme)"
             if $theme_ok; then
                 log::ok "Theme: ${current}"
             else
-                log::warn "Theme: ${current:-none} (expected ${_PLYMOUTH_THEME})"
+                log::warn "Theme: ${current:-none} (not a supported theme)"
             fi
             if $grub_ok; then
                 log::ok "GRUB: splash enabled"
@@ -95,6 +101,7 @@ plymouth::apply() {
             if ! $theme_ok || ! $grub_ok; then
                 options+=("Configure Plymouth")
             fi
+            options+=("Change theme")
             options+=("Remove Plymouth")
         fi
 
@@ -125,12 +132,59 @@ plymouth::apply() {
                 log::break
                 _plymouth::configure
                 ;;
+            "Change theme")
+                _plymouth::select_theme
+                ;;
             "Remove Plymouth")
                 log::break
                 _plymouth::remove
                 ;;
         esac
     done
+}
+
+_plymouth::select_theme() {
+    local current
+    current="$(_plymouth::current_theme)"
+
+    local theme_choice
+    theme_choice="$(gum::choose \
+        --header "Select Plymouth theme (current: ${current:-none}):" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "spinner — Generic loading animation" \
+        "bgrt — Manufacturer logo (UEFI)")"
+
+    if [[ -z "$theme_choice" ]]; then
+        return
+    fi
+
+    local theme="${theme_choice%% —*}"
+
+    if [[ "$theme" == "$current" ]]; then
+        log::break
+        log::ok "Theme already set to ${theme}"
+        return
+    fi
+
+    log::break
+    log::info "Setting theme to ${theme}"
+    ui::flush_input
+    if sudo plymouth-set-default-theme "$theme" </dev/tty; then
+        log::ok "Theme set to ${theme}"
+    else
+        log::error "Failed to set theme"
+        return
+    fi
+
+    log::info "Updating initramfs"
+    if sudo update-initramfs -u </dev/tty; then
+        log::ok "Initramfs updated"
+    else
+        log::error "Failed to update initramfs"
+    fi
 }
 
 _plymouth::install() {
@@ -145,12 +199,13 @@ _plymouth::install() {
 }
 
 _plymouth::configure() {
-    # Set theme
+    # Set theme if not a supported one
     if ! _plymouth::theme_active; then
-        log::info "Setting theme to ${_PLYMOUTH_THEME}"
+        local target="${_PLYMOUTH_SUPPORTED_THEMES[0]}"
+        log::info "Setting theme to ${target}"
         ui::flush_input
-        if sudo plymouth-set-default-theme "$_PLYMOUTH_THEME" </dev/tty; then
-            log::ok "Theme set to ${_PLYMOUTH_THEME}"
+        if sudo plymouth-set-default-theme "$target" </dev/tty; then
+            log::ok "Theme set to ${target}"
         else
             log::error "Failed to set theme"
             return

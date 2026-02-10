@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.5] - 2026-02-10
+
+### Added
+
+- **GRUB module** under System Essentials -- configure boot resolution (GRUB_GFXMODE with presets and custom input), remove background image, restore defaults
+- **Plymouth theme selection** -- choose between `spinner` (generic animation) and `bgrt` (UEFI manufacturer logo) in Plymouth wizard
+
 ## [0.12.4] - 2026-02-09
 
 ### Fixed

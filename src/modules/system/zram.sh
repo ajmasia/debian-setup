@@ -66,7 +66,7 @@ zram::apply() {
 
         # Show active swap
         local swap_info
-        swap_info="$(swapon --show 2>/dev/null || true)"
+        swap_info="$(/sbin/swapon --show 2>/dev/null || true)"
         if [[ -n "$swap_info" ]]; then
             log::break
             log::info "Active swap devices"
