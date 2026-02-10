@@ -7,6 +7,7 @@ _GRUB_LABEL="Configure GRUB"
 _GRUB_DESC="Configure GRUB resolution and background image."
 
 _GRUB_CONF="/etc/default/grub"
+_GRUB_CFG="/boot/grub/grub.cfg"
 
 _grub::gfxmode_set() {
     [[ -f "$_GRUB_CONF" ]] || return 1
@@ -18,15 +19,8 @@ _grub::gfxmode_set() {
 }
 
 _grub::background_clean() {
-    [[ -f "$_GRUB_CONF" ]] || return 0
-    if grep -q '^GRUB_BACKGROUND=' "$_GRUB_CONF" 2>/dev/null; then
-        local value
-        value="$(grep -oP '^GRUB_BACKGROUND=\K.*' "$_GRUB_CONF" 2>/dev/null || true)"
-        value="${value//\"/}"
-        [[ -z "$value" ]]
-    else
-        return 0
-    fi
+    [[ -f "$_GRUB_CFG" ]] || return 0
+    ! grep -q 'background_image' "$_GRUB_CFG" 2>/dev/null
 }
 
 grub::check() {
@@ -75,10 +69,9 @@ grub::apply() {
         if $bg_clean; then
             log::ok "Background: clean"
         else
-            local current_bg
-            current_bg="$(grep -oP '^GRUB_BACKGROUND=\K.*' "$_GRUB_CONF" 2>/dev/null || true)"
-            current_bg="${current_bg//\"/}"
-            log::warn "Background: ${current_bg}"
+            local bg_path
+            bg_path="$(grep -oP 'background_image \K\S+' "$_GRUB_CFG" 2>/dev/null | head -1 || true)"
+            log::warn "Background: ${bg_path:-detected}"
         fi
 
         log::break
@@ -122,7 +115,39 @@ grub::apply() {
     done
 }
 
+_GRUB_COMMON_RESOLUTIONS=("1024x768" "1280x1024" "1440x900" "1680x1050" "1920x1080" "1920x1200" "2560x1440" "3840x2160")
+_GRUB_RECOMMENDED="1920x1080"
+
+_grub::detect_resolutions() {
+    local mode_file
+    for mode_file in /sys/class/drm/card*/*/modes; do
+        [[ -f "$mode_file" ]] || continue
+        cat "$mode_file"
+    done | sort -t'x' -k1 -rn -k2 -rn | uniq
+}
+
 _grub::change_resolution() {
+    local options=()
+    local detected common mode
+    detected="$(_grub::detect_resolutions)"
+
+    if [[ -n "$detected" ]]; then
+        for common in "${_GRUB_COMMON_RESOLUTIONS[@]}"; do
+            if printf '%s\n' "$detected" | grep -qxF "$common"; then
+                if [[ "$common" == "$_GRUB_RECOMMENDED" ]]; then
+                    options+=("${common} (recommended)")
+                else
+                    options+=("$common")
+                fi
+            fi
+        done
+    fi
+
+    if [[ ${#options[@]} -eq 0 ]]; then
+        options+=("1024x768" "1440x900" "1920x1080 (recommended)" "1920x1200")
+    fi
+    options+=("Custom")
+
     local res_choice
     res_choice="$(gum::choose \
         --header "Select GRUB resolution:" \
@@ -130,10 +155,7 @@ _grub::change_resolution() {
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
         --selected.foreground "$HEX_GREEN" \
-        "1280x800 — Large text, very readable" \
-        "1440x900 — Good balance" \
-        "1920x1200 — High resolution" \
-        "Custom")"
+        "${options[@]}")"
 
     if [[ -z "$res_choice" ]]; then
         return
@@ -155,7 +177,7 @@ _grub::change_resolution() {
             return
         fi
     else
-        resolution="${res_choice%% —*}"
+        resolution="${res_choice% (recommended)}"
     fi
 
     log::break
@@ -177,11 +199,10 @@ _grub::remove_background() {
     ui::flush_input
     if grep -q '^#\?GRUB_BACKGROUND=' "$_GRUB_CONF" 2>/dev/null; then
         sudo sed -i 's/^#\?GRUB_BACKGROUND=.*/GRUB_BACKGROUND=""/' "$_GRUB_CONF" </dev/tty
-        log::ok "GRUB_BACKGROUND cleared"
     else
-        log::ok "No GRUB_BACKGROUND to remove"
-        return
+        printf 'GRUB_BACKGROUND=""\n' | sudo tee -a "$_GRUB_CONF" > /dev/null
     fi
+    log::ok "GRUB_BACKGROUND overridden"
 
     _grub::update
 }
