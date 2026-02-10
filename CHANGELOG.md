@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.7] - 2026-02-10
+
+### Fixed
+
+- GRUB background removal now disables `05_debian_theme` via `chmod -x` (previous `GRUB_BACKGROUND=""` approach did not work)
+- Plymouth bgrt-luks dialog moved below manufacturer logo to avoid overlap
+
 ## [0.12.6] - 2026-02-10
 
 ### Added
@@ -11,7 +18,6 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - GRUB background detection now checks generated `grub.cfg` (catches `desktop-base` / `05_debian_theme` backgrounds)
-- GRUB background removal adds `GRUB_BACKGROUND=""` to override Debian theme when variable not present
 - GRUB resolution selector shows detected display modes filtered to common presets with recommendation
 
 ## [0.12.5] - 2026-02-10
