@@ -8,6 +8,7 @@ _GRUB_DESC="Configure GRUB resolution and background image."
 
 _GRUB_CONF="/etc/default/grub"
 _GRUB_CFG="/boot/grub/grub.cfg"
+_GRUB_DEBIAN_THEME="/etc/grub.d/05_debian_theme"
 
 _grub::gfxmode_set() {
     [[ -f "$_GRUB_CONF" ]] || return 1
@@ -18,19 +19,20 @@ _grub::gfxmode_set() {
     [[ -n "$value" && "$value" != "auto" ]]
 }
 
-_grub::background_clean() {
-    [[ -f "$_GRUB_CFG" ]] || return 0
-    ! grep -q 'background_image' "$_GRUB_CFG" 2>/dev/null
+_grub::debian_theme_disabled() {
+    [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]]
 }
 
 grub::check() {
-    _grub::gfxmode_set && _grub::background_clean
+    _grub::gfxmode_set
 }
 
 grub::status() {
     local issues=()
     _grub::gfxmode_set || issues+=("default resolution")
-    _grub::background_clean || issues+=("background image set")
+    if [[ -f "$_GRUB_DEBIAN_THEME" && -x "$_GRUB_DEBIAN_THEME" ]]; then
+        issues+=("Debian theme active")
+    fi
     if [[ ${#issues[@]} -gt 0 ]]; then
         local IFS=", "
         printf '%s' "${issues[*]}"
@@ -41,9 +43,8 @@ grub::apply() {
     local choice
 
     while true; do
-        local gfxmode_ok=false bg_clean=true
+        local gfxmode_ok=false
         _grub::gfxmode_set && gfxmode_ok=true
-        _grub::background_clean || bg_clean=false
 
         ui::clear_content
         log::nav "System Essentials > GRUB"
@@ -65,23 +66,27 @@ grub::apply() {
             log::warn "Resolution: ${current_gfx} (default)"
         fi
 
-        # Show current BACKGROUND
-        if $bg_clean; then
-            log::ok "Background: clean"
-        else
-            local bg_path
-            bg_path="$(grep -oP 'background_image \K\S+' "$_GRUB_CFG" 2>/dev/null | head -1 || true)"
-            log::warn "Background: ${bg_path:-detected}"
+        # Show Debian theme status
+        local theme_disabled=false
+        [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]] && theme_disabled=true
+
+        if $theme_disabled; then
+            log::ok "Debian theme: disabled"
+        elif [[ -f "$_GRUB_DEBIAN_THEME" ]]; then
+            log::warn "Debian theme: active"
         fi
 
         log::break
 
         local options=()
         options+=("Change resolution")
-        if ! $bg_clean; then
-            options+=("Remove background")
+        if ! $theme_disabled && [[ -f "$_GRUB_DEBIAN_THEME" ]]; then
+            options+=("Disable Debian theme")
         fi
-        if $gfxmode_ok || ! $bg_clean; then
+        if $theme_disabled; then
+            options+=("Enable Debian theme")
+        fi
+        if $gfxmode_ok || $theme_disabled; then
             options+=("Restore defaults")
         fi
         options+=("Back" "Exit")
@@ -105,8 +110,11 @@ grub::apply() {
             "Change resolution")
                 _grub::change_resolution
                 ;;
-            "Remove background")
-                _grub::remove_background
+            "Disable Debian theme")
+                _grub::disable_debian_theme
+                ;;
+            "Enable Debian theme")
+                _grub::enable_debian_theme
                 ;;
             "Restore defaults")
                 _grub::restore_defaults
@@ -193,16 +201,22 @@ _grub::change_resolution() {
     _grub::update
 }
 
-_grub::remove_background() {
+_grub::disable_debian_theme() {
     log::break
-    log::info "Removing GRUB background"
+    log::info "Disabling Debian GRUB theme"
     ui::flush_input
-    if grep -q '^#\?GRUB_BACKGROUND=' "$_GRUB_CONF" 2>/dev/null; then
-        sudo sed -i 's/^#\?GRUB_BACKGROUND=.*/GRUB_BACKGROUND=""/' "$_GRUB_CONF" </dev/tty
-    else
-        printf 'GRUB_BACKGROUND=""\n' | sudo tee -a "$_GRUB_CONF" > /dev/null
-    fi
-    log::ok "GRUB_BACKGROUND overridden"
+    sudo chmod -x "$_GRUB_DEBIAN_THEME" </dev/tty
+    log::ok "Debian theme disabled"
+
+    _grub::update
+}
+
+_grub::enable_debian_theme() {
+    log::break
+    log::info "Enabling Debian GRUB theme"
+    ui::flush_input
+    sudo chmod +x "$_GRUB_DEBIAN_THEME" </dev/tty
+    log::ok "Debian theme enabled"
 
     _grub::update
 }
@@ -215,9 +229,9 @@ _grub::restore_defaults() {
         sudo sed -i '/^GRUB_GFXMODE=/d' "$_GRUB_CONF" </dev/tty
         log::ok "GRUB_GFXMODE removed"
     fi
-    if grep -q '^GRUB_BACKGROUND=' "$_GRUB_CONF" 2>/dev/null; then
-        sudo sed -i '/^GRUB_BACKGROUND=/d' "$_GRUB_CONF" </dev/tty
-        log::ok "GRUB_BACKGROUND removed"
+    if [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]]; then
+        sudo chmod +x "$_GRUB_DEBIAN_THEME" </dev/tty
+        log::ok "Debian theme re-enabled"
     fi
 
     _grub::update
