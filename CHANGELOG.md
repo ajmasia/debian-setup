@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.8] - 2026-02-10
+
+### Fixed
+
+- Plymouth bgrt-luks theme files now created before already-set check (fixes theme selected but files missing on disk)
+
 ## [0.12.7] - 2026-02-10
 
 ### Fixed
