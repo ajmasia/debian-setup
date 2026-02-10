@@ -66,6 +66,13 @@ grub::apply() {
             log::warn "Resolution: ${current_gfx} (default)"
         fi
 
+        # Show payload
+        if grep -q '^GRUB_GFXPAYLOAD_LINUX=keep' "$_GRUB_CONF" 2>/dev/null; then
+            log::ok "Boot resolution: inherited"
+        elif $gfxmode_ok; then
+            log::warn "Boot resolution: native (not inherited)"
+        fi
+
         # Show Debian theme status
         local theme_disabled=false
         [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]] && theme_disabled=true
@@ -78,15 +85,24 @@ grub::apply() {
 
         log::break
 
+        local payload_on=false
+        grep -q '^GRUB_GFXPAYLOAD_LINUX=keep' "$_GRUB_CONF" 2>/dev/null && payload_on=true
+
         local options=()
         options+=("Change resolution")
+        if $gfxmode_ok && ! $payload_on; then
+            options+=("Keep resolution during boot")
+        fi
+        if $payload_on; then
+            options+=("Use native resolution during boot")
+        fi
         if ! $theme_disabled && [[ -f "$_GRUB_DEBIAN_THEME" ]]; then
             options+=("Disable Debian theme")
         fi
         if $theme_disabled; then
             options+=("Enable Debian theme")
         fi
-        if $gfxmode_ok || $theme_disabled; then
+        if $gfxmode_ok || $theme_disabled || $payload_on; then
             options+=("Restore defaults")
         fi
         options+=("Back" "Exit")
@@ -109,6 +125,12 @@ grub::apply() {
                 ;;
             "Change resolution")
                 _grub::change_resolution
+                ;;
+            "Keep resolution during boot")
+                _grub::set_payload keep
+                ;;
+            "Use native resolution during boot")
+                _grub::set_payload remove
                 ;;
             "Disable Debian theme")
                 _grub::disable_debian_theme
@@ -201,6 +223,28 @@ _grub::change_resolution() {
     _grub::update
 }
 
+_grub::set_payload() {
+    log::break
+    ui::flush_input
+    if [[ "$1" == "keep" ]]; then
+        log::info "Setting GRUB_GFXPAYLOAD_LINUX to keep"
+        if grep -q '^#\?GRUB_GFXPAYLOAD_LINUX=' "$_GRUB_CONF" 2>/dev/null; then
+            sudo sed -i 's/^#\?GRUB_GFXPAYLOAD_LINUX=.*/GRUB_GFXPAYLOAD_LINUX=keep/' "$_GRUB_CONF" </dev/tty
+        else
+            printf 'GRUB_GFXPAYLOAD_LINUX=keep\n' | sudo tee -a "$_GRUB_CONF" > /dev/null
+        fi
+        log::ok "Boot will use GRUB resolution"
+    else
+        if grep -q '^GRUB_GFXPAYLOAD_LINUX=' "$_GRUB_CONF" 2>/dev/null; then
+            log::info "Removing GRUB_GFXPAYLOAD_LINUX"
+            sudo sed -i '/^GRUB_GFXPAYLOAD_LINUX=/d' "$_GRUB_CONF" </dev/tty
+            log::ok "Boot will use native resolution"
+        fi
+    fi
+
+    _grub::update
+}
+
 _grub::disable_debian_theme() {
     log::break
     log::info "Disabling Debian GRUB theme"
@@ -228,6 +272,10 @@ _grub::restore_defaults() {
     if grep -q '^GRUB_GFXMODE=' "$_GRUB_CONF" 2>/dev/null; then
         sudo sed -i '/^GRUB_GFXMODE=/d' "$_GRUB_CONF" </dev/tty
         log::ok "GRUB_GFXMODE removed"
+    fi
+    if grep -q '^GRUB_GFXPAYLOAD_LINUX=' "$_GRUB_CONF" 2>/dev/null; then
+        sudo sed -i '/^GRUB_GFXPAYLOAD_LINUX=/d' "$_GRUB_CONF" </dev/tty
+        log::ok "GRUB_GFXPAYLOAD_LINUX removed"
     fi
     if [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]]; then
         sudo chmod +x "$_GRUB_DEBIAN_THEME" </dev/tty
