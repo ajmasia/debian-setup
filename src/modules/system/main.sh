@@ -12,6 +12,7 @@ _SYSTEM_TASKS=(
     "${_KERNEL_LABEL}|_KERNEL_DESC|kernel::check|kernel::apply|kernel::status"
     "${_WATCHERS_LABEL}|_WATCHERS_DESC|watchers::check|watchers::apply|watchers::status"
     "${_PLYMOUTH_LABEL}|_PLYMOUTH_DESC|plymouth::check|plymouth::apply|plymouth::status"
+    "${_GRUB_LABEL}|_GRUB_DESC|grub::check|grub::apply|grub::status"
     "${_HIBERNATE_LABEL}|_HIBERNATE_DESC|hibernate::check|hibernate::apply|hibernate::status"
 )
 
