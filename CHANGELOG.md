@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.9] - 2026-02-10
+
+### Added
+
+- GRUB boot resolution inheritance option (`GRUB_GFXPAYLOAD_LINUX=keep`) to carry GRUB resolution through kernel console and Plymouth
+
 ## [0.12.8] - 2026-02-10
 
 ### Fixed
