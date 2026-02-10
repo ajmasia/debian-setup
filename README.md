@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.12.5-blue)
+![Version](https://img.shields.io/badge/version-0.12.6-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -22,8 +22,8 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Zram Swap** -- Install and configure compressed swap in RAM (zstd)
 - **Kernel** -- Switch between stable and backports kernel with safe removal and reboot
 - **Inotify Watchers** -- Configure fs.inotify.max_user_watches with RAM detection and custom input
-- **Plymouth** -- Plymouth boot splash with theme selection (spinner / bgrt manufacturer logo), GRUB splash parameter
-- **GRUB** -- Configure GRUB resolution (GFXMODE presets + custom) and remove background image
+- **Plymouth** -- Plymouth boot splash with theme selection (spinner / bgrt / bgrt-luks for LUKS-visible logo), GRUB splash parameter
+- **GRUB** -- Configure GRUB resolution (detected display modes + custom) and remove background image
 - **Hibernate** -- Swap file + suspend-then-hibernate (coexists with zram, low priority swap)
 
 ### Package managers
