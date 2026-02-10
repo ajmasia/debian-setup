@@ -223,6 +223,18 @@ THEME
 )"
     printf '%s\n' "$conf" | sudo tee "$_PLYMOUTH_BGRT_LUKS_CONF" > /dev/null
     log::ok "bgrt-luks theme created"
+
+    # If theme was already selected but files were missing, rebuild initramfs
+    local current
+    current="$(_plymouth::current_theme)"
+    if [[ "$current" == "bgrt-luks" ]]; then
+        log::info "Rebuilding initramfs with bgrt-luks theme"
+        if sudo update-initramfs -u </dev/tty; then
+            log::ok "Initramfs updated"
+        else
+            log::error "Failed to update initramfs"
+        fi
+    fi
 }
 
 _plymouth::select_theme() {
@@ -246,16 +258,16 @@ _plymouth::select_theme() {
 
     local theme="${theme_choice%% —*}"
 
-    if [[ "$theme" == "$current" ]]; then
-        log::break
-        log::ok "Theme already set to ${theme}"
-        return
-    fi
-
     log::break
 
+    # Ensure bgrt-luks theme files exist before any check
     if [[ "$theme" == "bgrt-luks" ]]; then
         _plymouth::ensure_bgrt_luks || return
+    fi
+
+    if [[ "$theme" == "$current" ]]; then
+        log::ok "Theme already set to ${theme}"
+        return
     fi
 
     log::info "Setting theme to ${theme}"
