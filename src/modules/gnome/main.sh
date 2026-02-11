@@ -10,7 +10,7 @@ _UI_TASKS=(
     "${_TERMCSS_LABEL}|_TERMCSS_DESC|termcss::check|termcss::apply|termcss::status"
     "${_EXTENSIONS_LABEL}|_EXTENSIONS_DESC|extensions::check|extensions::apply|extensions::status"
     "${_BROWSERTHEMES_LABEL}|_BROWSERTHEMES_DESC|browserthemes::check|browserthemes::apply|browserthemes::status"
-    "${_APPTHEMES_LABEL}|_APPTHEMES_DESC|appthemes::check|appthemes::apply|appthemes::status"
+    "${_APPTHEMES_LABEL}|_APPTHEMES_DESC|appthemes::check|appthemes::run|appthemes::status"
 )
 
 ui_module::log_status() {
@@ -57,7 +57,7 @@ ui_module::run() {
         items+=("Back" "Exit")
 
         choice="$(gum::filter \
-            --height 8 \
+            --height 9 \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
             --indicator.foreground "$HEX_BLUE" \
