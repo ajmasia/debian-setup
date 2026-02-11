@@ -2,9 +2,11 @@
 # Format: dir_name|label|pack
 circle|Circle|pack_1
 circle_alt|Circle Alt|pack_1
+darth_vader|Darth Vader|pack_2
 deus_ex|Deus Ex|pack_2
 hexagon_hud|Hexagon HUD|pack_2
 lone|Lone|pack_3
 loader_2|Loader 2|pack_3
+motion|Motion|pack_3
 spinner_alt|Spinner Alt|pack_4
 rings_2|Rings 2|pack_4
