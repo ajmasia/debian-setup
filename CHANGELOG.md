@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.14] - 2026-02-11
+
+### Added
+
+- **App Themes** informational module in UI with Catppuccin Mocha install guides for btop, Alacritty, Atuin, bat, cava, eza, lazygit, and Starship
+
 ## [0.12.13] - 2026-02-11
 
 ### Added

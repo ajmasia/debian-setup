@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.12.13-blue)
+![Version](https://img.shields.io/badge/version-0.12.14-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -102,6 +102,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Terminal CSS** -- VTE terminal padding for GTK3 and GTK4
 - **Extensions** -- Manage GNOME Shell extensions (Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes)
 - **Browser Themes** -- Catppuccin Mocha install guide for Brave, Chromium, Firefox, LibreWolf
+- **App Themes** -- Catppuccin Mocha install guide for btop, Alacritty, Atuin, bat, cava, eza, lazygit, Starship
 
 ### Diagnostics
 - **Health check** -- System info, dependency status, and task overview
