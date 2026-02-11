@@ -23,6 +23,16 @@ _grub::debian_theme_disabled() {
     [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]]
 }
 
+_GRUB_SILENT_PARAMS=("quiet" "loglevel=0" "systemd.show_status=false" "vt.global_cursor_default=0")
+
+_grub::silent_enabled() {
+    [[ -f "$_GRUB_CONF" ]] || return 1
+    local param
+    for param in "${_GRUB_SILENT_PARAMS[@]}"; do
+        grep -qF "$param" "$_GRUB_CONF" 2>/dev/null || return 1
+    done
+}
+
 grub::check() {
     _grub::gfxmode_set
 }
@@ -83,6 +93,15 @@ grub::apply() {
             log::warn "Debian theme: active"
         fi
 
+        # Show silent boot status
+        local silent_on=false
+        _grub::silent_enabled && silent_on=true
+        if $silent_on; then
+            log::ok "Silent boot: enabled"
+        else
+            log::warn "Silent boot: disabled (kernel messages visible)"
+        fi
+
         log::break
 
         local payload_on=false
@@ -102,7 +121,12 @@ grub::apply() {
         if $theme_disabled; then
             options+=("Enable Debian theme")
         fi
-        if $gfxmode_ok || $theme_disabled || $payload_on; then
+        if ! $silent_on; then
+            options+=("Enable silent boot")
+        else
+            options+=("Disable silent boot")
+        fi
+        if $gfxmode_ok || $theme_disabled || $payload_on || $silent_on; then
             options+=("Restore defaults")
         fi
         options+=("Back" "Exit")
@@ -137,6 +161,12 @@ grub::apply() {
                 ;;
             "Enable Debian theme")
                 _grub::enable_debian_theme
+                ;;
+            "Enable silent boot")
+                _grub::set_silent enable
+                ;;
+            "Disable silent boot")
+                _grub::set_silent disable
                 ;;
             "Restore defaults")
                 _grub::restore_defaults
@@ -265,6 +295,33 @@ _grub::enable_debian_theme() {
     _grub::update
 }
 
+_grub::set_silent() {
+    log::break
+    ui::flush_input
+    if [[ "$1" == "enable" ]]; then
+        log::info "Enabling silent boot"
+        local param
+        for param in "${_GRUB_SILENT_PARAMS[@]}"; do
+            if ! grep -qF "$param" "$_GRUB_CONF" 2>/dev/null; then
+                sudo sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"\(.*\)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 ${param}\"/" "$_GRUB_CONF" </dev/tty
+            fi
+        done
+        sudo sed -i 's/  */ /g' "$_GRUB_CONF" </dev/tty
+        log::ok "Silent boot enabled"
+    else
+        log::info "Disabling silent boot"
+        local param
+        for param in "${_GRUB_SILENT_PARAMS[@]}"; do
+            if grep -qF "$param" "$_GRUB_CONF" 2>/dev/null; then
+                sudo sed -i "s/ ${param}//g" "$_GRUB_CONF" </dev/tty
+            fi
+        done
+        log::ok "Silent boot disabled"
+    fi
+
+    _grub::update
+}
+
 _grub::restore_defaults() {
     log::break
     log::info "Restoring GRUB defaults"
@@ -280,6 +337,13 @@ _grub::restore_defaults() {
     if [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]]; then
         sudo chmod +x "$_GRUB_DEBIAN_THEME" </dev/tty
         log::ok "Debian theme re-enabled"
+    fi
+    if _grub::silent_enabled; then
+        local param
+        for param in "${_GRUB_SILENT_PARAMS[@]}"; do
+            sudo sed -i "s/ ${param}//g" "$_GRUB_CONF" </dev/tty
+        done
+        log::ok "Silent boot disabled"
     fi
 
     _grub::update
