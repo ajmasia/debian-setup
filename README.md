@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.12.13-blue)
+![Version](https://img.shields.io/badge/version-0.12.15-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -77,7 +77,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **QEMU/KVM** -- QEMU, libvirt, virt-manager with user groups, libvirtd service, and default network
 
 ### Software
-- **Utilities** -- CLI utilities (fzf, bat, ripgrep, fd, htop, btop, jq, yq, etc.)
+- **Utilities** -- CLI utilities (fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, etc.)
 - **Media** -- Media tools and codecs
 - **Editors** -- VS Code (with extensions management) and Neovim (LazyVim + dependencies wizard)
 - **Terminals** -- Alacritty (build from source), Kitty (user-space installer), Ptyxis (APT)
@@ -102,6 +102,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Terminal CSS** -- VTE terminal padding for GTK3 and GTK4
 - **Extensions** -- Manage GNOME Shell extensions (Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes)
 - **Browser Themes** -- Catppuccin Mocha install guide for Brave, Chromium, Firefox, LibreWolf
+- **App Themes** -- Catppuccin Mocha themes for CLI apps (btop, Alacritty, Atuin, bat, cava, eza, lazygit, Starship) with install/remove, marker-based config, and accent color selection
 
 ### Diagnostics
 - **Health check** -- System info, dependency status, and task overview

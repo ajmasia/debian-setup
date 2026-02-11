@@ -29,6 +29,7 @@ _SEARCH_ARRAYS=(
     _FONTS_TASKS
     _UI_TASKS
     _APPEARANCE_TASKS
+    _APPTHEMES_TASKS
 )
 
 menu::main() {

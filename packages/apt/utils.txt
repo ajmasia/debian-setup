@@ -1,6 +1,7 @@
 # CLI utilities
 fzf
 bat
+eza
 ripgrep
 fd-find
 htop

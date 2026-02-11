@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.15] - 2026-02-11
+
+### Added
+
+- **App Themes** rewritten from informational to functional sub-aggregator with install/remove support for Catppuccin Mocha themes: btop, Alacritty, Atuin, bat, cava, eza, lazygit, and Starship
+- Marker-based config management (`# debian-setup: catppuccin-mocha start/end`) for safe insert/remove of theme blocks
+- Accent color selection (14 Catppuccin accents) for Atuin, eza, and lazygit themes
+- Dual marker support for Starship (palette line + palette table)
+- `batcat` detection for Debian (fallback to `bat`)
+- Theme activation in btop config (`color_theme`), Alacritty (`general.import`), Atuin (`[theme]`), bat (`--theme`), and Starship (`palette`)
+- **eza** added to CLI utilities package list
+
+## [0.12.14] - 2026-02-11
+
+### Added
+
+- **App Themes** informational module in UI with Catppuccin Mocha install guides for btop, Alacritty, Atuin, bat, cava, eza, lazygit, and Starship
+
 ## [0.12.13] - 2026-02-11
 
 ### Added
