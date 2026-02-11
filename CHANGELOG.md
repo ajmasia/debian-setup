@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.11] - 2026-02-11
+
+### Added
+
+- **Community Plymouth themes** from adi1090x/plymouth-themes -- install, remove, and select from 8 curated themes (Circle, Circle Alt, Deus Ex, Hexagon HUD, Lone, Loader 2, Spinner Alt, Rings 2) integrated into the existing Plymouth wizard
+- Community theme list in `packages/plymouth/themes.txt` for easy customization
+
 ## [0.12.10] - 2026-02-10
 
 ### Added

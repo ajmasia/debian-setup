@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.12.10-blue)
+![Version](https://img.shields.io/badge/version-0.12.11-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -22,7 +22,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Zram Swap** -- Install and configure compressed swap in RAM (zstd)
 - **Kernel** -- Switch between stable and backports kernel with safe removal and reboot
 - **Inotify Watchers** -- Configure fs.inotify.max_user_watches with RAM detection and custom input
-- **Plymouth** -- Plymouth boot splash with theme selection (spinner / bgrt / bgrt-luks for LUKS-visible logo), GRUB splash parameter
+- **Plymouth** -- Plymouth boot splash with theme selection (spinner / bgrt / bgrt-luks for LUKS-visible logo), community themes from adi1090x/plymouth-themes, GRUB splash parameter
 - **GRUB** -- Configure GRUB resolution (detected display modes + custom), boot resolution inheritance, disable Debian theme
 - **Hibernate** -- Swap file + suspend-then-hibernate (coexists with zram, low priority swap)
 
@@ -197,6 +197,8 @@ debian-setup/
 │   │   └── extensions.txt          # GNOME Shell extensions (uuid|label)
 │   ├── fonts/
 │   │   └── nerdfonts.txt           # Nerd Fonts (archive_name|label)
+│   ├── plymouth/
+│   │   └── themes.txt              # Community Plymouth themes (dir_name|label|pack)
 │   └── vscode/
 │       └── extensions.txt          # VS Code extensions (id|label)
 ```
