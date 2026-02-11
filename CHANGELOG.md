@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.12] - 2026-02-11
+
+### Added
+
+- Darth Vader and Motion community Plymouth themes
+
 ## [0.12.11] - 2026-02-11
 
 ### Added
