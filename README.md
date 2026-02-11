@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.12.12-blue)
+![Version](https://img.shields.io/badge/version-0.12.13-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -23,7 +23,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Kernel** -- Switch between stable and backports kernel with safe removal and reboot
 - **Inotify Watchers** -- Configure fs.inotify.max_user_watches with RAM detection and custom input
 - **Plymouth** -- Plymouth boot splash with theme selection (spinner / bgrt / bgrt-luks for LUKS-visible logo), community themes from adi1090x/plymouth-themes, GRUB splash parameter
-- **GRUB** -- Configure GRUB resolution (detected display modes + custom), boot resolution inheritance, disable Debian theme
+- **GRUB** -- Configure GRUB resolution (detected display modes + custom), boot resolution inheritance, silent boot (quiet + loglevel + systemd status + VT cursor), disable Debian theme
 - **Hibernate** -- Swap file + suspend-then-hibernate (coexists with zram, low priority swap)
 
 ### Package managers

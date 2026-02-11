@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.13] - 2026-02-11
+
+### Added
+
+- **GRUB silent boot** option to hide all boot messages after GRUB — adds `quiet`, `loglevel=0`, `systemd.show_status=false`, and `vt.global_cursor_default=0` to kernel command line, with enable/disable toggle and restore defaults support
+
 ## [0.12.12] - 2026-02-11
 
 ### Added
