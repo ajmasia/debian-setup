@@ -10,6 +10,7 @@ _UI_TASKS=(
     "${_TERMCSS_LABEL}|_TERMCSS_DESC|termcss::check|termcss::apply|termcss::status"
     "${_EXTENSIONS_LABEL}|_EXTENSIONS_DESC|extensions::check|extensions::apply|extensions::status"
     "${_BROWSERTHEMES_LABEL}|_BROWSERTHEMES_DESC|browserthemes::check|browserthemes::apply|browserthemes::status"
+    "${_APPTHEMES_LABEL}|_APPTHEMES_DESC|appthemes::check|appthemes::apply|appthemes::status"
 )
 
 ui_module::log_status() {
