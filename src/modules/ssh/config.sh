@@ -341,9 +341,11 @@ _ssh_config::_remove_entry() {
 
 _ssh_config::_quick_test() {
     local host="$1"
-    local output
-    output="$(ssh -T -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "${host}" 2>&1 || true)"
-    [[ "$output" == *"successfully authenticated"* ]] || [[ "$output" == *"Welcome"* ]] || [[ "$output" == *"welcome"* ]]
+    local rc=0
+    ssh -T -o ConnectTimeout=3 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "${host}" &>/dev/null || rc=$?
+    # 0 = success, 1 = authenticated but no shell (git hosting) — both OK
+    # 255 = SSH connection or auth failure
+    [[ $rc -ne 255 ]]
 }
 
 _ssh_config::_test_host() {
@@ -352,11 +354,13 @@ _ssh_config::_test_host() {
     log::break
     log::info "Testing connection to ${host}"
 
+    local rc=0
     local output
-    output="$(ssh -T -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new "${host}" 2>&1 || true)"
+    output="$(ssh -T -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "${host}" 2>&1)" || rc=$?
 
-    if [[ "$output" == *"successfully authenticated"* ]] || [[ "$output" == *"Welcome"* ]] || [[ "$output" == *"welcome"* ]]; then
+    if [[ $rc -ne 255 ]]; then
         log::ok "${host}: connection OK"
+        [[ -n "$output" ]] && log::info "${output}"
     else
         log::warn "${host}: connection failed"
         [[ -n "$output" ]] && log::warn "${output}"
