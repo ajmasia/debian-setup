@@ -188,7 +188,44 @@ _ssh_signing::_setup_global() {
     local key_base="$2"
     local key_path="~/.ssh/${key_base}"
 
+    # Ask for name
+    local git_name
+    git_name="$(git config --global user.name 2>/dev/null || true)"
+    ui::flush_input
+    local name
+    name="$(gum::input \
+        --header "Name for git commits:" \
+        --header.foreground "$HEX_LAVENDER" \
+        --value "${git_name:-}" \
+        --placeholder "Your Name")"
+
+    if [[ -z "$name" ]]; then
+        log::warn "No name provided, cancelled"
+        return
+    fi
+
+    # Ask for email
+    local git_email
+    git_email="$(git config --global user.email 2>/dev/null || true)"
+    local email
+    email="$(gum::input \
+        --header "Email for git commits:" \
+        --header.foreground "$HEX_LAVENDER" \
+        --value "${git_email:-}" \
+        --placeholder "your@email.com")"
+
+    if [[ -z "$email" ]]; then
+        log::warn "No email provided, cancelled"
+        return
+    fi
+
     log::info "Configuring global commit signing"
+
+    git config --global user.name "$name"
+    log::ok "user.name: ${name}"
+
+    git config --global user.email "$email"
+    log::ok "user.email: ${email}"
 
     git config --global gpg.format ssh
     log::ok "gpg.format set to ssh"
@@ -200,17 +237,13 @@ _ssh_signing::_setup_global() {
     log::ok "Auto-sign commits enabled"
 
     # Configure allowed signers
-    local git_email
-    git_email="$(git config --global user.email 2>/dev/null || true)"
-    if [[ -n "$git_email" ]]; then
-        local key_content
-        key_content="$(cat "$HOME/.ssh/${selected}")"
-        printf '%s %s\n' "$git_email" "$key_content" > "$_SSH_ALLOWED_SIGNERS"
-        log::ok "Allowed signers: ${git_email}"
+    local key_content
+    key_content="$(cat "$HOME/.ssh/${selected}")"
+    printf '%s %s\n' "$email" "$key_content" > "$_SSH_ALLOWED_SIGNERS"
+    log::ok "Allowed signers: ${email}"
 
-        git config --global gpg.ssh.allowedSignersFile "~/.ssh/allowed_signers"
-        log::ok "gpg.ssh.allowedSignersFile configured"
-    fi
+    git config --global gpg.ssh.allowedSignersFile "~/.ssh/allowed_signers"
+    log::ok "gpg.ssh.allowedSignersFile configured"
 
     _ssh_signing::_format_gitconfig
 }
