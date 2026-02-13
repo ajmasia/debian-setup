@@ -58,7 +58,7 @@ Se pinta una vez. `_UI_CONTENT_ROW` guarda la fila del cursor (via `\033[6n`, 1-
 - Permite detectar "restart needed"
 
 ### Modulos siempre visibles
-Package Managers, Hardware, System Essentials, Dotfiles, Shell, Development, UI and Theming, Software, Virtualization, Health siempre en menu principal. SSH tasks incluidos en System Essentials. Sin status logging al inicio.
+Hardware Support, Package Managers, System Essentials, Dotfiles, Shell Tools, OpenSSH Server, Development, UI and Theming, Software, Virtualization, Health siempre en menu principal. Sin status logging al inicio.
 
 ### gum wrappers
 `gum::choose`, `gum::filter`, `gum::input` — todos capturan exit code y propagan SIGINT (130) con `exit 130`. NO usar `2>/dev/null` (gum renderiza UI en stderr).

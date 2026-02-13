@@ -15,6 +15,9 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 
 ## Features
 
+### Hardware Support
+- **Slimbook EVO** -- Install Slimbook repository and EVO/GNOME meta-packages
+
 ### System essentials
 - **Sudoers** -- Add/remove current user to sudoers
 - **Password Feedback** -- Enable/disable asterisks on sudo password prompt
@@ -25,11 +28,6 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Plymouth** -- Plymouth boot splash with theme selection (spinner / bgrt / bgrt-luks for LUKS-visible logo), community themes from adi1090x/plymouth-themes, GRUB splash parameter
 - **GRUB** -- Configure GRUB resolution (detected display modes + custom), boot resolution inheritance, silent boot (quiet + loglevel + systemd status + VT cursor), disable Debian theme
 - **Hibernate** -- Swap file + suspend-then-hibernate (coexists with zram, low priority swap)
-- **OpenSSH Server** -- Install and manage openssh-server with service control
-- **SSH Access** -- Toggle pubkey-only, pubkey+password, or password-only with root login control
-- **SSH Keys** -- Generate ED25519 keys with suffix support for multiple identities
-- **SSH Config** -- Manage `~/.ssh/config` entries for GitHub, GitLab, and custom servers
-- **Commit Signing** -- Configure git commit signing with SSH keys, conditional `includeIf` for multi-identity setups
 
 ### Package managers
 - **System Upgrade** -- Update, dist-upgrade and autoremove in one step
@@ -64,15 +62,19 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 ### Dotfiles
 - **Dotfiles** -- Clone and apply dotfiles via GNU Stow (portable, compatible with standalone usage)
 
-### Shell
+### Shell Tools
 - **Starship** -- Cross-shell prompt
 - **Zoxide** -- Smarter cd command
 - **Atuin** -- Shell history search
 - **Tmux** -- Terminal multiplexer
 - **Zellij** -- Terminal workspace
 
-### Hardware
-- **Slimbook EVO** -- Install Slimbook repository and EVO/GNOME meta-packages
+### OpenSSH Server
+- **OpenSSH Server** -- Install and manage openssh-server with service control
+- **SSH Access** -- Toggle pubkey-only, pubkey+password, or password-only with root login control
+- **SSH Keys** -- Generate ED25519 keys with suffix support for multiple identities
+- **SSH Config** -- Manage `~/.ssh/config` entries for GitHub, GitLab, and custom servers
+- **Commit Signing** -- Configure git commit signing with SSH keys, conditional `includeIf` for multi-identity setups
 
 ### Virtualization
 - **QEMU/KVM** -- QEMU, libvirt, virt-manager with user groups, libvirtd service, and default network
@@ -169,7 +171,7 @@ debian-setup/
 │   ├── modules/
 │   │   ├── health.sh
 │   │   ├── system/                 # Sudoers, Password Feedback, Editor,
-│   │   │   ├── ...                 # Zram, Kernel, Watchers + SSH tasks
+│   │   │   ├── ...                 # Zram, Kernel, Watchers
 │   │   ├── packages/               # APT Sources, Flatpak, Nix
 │   │   │   ├── ...
 │   │   ├── development/            # Environments, Tools, AI
@@ -178,7 +180,7 @@ debian-setup/
 │   │   │   ├── tools.sh           # Build, GitHub CLI, AWS CLI, Docker, ...
 │   │   │   ├── ai.sh             # Claude Code, OpenCode, Copilot CLI, ...
 │   │   │   ├── ...
-│   │   ├── shell/                  # Starship, Zoxide, Atuin, Tmux, Zellij, Dotfiles
+│   │   ├── shell/                  # Shell Tools: Starship, Zoxide, Atuin, Tmux, Zellij, Dotfiles
 │   │   │   ├── ...
 │   │   ├── hardware/               # Slimbook EVO
 │   │   │   ├── ...
@@ -186,9 +188,9 @@ debian-setup/
 │   │   │   ├── ...
 │   │   ├── software/               # Utilities, Media, Editors, Terminals,
 │   │   │   ├── ...                 # Browsers, Security, Messaging, Productivity, Fonts
-│   │   ├── gnome/                  # UI and Theming: Appearance, Keyboard, Terminal CSS, Extensions, Browser Themes
+│   │   ├── gnome/                  # UI and Theming: Appearance, Keyboard, CSS, Extensions, Themes
 │   │   │   ├── ...
-│   │   ├── ssh/                    # SSH tasks (sourced by system module)
+│   │   ├── ssh/                    # OpenSSH Server, Access, Keys, Config, Signing
 │   │   │   ├── ...
 │   │   └── diagnostics/            # Health check, Logs
 │   │       ├── ...

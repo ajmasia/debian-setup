@@ -39,7 +39,7 @@ hardware::run() {
 
     while true; do
         ui::clear_content
-        log::nav "Hardware"
+        log::nav "Hardware Support"
         log::break
 
         # Show warnings for tasks that need attention

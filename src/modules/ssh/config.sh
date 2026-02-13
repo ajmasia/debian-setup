@@ -41,7 +41,7 @@ ssh_config::apply() {
 
     while true; do
         ui::clear_content
-        log::nav "System Essentials > SSH Config"
+        log::nav "OpenSSH Server > SSH Config"
         log::break
 
         log::info "Current SSH config entries"

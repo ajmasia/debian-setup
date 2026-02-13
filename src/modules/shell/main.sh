@@ -43,7 +43,7 @@ shell::run() {
 
     while true; do
         ui::clear_content
-        log::nav "Shell"
+        log::nav "Shell Tools"
         log::break
 
         # Build menu items (strip "Configure " prefix)
