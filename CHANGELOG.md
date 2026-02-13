@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.3] - 2026-02-14
+
+### Fixed
+
+- SSH connection test now works for any server, not just GitHub/GitLab (uses SSH exit code instead of string matching)
+- SSH Config now detects entries without `# comment` markers (manually added or from other tools)
+
 ## [0.13.2] - 2026-02-14
 
 ### Fixed

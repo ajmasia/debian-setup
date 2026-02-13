@@ -18,8 +18,16 @@ _ssh_config::has_gitlab() {
 
 _ssh_config::_list_custom() {
     [[ -f "$_SSH_CONFIG_FILE" ]] || return 0
-    awk '/^# /{name=substr($0,3); next} name && /^Host /{print name} {name=""}' \
-        "$_SSH_CONFIG_FILE" 2>/dev/null | grep -vE '^(GitHub|GitLab)$' || true
+    awk '
+        /^# /{name=substr($0,3); next}
+        /^Host / {
+            host=substr($0,6)
+            if (name) { print name } else { print host }
+            name=""
+            next
+        }
+        {name=""}
+    ' "$_SSH_CONFIG_FILE" 2>/dev/null | grep -vE '^(GitHub|GitLab|\*)$' || true
 }
 
 ssh_config::check() {
@@ -307,6 +315,9 @@ _ssh_config::_write_entry() {
     if grep -q "^# ${service}$" "$_SSH_CONFIG_FILE" 2>/dev/null; then
         sed -i "/^# ${service}$/,/^$/d" "$_SSH_CONFIG_FILE"
         log::info "Replaced existing ${service} entry"
+    elif grep -q "^Host ${host}$" "$_SSH_CONFIG_FILE" 2>/dev/null; then
+        sed -i "/^Host ${host}$/,/^$/d" "$_SSH_CONFIG_FILE"
+        log::info "Replaced existing ${host} entry"
     fi
 
     # Ensure config file and directory exist
@@ -335,15 +346,21 @@ _ssh_config::_remove_entry() {
     local service="$1"
 
     log::info "Removing ${service} from SSH config"
-    sed -i "/^# ${service}$/,/^$/d" "$_SSH_CONFIG_FILE"
+    if grep -q "^# ${service}$" "$_SSH_CONFIG_FILE" 2>/dev/null; then
+        sed -i "/^# ${service}$/,/^$/d" "$_SSH_CONFIG_FILE"
+    else
+        sed -i "/^Host ${service}$/,/^$/d" "$_SSH_CONFIG_FILE"
+    fi
     log::ok "${service} removed from ${_SSH_CONFIG_FILE}"
 }
 
 _ssh_config::_quick_test() {
     local host="$1"
-    local output
-    output="$(ssh -T -o ConnectTimeout=3 -o StrictHostKeyChecking=accept-new "${host}" 2>&1 || true)"
-    [[ "$output" == *"successfully authenticated"* ]] || [[ "$output" == *"Welcome"* ]] || [[ "$output" == *"welcome"* ]]
+    local rc=0
+    ssh -T -o ConnectTimeout=3 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "${host}" &>/dev/null || rc=$?
+    # 0 = success, 1 = authenticated but no shell (git hosting) — both OK
+    # 255 = SSH connection or auth failure
+    [[ $rc -ne 255 ]]
 }
 
 _ssh_config::_test_host() {
@@ -352,11 +369,13 @@ _ssh_config::_test_host() {
     log::break
     log::info "Testing connection to ${host}"
 
+    local rc=0
     local output
-    output="$(ssh -T -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new "${host}" 2>&1 || true)"
+    output="$(ssh -T -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "${host}" 2>&1)" || rc=$?
 
-    if [[ "$output" == *"successfully authenticated"* ]] || [[ "$output" == *"Welcome"* ]] || [[ "$output" == *"welcome"* ]]; then
+    if [[ $rc -ne 255 ]]; then
         log::ok "${host}: connection OK"
+        [[ -n "$output" ]] && log::info "${output}"
     else
         log::warn "${host}: connection failed"
         [[ -n "$output" ]] && log::warn "${output}"
