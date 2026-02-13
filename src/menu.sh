@@ -7,7 +7,7 @@ _MENU_LOADED=1
 _SEARCH_ARRAYS=(
     _SYSTEM_TASKS
     _PACKAGES_TASKS
-    _SSH_TASKS
+    _DOTFILES_TASKS
     _SHELL_TASKS
     _HARDWARE_TASKS
     _VIRTUALIZATION_TASKS
@@ -36,7 +36,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System Essentials" "Package managers" "OpenSSH server" "Development" "Shell" "Hardware" "Virtualization" "Software" "UI" "Diagnostics" "Exit")
+        items=("Package Managers" "Hardware" "System Essentials" "Dotfiles" "Shell" "Development" "UI and Theming" "Software" "Virtualization" "Health" "Exit")
 
         choice="$(gum::filter \
             --height 12 \
@@ -50,43 +50,43 @@ menu::main() {
             "${items[@]}")"
 
         case "$choice" in
-            "System Essentials")
-                system::run
-                ui::clear_content
-                ;;
-            "Package managers")
+            "Package Managers")
                 packages::run
-                ui::clear_content
-                ;;
-            "OpenSSH server")
-                ssh::run
-                ui::clear_content
-                ;;
-            "Development")
-                development::run
-                ui::clear_content
-                ;;
-            "Shell")
-                shell::run
                 ui::clear_content
                 ;;
             "Hardware")
                 hardware::run
                 ui::clear_content
                 ;;
-            "Virtualization")
-                virtualization::run
+            "System Essentials")
+                system::run
+                ui::clear_content
+                ;;
+            "Dotfiles")
+                dotfiles::apply
+                ui::clear_content
+                ;;
+            "Shell")
+                shell::run
+                ui::clear_content
+                ;;
+            "Development")
+                development::run
+                ui::clear_content
+                ;;
+            "UI and Theming")
+                ui_module::run
                 ui::clear_content
                 ;;
             "Software")
                 software::run
                 ui::clear_content
                 ;;
-            "UI")
-                ui_module::run
+            "Virtualization")
+                virtualization::run
                 ui::clear_content
                 ;;
-            "Diagnostics")
+            "Health")
                 diagnostics::run
                 ui::clear_content
                 ;;

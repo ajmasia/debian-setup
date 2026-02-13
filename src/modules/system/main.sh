@@ -14,6 +14,11 @@ _SYSTEM_TASKS=(
     "${_PLYMOUTH_LABEL}|_PLYMOUTH_DESC|plymouth::check|plymouth::apply|plymouth::status"
     "${_GRUB_LABEL}|_GRUB_DESC|grub::check|grub::apply|grub::status"
     "${_HIBERNATE_LABEL}|_HIBERNATE_DESC|hibernate::check|hibernate::apply|hibernate::status"
+    "${_SSH_SERVER_LABEL}|_SSH_SERVER_DESC|ssh_server::check|ssh_server::apply|ssh_server::status"
+    "${_SSH_ACCESS_LABEL}|_SSH_ACCESS_DESC|ssh_access::check|ssh_access::apply|ssh_access::status"
+    "${_SSH_KEYS_LABEL}|_SSH_KEYS_DESC|ssh_keys::check|ssh_keys::apply|ssh_keys::status"
+    "${_SSH_CONFIG_LABEL}|_SSH_CONFIG_DESC|ssh_config::check|ssh_config::apply|ssh_config::status"
+    "${_SSH_SIGNING_LABEL}|_SSH_SIGNING_DESC|ssh_signing::check|ssh_signing::apply|ssh_signing::status"
 )
 
 system::log_status() {
@@ -60,7 +65,7 @@ system::run() {
         items+=("Back" "Exit")
 
         choice="$(gum::filter \
-            --height 12 \
+            --height 18 \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
             --indicator.foreground "$HEX_BLUE" \

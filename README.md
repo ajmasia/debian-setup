@@ -4,14 +4,14 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.12.22-blue)
+![Version](https://img.shields.io/badge/version-0.13.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 Post-install automation for the impatient developer.
 
-Interactive CLI tool that automates common Debian post-installation tasks: system configuration, package managers, SSH, development environments, virtualization, software installation, and more.
+Interactive CLI tool that automates common Debian post-installation tasks: system configuration, package managers, development environments, virtualization, software installation, and more.
 
 ## Features
 
@@ -25,6 +25,11 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Plymouth** -- Plymouth boot splash with theme selection (spinner / bgrt / bgrt-luks for LUKS-visible logo), community themes from adi1090x/plymouth-themes, GRUB splash parameter
 - **GRUB** -- Configure GRUB resolution (detected display modes + custom), boot resolution inheritance, silent boot (quiet + loglevel + systemd status + VT cursor), disable Debian theme
 - **Hibernate** -- Swap file + suspend-then-hibernate (coexists with zram, low priority swap)
+- **OpenSSH Server** -- Install and manage openssh-server with service control
+- **SSH Access** -- Toggle pubkey-only, pubkey+password, or password-only with root login control
+- **SSH Keys** -- Generate ED25519 keys with suffix support for multiple identities
+- **SSH Config** -- Manage `~/.ssh/config` entries for GitHub, GitLab, and custom servers
+- **Commit Signing** -- Configure git commit signing with SSH keys, conditional `includeIf` for multi-identity setups
 
 ### Package managers
 - **System Upgrade** -- Update, dist-upgrade and autoremove in one step
@@ -33,13 +38,6 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Nala** -- Install/remove Nala, a prettier APT frontend with parallel downloads
 - **Nix** -- Install/remove Nix package manager (multi-user daemon, flakes toggle)
 - **Homebrew** -- Install/remove Homebrew on Linux with automatic dependency setup
-
-### SSH
-- **OpenSSH Server** -- Install and manage openssh-server with service control
-- **SSH Access** -- Toggle pubkey-only, pubkey+password, or password-only with root login control
-- **SSH Keys** -- Generate ED25519 keys with suffix support for multiple identities
-- **SSH Config** -- Manage `~/.ssh/config` entries for GitHub, GitLab, and custom servers
-- **Commit Signing** -- Configure git commit signing with SSH keys, conditional `includeIf` for multi-identity setups
 
 ### Development
 
@@ -63,13 +61,15 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **GitHub Copilot CLI** -- AI-powered CLI (gh extension)
 - **AI Resources** -- Curated list of AI tools for developers
 
+### Dotfiles
+- **Dotfiles** -- Clone and apply dotfiles via GNU Stow (portable, compatible with standalone usage)
+
 ### Shell
 - **Starship** -- Cross-shell prompt
 - **Zoxide** -- Smarter cd command
 - **Atuin** -- Shell history search
 - **Tmux** -- Terminal multiplexer
 - **Zellij** -- Terminal workspace
-- **Dotfiles** -- Clone and apply dotfiles via GNU Stow (portable, compatible with standalone usage)
 
 ### Hardware
 - **Slimbook EVO** -- Install Slimbook repository and EVO/GNOME meta-packages
@@ -93,7 +93,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak / APT + Nautilus plugin), LocalSend (Flatpak), Balena Etcher (GitHub zip)
 - **Fonts** -- Nerd Fonts (Noto, Symbols Only, Hack, CaskaydiaCove, FiraCode) from GitHub releases
 
-### UI
+### UI and Theming
 - **Appearance**
   - **GTK Theme** -- Catppuccin Mocha GTK theme with accent color selection, dark mode toggle, GTK4/libadwaita symlinks
   - **Icons** -- Papirus icons (standalone or with Catppuccin folder colors)
@@ -105,7 +105,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Browser Themes** -- Catppuccin Mocha install guide for Brave, Chromium, Firefox, LibreWolf
 - **App Themes** -- Catppuccin Mocha themes for CLI apps (btop, Alacritty, Atuin, bat, cava, eza, lazygit, Starship) with install/remove, marker-based config, and accent color selection
 
-### Diagnostics
+### Health
 - **Health check** -- System info, dependency status, and task overview
 - **Log management** -- View, delete, and clean session logs
 
@@ -169,10 +169,8 @@ debian-setup/
 │   ├── modules/
 │   │   ├── health.sh
 │   │   ├── system/                 # Sudoers, Password Feedback, Editor,
-│   │   │   ├── ...                 # Zram, Kernel, Watchers
+│   │   │   ├── ...                 # Zram, Kernel, Watchers + SSH tasks
 │   │   ├── packages/               # APT Sources, Flatpak, Nix
-│   │   │   ├── ...
-│   │   ├── ssh/                    # Server, Access, Keys, Config, Signing
 │   │   │   ├── ...
 │   │   ├── development/            # Environments, Tools, AI
 │   │   │   ├── main.sh            # Top-level aggregator
@@ -180,7 +178,7 @@ debian-setup/
 │   │   │   ├── tools.sh           # Build, GitHub CLI, AWS CLI, Docker, ...
 │   │   │   ├── ai.sh             # Claude Code, OpenCode, Copilot CLI, ...
 │   │   │   ├── ...
-│   │   ├── shell/                  # Starship, Zoxide, Atuin, Tmux, Zellij
+│   │   ├── shell/                  # Starship, Zoxide, Atuin, Tmux, Zellij, Dotfiles
 │   │   │   ├── ...
 │   │   ├── hardware/               # Slimbook EVO
 │   │   │   ├── ...
@@ -188,7 +186,9 @@ debian-setup/
 │   │   │   ├── ...
 │   │   ├── software/               # Utilities, Media, Editors, Terminals,
 │   │   │   ├── ...                 # Browsers, Security, Messaging, Productivity, Fonts
-│   │   ├── gnome/                  # Appearance, Keyboard, Terminal CSS, Extensions, Browser Themes
+│   │   ├── gnome/                  # UI and Theming: Appearance, Keyboard, Terminal CSS, Extensions, Browser Themes
+│   │   │   ├── ...
+│   │   ├── ssh/                    # SSH tasks (sourced by system module)
 │   │   │   ├── ...
 │   │   └── diagnostics/            # Health check, Logs
 │   │       ├── ...

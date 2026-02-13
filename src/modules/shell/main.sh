@@ -10,7 +10,6 @@ _SHELL_TASKS=(
     "${_ATUIN_LABEL}|_ATUIN_DESC|atuin::check|atuin::apply|atuin::status"
     "${_TMUX_LABEL}|_TMUX_DESC|tmux::check|tmux::apply|tmux::status"
     "${_ZELLIJ_LABEL}|_ZELLIJ_DESC|zellij::check|zellij::apply|zellij::status"
-    "${_DOTFILES_LABEL}|_DOTFILES_DESC|dotfiles::check|dotfiles::apply|dotfiles::status"
 )
 
 shell::log_status() {

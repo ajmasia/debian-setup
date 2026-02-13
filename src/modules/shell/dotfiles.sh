@@ -6,6 +6,9 @@ _MOD_DOTFILES_LOADED=1
 _DOTFILES_LABEL="Configure Dotfiles"
 _DOTFILES_DESC="Clone and apply dotfiles via GNU Stow."
 
+# Single-entry registry for global search
+_DOTFILES_TASKS=("${_DOTFILES_LABEL}|_DOTFILES_DESC|dotfiles::check|dotfiles::apply|dotfiles::status")
+
 _DOTFILES_DIR="$HOME/.dotfiles"
 _DOTFILES_CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/debian-setup"
 _DOTFILES_CONF="${_DOTFILES_CONF_DIR}/dotfiles.conf"
@@ -238,7 +241,7 @@ dotfiles::apply() {
         _dotfiles::repo_cloned && repo_ok=true
 
         ui::clear_content
-        log::nav "Shell > Dotfiles"
+        log::nav "Dotfiles"
         log::break
 
         log::info "Dotfiles (GNU Stow)"

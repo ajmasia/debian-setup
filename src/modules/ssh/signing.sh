@@ -53,7 +53,7 @@ ssh_signing::apply() {
 
     while true; do
         ui::clear_content
-        log::nav "OpenSSH server > Configure commit signing"
+        log::nav "System Essentials > Commit Signing"
         log::break
 
         log::info "Current commit signing configuration"

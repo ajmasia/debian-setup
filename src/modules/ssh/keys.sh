@@ -36,7 +36,7 @@ ssh_keys::apply() {
 
     while true; do
         ui::clear_content
-        log::nav "OpenSSH server > Configure SSH keys"
+        log::nav "System Essentials > SSH Keys"
         log::break
 
         log::info "Current SSH keys"
