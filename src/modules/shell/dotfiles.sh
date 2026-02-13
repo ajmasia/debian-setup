@@ -155,7 +155,47 @@ _dotfiles::stow_apply() {
         stow_dir="${_DOTFILES_DIR}/${parent}"
     fi
     mkdir -p "$target"
-    stow -d "$stow_dir" -t "$target" "$package" 2>&1
+
+    local output
+    if output="$(stow -d "$stow_dir" -t "$target" "$package" 2>&1)"; then
+        return 0
+    fi
+
+    # Conflict detected — ask user
+    log::warn "${src_prefix}: existing files conflict"
+    log::break
+
+    local choice
+    choice="$(gum::choose \
+        --header "Existing files conflict with ${src_prefix}. What to do?" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "Adopt (replace existing with repo version)" \
+        "Skip")"
+
+    case "$choice" in
+        "Adopt"*)
+            # Remove conflicting non-symlink targets, then stow
+            local src_dir="${_DOTFILES_DIR}/${src_prefix}"
+            local entry name
+            for entry in "$src_dir"/* "$src_dir"/.*; do
+                [[ -e "$entry" ]] || continue
+                name="$(basename "$entry")"
+                [[ "$name" == "." || "$name" == ".." ]] && continue
+                local item_target="${target}/${name}"
+                if [[ -e "$item_target" && ! -L "$item_target" ]]; then
+                    rm -rf "$item_target"
+                fi
+            done
+            stow -d "$stow_dir" -t "$target" "$package" 2>&1
+            ;;
+        *)
+            log::warn "${src_prefix} skipped"
+            return 1
+            ;;
+    esac
 }
 
 _dotfiles::stow_remove() {
@@ -214,6 +254,47 @@ dotfiles::apply() {
             url="$(_dotfiles::saved_url)"
             log::ok "Repo: ${_DOTFILES_DIR}"
             [[ -n "$url" ]] && log::ok "Remote: ${url}"
+
+            # Git status
+            local git_status=""
+            local dirty=false ahead=false behind=false
+
+            if [[ -n "$(git -C "$_DOTFILES_DIR" status --porcelain 2>/dev/null)" ]]; then
+                dirty=true
+            fi
+
+            git -C "$_DOTFILES_DIR" fetch --quiet 2>/dev/null || true
+            local counts
+            counts="$(git -C "$_DOTFILES_DIR" rev-list --left-right --count HEAD...@{upstream} 2>/dev/null)" || true
+            if [[ -n "$counts" ]]; then
+                local ahead_n behind_n
+                ahead_n="$(printf '%s' "$counts" | cut -f1)"
+                behind_n="$(printf '%s' "$counts" | cut -f2)"
+                [[ "$ahead_n" -gt 0 ]] 2>/dev/null && ahead=true
+                [[ "$behind_n" -gt 0 ]] 2>/dev/null && behind=true
+            fi
+
+            if $dirty && $ahead; then
+                git_status="dirty, ${ahead_n} commit(s) ahead"
+            elif $dirty && $behind; then
+                git_status="dirty, ${behind_n} commit(s) behind"
+            elif $dirty; then
+                git_status="dirty (uncommitted changes)"
+            elif $ahead && $behind; then
+                git_status="diverged (${ahead_n} ahead, ${behind_n} behind)"
+            elif $ahead; then
+                git_status="${ahead_n} commit(s) ahead of remote"
+            elif $behind; then
+                git_status="${behind_n} commit(s) behind remote"
+            else
+                git_status="up to date"
+            fi
+
+            if [[ "$git_status" == "up to date" ]]; then
+                log::ok "Git: ${git_status}"
+            else
+                log::warn "Git: ${git_status}"
+            fi
 
             # Show items summary
             local item total=0 linked=0
@@ -407,28 +488,77 @@ _dotfiles::apply_all() {
     else
         log::ok "All groups already applied"
     fi
+
+    ui::return_or_exit
+}
+
+# ── Per-item link/unlink (ln -sr, compatible with stow) ─
+
+_dotfiles::link_item() {
+    local item="$1"
+    local target
+    target="$(_dotfiles::resolve_target "$item")" || return 1
+    local source="${_DOTFILES_DIR}/${item}"
+
+    if [[ -L "$target" ]]; then
+        local link_dest
+        link_dest="$(readlink -f "$target")"
+        local source_real
+        source_real="$(readlink -f "$source")"
+        if [[ "$link_dest" == "$source_real" ]]; then
+            return 0
+        fi
+        log::warn "${item}: target is symlink to another location, skipped"
+        return 1
+    fi
+
+    if [[ -e "$target" ]]; then
+        log::warn "${item}: existing file/dir conflicts"
+        log::break
+        local choice
+        choice="$(gum::choose \
+            --header "${item}: existing file conflicts. What to do?" \
+            --header.foreground "$HEX_LAVENDER" \
+            --cursor.foreground "$HEX_BLUE" \
+            --item.foreground "$HEX_TEXT" \
+            --selected.foreground "$HEX_GREEN" \
+            "Adopt (replace existing with repo version)" \
+            "Skip")"
+        case "$choice" in
+            "Adopt"*)
+                rm -rf "$target"
+                ;;
+            *)
+                log::warn "${item} skipped"
+                return 1
+                ;;
+        esac
+    fi
+
+    mkdir -p "$(dirname "$target")"
+    ln -sr "$source" "$target"
+    log::ok "${item} applied"
 }
 
 # ── Select apply ────────────────────────────────────────
 
 _dotfiles::select_apply() {
-    local mapping src_prefix
+    local item
     local pending=()
 
-    for mapping in "${_DOTFILES_MAP[@]}"; do
-        src_prefix="${mapping%%:*}"
-        _dotfiles::group_has_items "$src_prefix" || continue
-        _dotfiles::group_has_pending "$src_prefix" && pending+=("$src_prefix")
-    done
+    while IFS= read -r item; do
+        _dotfiles::is_linked "$item" || pending+=("$item")
+    done < <(_dotfiles::list_items)
 
     if [[ ${#pending[@]} -eq 0 ]]; then
-        log::ok "All groups already applied"
+        log::ok "All items already applied"
+        ui::return_or_exit
         return
     fi
 
     local selected
     selected="$(gum::choose --no-limit \
-        --header "Select groups to apply:" \
+        --header "Select items to apply:" \
         --header.foreground "$HEX_LAVENDER" \
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
@@ -439,53 +569,52 @@ _dotfiles::select_apply() {
         return
     fi
 
-    local group count=0
-    while IFS= read -r group; do
-        local target_prefix=""
-        for mapping in "${_DOTFILES_MAP[@]}"; do
-            src_prefix="${mapping%%:*}"
-            if [[ "$src_prefix" == "$group" ]]; then
-                target_prefix="${mapping#*:}"
-                break
-            fi
-        done
-        [[ -n "$target_prefix" ]] || continue
-
-        log::info "Applying ${group}"
-        if _dotfiles::stow_apply "$group" "$target_prefix"; then
-            log::ok "${group} applied"
-            count=$((count + 1))
-        else
-            log::error "Failed to apply ${group} (conflict?)"
-        fi
+    local name count=0
+    while IFS= read -r name; do
+        _dotfiles::link_item "$name" && count=$((count + 1))
     done <<< "$selected"
 
+    log::break
     if [[ $count -gt 0 ]]; then
-        log::break
-        log::ok "${count} group(s) applied"
+        log::ok "${count} item(s) applied"
     fi
+
+    ui::return_or_exit
 }
 
 # ── Select remove ───────────────────────────────────────
 
+_dotfiles::unlink_item() {
+    local item="$1"
+    local target
+    target="$(_dotfiles::resolve_target "$item")" || return 1
+
+    if [[ -L "$target" ]]; then
+        rm "$target"
+        log::ok "${item} removed"
+    else
+        log::warn "${item}: not a symlink, skipped"
+        return 1
+    fi
+}
+
 _dotfiles::select_remove() {
-    local mapping src_prefix
+    local item
     local applied=()
 
-    for mapping in "${_DOTFILES_MAP[@]}"; do
-        src_prefix="${mapping%%:*}"
-        _dotfiles::group_has_items "$src_prefix" || continue
-        _dotfiles::group_has_applied "$src_prefix" && applied+=("$src_prefix")
-    done
+    while IFS= read -r item; do
+        _dotfiles::is_linked "$item" && applied+=("$item")
+    done < <(_dotfiles::list_items)
 
     if [[ ${#applied[@]} -eq 0 ]]; then
-        log::ok "No groups applied"
+        log::ok "No items applied"
+        ui::return_or_exit
         return
     fi
 
     local selected
     selected="$(gum::choose --no-limit \
-        --header "Select groups to remove:" \
+        --header "Select items to remove:" \
         --header.foreground "$HEX_LAVENDER" \
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
@@ -496,31 +625,17 @@ _dotfiles::select_remove() {
         return
     fi
 
-    local group count=0
-    while IFS= read -r group; do
-        local target_prefix=""
-        for mapping in "${_DOTFILES_MAP[@]}"; do
-            src_prefix="${mapping%%:*}"
-            if [[ "$src_prefix" == "$group" ]]; then
-                target_prefix="${mapping#*:}"
-                break
-            fi
-        done
-        [[ -n "$target_prefix" ]] || continue
-
-        log::info "Removing ${group}"
-        if _dotfiles::stow_remove "$group" "$target_prefix"; then
-            log::ok "${group} removed"
-            count=$((count + 1))
-        else
-            log::error "Failed to remove ${group}"
-        fi
+    local name count=0
+    while IFS= read -r name; do
+        _dotfiles::unlink_item "$name" && count=$((count + 1))
     done <<< "$selected"
 
+    log::break
     if [[ $count -gt 0 ]]; then
-        log::break
-        log::ok "${count} group(s) removed"
+        log::ok "${count} item(s) removed"
     fi
+
+    ui::return_or_exit
 }
 
 # ── Update ──────────────────────────────────────────────
