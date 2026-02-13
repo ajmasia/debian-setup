@@ -13,7 +13,6 @@ _SOFTWARE_TASKS=(
     "${_SECURITY_LABEL}|_SECURITY_DESC|security::check|security::run|security::status"
     "${_MESSAGING_LABEL}|_MESSAGING_DESC|messaging::check|messaging::run|messaging::status"
     "${_PRODUCTIVITY_LABEL}|_PRODUCTIVITY_DESC|productivity::check|productivity::run|productivity::status"
-    "${_FONTS_LABEL}|_FONTS_DESC|fonts::check|fonts::run|fonts::status"
 )
 
 software::log_status() {

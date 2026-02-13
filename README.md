@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.13.3-blue)
+![Version](https://img.shields.io/badge/version-0.13.4-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -93,7 +93,6 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
   - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
 - **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
 - **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak / APT + Nautilus plugin), LocalSend (Flatpak), Balena Etcher (GitHub zip)
-- **Fonts** -- Nerd Fonts (Noto, Symbols Only, Hack, CaskaydiaCove, CaskaydiaMono, FiraCode) from GitHub releases
 
 ### UI and Theming
 - **Appearance**
@@ -106,6 +105,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Extensions** -- Manage GNOME Shell extensions (Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes)
 - **Browser Themes** -- Catppuccin Mocha install guide for Brave, Chromium, Firefox, LibreWolf
 - **App Themes** -- Catppuccin Mocha themes for CLI apps (btop, Alacritty, Atuin, bat, cava, eza, lazygit, Starship) with install/remove, marker-based config, and accent color selection
+- **Fonts** -- Nerd Fonts (Noto, Symbols Only, Hack, CaskaydiaCove, CaskaydiaMono, FiraCode) from GitHub releases
 
 ### Health
 - **Health check** -- System info, dependency status, and task overview
