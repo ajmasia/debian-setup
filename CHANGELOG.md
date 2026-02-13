@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.0] - 2026-02-13
+
+### Changed
+
+- **Main menu reorganized**: new order — Package Managers, Hardware, System Essentials, Dotfiles, Shell, Development, UI and Theming, Software, Virtualization, Health
+- **SSH tasks moved into System Essentials** — no longer a standalone top-level menu item (14 tasks total)
+- **Dotfiles promoted to main menu** — accessible directly instead of through Shell submenu
+- **UI renamed to "UI and Theming"** — clearer label for GNOME customization module
+- **Diagnostics renamed to "Health"** — shorter, more descriptive label
+- SSH breadcrumbs updated to reflect new location under System Essentials
+
 ## [0.12.22] - 2026-02-13
 
 ### Added
