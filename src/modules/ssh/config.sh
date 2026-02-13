@@ -17,7 +17,7 @@ _ssh_config::has_gitlab() {
 }
 
 _ssh_config::_list_custom() {
-    [[ -f "$_SSH_CONFIG_FILE" ]] || return
+    [[ -f "$_SSH_CONFIG_FILE" ]] || return 0
     awk '/^# /{name=substr($0,3); next} name && /^Host /{print name} {name=""}' \
         "$_SSH_CONFIG_FILE" 2>/dev/null | grep -vE '^(GitHub|GitLab)$' || true
 }
