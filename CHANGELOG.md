@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.22] - 2026-02-13
+
+### Added
+
+- **Dotfiles** wizard now shows git repo status on entry (up to date, dirty, ahead/behind, diverged)
+- Adopt prompt on conflict: when existing files collide with dotfiles, user chooses to replace with repo version or skip
+
+### Changed
+
+- Select to apply/remove now operates at individual item level for finer control
+- Apply all uses GNU Stow at group level with conflict detection and adopt prompt
+- All operations pause with Back/Exit after completion so results are visible
+
 ## [0.12.21] - 2026-02-13
 
 ### Changed
