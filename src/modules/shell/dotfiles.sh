@@ -1,16 +1,17 @@
-# Dotfiles management task (custom symlinks)
+# Dotfiles management task (GNU Stow)
 
 [[ -n "${_MOD_DOTFILES_LOADED:-}" ]] && return 0
 _MOD_DOTFILES_LOADED=1
 
 _DOTFILES_LABEL="Configure Dotfiles"
-_DOTFILES_DESC="Clone and apply dotfiles via symlinks."
+_DOTFILES_DESC="Clone and apply dotfiles via GNU Stow."
 
 _DOTFILES_DIR="$HOME/.dotfiles"
 _DOTFILES_CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/debian-setup"
 _DOTFILES_CONF="${_DOTFILES_CONF_DIR}/dotfiles.conf"
 
-# Mapping: repo_dir -> target_dir
+# Mapping: src_prefix:target_dir
+# stow derives: -d DOTFILES_DIR/$(dirname prefix) -t target $(basename prefix)
 _DOTFILES_MAP=(
     "home:${HOME}"
     "config:${HOME}/.config"
@@ -19,6 +20,10 @@ _DOTFILES_MAP=(
 )
 
 # ── Helpers ─────────────────────────────────────────────
+
+_dotfiles::stow_installed() {
+    command -v stow &>/dev/null
+}
 
 _dotfiles::repo_cloned() {
     [[ -d "${_DOTFILES_DIR}/.git" ]]
@@ -37,10 +42,9 @@ _dotfiles::save_url() {
 }
 
 _dotfiles::list_items() {
-    local mapping src_prefix target_prefix
+    local mapping src_prefix
     for mapping in "${_DOTFILES_MAP[@]}"; do
         src_prefix="${mapping%%:*}"
-        target_prefix="${mapping#*:}"
         local src_dir="${_DOTFILES_DIR}/${src_prefix}"
         [[ -d "$src_dir" ]] || continue
         local entry
@@ -81,59 +85,105 @@ _dotfiles::is_linked() {
     [[ "$link_dest" == "$source_path" ]]
 }
 
-_dotfiles::link() {
-    local item="$1"
-    local target
-    target="$(_dotfiles::resolve_target "$item")" || return 1
-    local source="${_DOTFILES_DIR}/${item}"
-
-    # Conflict handling
-    if [[ -L "$target" ]]; then
-        local link_dest
-        link_dest="$(readlink -f "$target")"
-        local source_real
-        source_real="$(readlink -f "$source")"
-        if [[ "$link_dest" == "$source_real" ]]; then
-            log::ok "${item} already applied"
-            return 0
-        fi
-        log::warn "${item}: target is symlink to another location, skipped"
-        return 1
-    fi
-
-    if [[ -e "$target" ]]; then
-        log::warn "${item}: conflict (regular file/dir exists at target), skipped"
-        return 1
-    fi
-
-    mkdir -p "$(dirname "$target")"
-    ln -s "$source" "$target"
-    log::ok "${item} applied"
+_dotfiles::group_has_items() {
+    local src_prefix="$1"
+    local src_dir="${_DOTFILES_DIR}/${src_prefix}"
+    [[ -d "$src_dir" ]] || return 1
+    local entry name
+    for entry in "$src_dir"/* "$src_dir"/.*; do
+        [[ -e "$entry" ]] || continue
+        name="$(basename "$entry")"
+        [[ "$name" == "." || "$name" == ".." ]] && continue
+        return 0
+    done
+    return 1
 }
 
-_dotfiles::unlink() {
-    local item="$1"
-    local target
-    target="$(_dotfiles::resolve_target "$item")" || return 1
+_dotfiles::group_applied() {
+    local src_prefix="$1"
+    local src_dir="${_DOTFILES_DIR}/${src_prefix}"
+    [[ -d "$src_dir" ]] || return 1
+    local entry name has_items=false
+    for entry in "$src_dir"/* "$src_dir"/.*; do
+        [[ -e "$entry" ]] || continue
+        name="$(basename "$entry")"
+        [[ "$name" == "." || "$name" == ".." ]] && continue
+        has_items=true
+        _dotfiles::is_linked "${src_prefix}/${name}" || return 1
+    done
+    $has_items
+}
 
-    if [[ -L "$target" ]]; then
-        rm "$target"
-        log::ok "${item} removed"
+_dotfiles::group_has_pending() {
+    local src_prefix="$1"
+    local src_dir="${_DOTFILES_DIR}/${src_prefix}"
+    [[ -d "$src_dir" ]] || return 1
+    local entry name
+    for entry in "$src_dir"/* "$src_dir"/.*; do
+        [[ -e "$entry" ]] || continue
+        name="$(basename "$entry")"
+        [[ "$name" == "." || "$name" == ".." ]] && continue
+        _dotfiles::is_linked "${src_prefix}/${name}" || return 0
+    done
+    return 1
+}
+
+_dotfiles::group_has_applied() {
+    local src_prefix="$1"
+    local src_dir="${_DOTFILES_DIR}/${src_prefix}"
+    [[ -d "$src_dir" ]] || return 1
+    local entry name
+    for entry in "$src_dir"/* "$src_dir"/.*; do
+        [[ -e "$entry" ]] || continue
+        name="$(basename "$entry")"
+        [[ "$name" == "." || "$name" == ".." ]] && continue
+        _dotfiles::is_linked "${src_prefix}/${name}" && return 0
+    done
+    return 1
+}
+
+# ── Stow operations ────────────────────────────────────
+
+_dotfiles::stow_apply() {
+    local src_prefix="$1" target="$2"
+    local parent package stow_dir
+    parent="$(dirname "$src_prefix")"
+    package="$(basename "$src_prefix")"
+    if [[ "$parent" == "." ]]; then
+        stow_dir="$_DOTFILES_DIR"
     else
-        log::warn "${item}: not a symlink, skipped"
-        return 1
+        stow_dir="${_DOTFILES_DIR}/${parent}"
     fi
+    mkdir -p "$target"
+    stow -d "$stow_dir" -t "$target" "$package" 2>&1
+}
+
+_dotfiles::stow_remove() {
+    local src_prefix="$1" target="$2"
+    local parent package stow_dir
+    parent="$(dirname "$src_prefix")"
+    package="$(basename "$src_prefix")"
+    if [[ "$parent" == "." ]]; then
+        stow_dir="$_DOTFILES_DIR"
+    else
+        stow_dir="${_DOTFILES_DIR}/${parent}"
+    fi
+    stow -d "$stow_dir" -t "$target" -D "$package" 2>&1
 }
 
 # ── Public API ──────────────────────────────────────────
 
 dotfiles::check() {
-    _dotfiles::repo_cloned
+    _dotfiles::stow_installed && _dotfiles::repo_cloned
 }
 
 dotfiles::status() {
-    if ! _dotfiles::repo_cloned; then
-        printf '%s' "repo not cloned"
+    local issues=()
+    _dotfiles::stow_installed || issues+=("stow not installed")
+    _dotfiles::repo_cloned || issues+=("repo not cloned")
+    if [[ ${#issues[@]} -gt 0 ]]; then
+        local IFS=", "
+        printf '%s' "${issues[*]}"
     fi
 }
 
@@ -143,14 +193,21 @@ dotfiles::apply() {
     local choice
 
     while true; do
-        local repo_ok=false
+        local stow_ok=false repo_ok=false
+        _dotfiles::stow_installed && stow_ok=true
         _dotfiles::repo_cloned && repo_ok=true
 
         ui::clear_content
         log::nav "Shell > Dotfiles"
         log::break
 
-        log::info "Dotfiles (symlinks)"
+        log::info "Dotfiles (GNU Stow)"
+
+        if $stow_ok; then
+            log::ok "GNU Stow: installed"
+        else
+            log::warn "GNU Stow: not installed"
+        fi
 
         if $repo_ok; then
             local url
@@ -180,11 +237,15 @@ dotfiles::apply() {
 
         local options=()
 
+        if ! $stow_ok; then
+            options+=("Install GNU Stow")
+        fi
+
         if ! $repo_ok; then
             options+=("Clone dotfiles repo")
         fi
 
-        if $repo_ok; then
+        if $stow_ok && $repo_ok; then
             options+=("Show items" "Apply all" "Select to apply" "Select to remove" "Update repo")
         fi
 
@@ -205,6 +266,10 @@ dotfiles::apply() {
             "Exit")
                 ui::clear_content
                 ui::goodbye
+                ;;
+            "Install GNU Stow")
+                log::break
+                _dotfiles::install_stow
                 ;;
             "Clone dotfiles repo")
                 log::break
@@ -236,6 +301,19 @@ dotfiles::apply() {
                 ;;
         esac
     done
+}
+
+# ── Install Stow ───────────────────────────────────────
+
+_dotfiles::install_stow() {
+    log::info "Installing GNU Stow"
+    ui::flush_input
+    if sudo apt-get install -y stow </dev/tty; then
+        hash -r
+        log::ok "GNU Stow installed"
+    else
+        log::error "Failed to install GNU Stow"
+    fi
 }
 
 # ── Clone ───────────────────────────────────────────────
@@ -271,33 +349,30 @@ _dotfiles::show() {
     local mapping src_prefix
     for mapping in "${_DOTFILES_MAP[@]}"; do
         src_prefix="${mapping%%:*}"
+        _dotfiles::group_has_items "$src_prefix" || continue
+
+        local group_status
+        if _dotfiles::group_applied "$src_prefix"; then
+            group_status="applied"
+        elif _dotfiles::group_has_applied "$src_prefix"; then
+            group_status="partial"
+        else
+            group_status="not applied"
+        fi
+
+        printf "\n%b── %s (%s) ──%b\n" "${COLOR_OVERLAY1}" "$src_prefix" "$group_status" "${COLOR_RESET}"
+
         local src_dir="${_DOTFILES_DIR}/${src_prefix}"
-        [[ -d "$src_dir" ]] || continue
-
-        local has_entries=false
-        local entry
+        local entry name
         for entry in "$src_dir"/* "$src_dir"/.*; do
             [[ -e "$entry" ]] || continue
-            local name
-            name="$(basename "$entry")"
-            [[ "$name" == "." || "$name" == ".." ]] && continue
-            has_entries=true
-            break
-        done
-        $has_entries || continue
-
-        printf "\n%b── %s ──%b\n" "${COLOR_OVERLAY1}" "$src_prefix" "${COLOR_RESET}"
-
-        for entry in "$src_dir"/* "$src_dir"/.*; do
-            [[ -e "$entry" ]] || continue
-            local name
             name="$(basename "$entry")"
             [[ "$name" == "." || "$name" == ".." ]] && continue
             local item="${src_prefix}/${name}"
             if _dotfiles::is_linked "$item"; then
-                log::ok "  ${name} (applied)"
+                log::ok "  ${name}"
             else
-                log::warn "  ${name} (not applied)"
+                log::warn "  ${name}"
             fi
         done
     done
@@ -309,42 +384,51 @@ _dotfiles::show() {
 # ── Apply all ───────────────────────────────────────────
 
 _dotfiles::apply_all() {
-    local item count=0
+    local mapping src_prefix target_prefix count=0
 
-    while IFS= read -r item; do
-        if ! _dotfiles::is_linked "$item"; then
-            _dotfiles::link "$item" && count=$((count + 1))
+    for mapping in "${_DOTFILES_MAP[@]}"; do
+        src_prefix="${mapping%%:*}"
+        target_prefix="${mapping#*:}"
+        _dotfiles::group_has_items "$src_prefix" || continue
+        _dotfiles::group_applied "$src_prefix" && continue
+
+        log::info "Applying ${src_prefix}"
+        if _dotfiles::stow_apply "$src_prefix" "$target_prefix"; then
+            log::ok "${src_prefix} applied"
+            count=$((count + 1))
+        else
+            log::error "Failed to apply ${src_prefix} (conflict?)"
         fi
-    done < <(_dotfiles::list_items)
+    done
 
     log::break
     if [[ $count -gt 0 ]]; then
-        log::ok "${count} item(s) applied"
+        log::ok "${count} group(s) applied"
     else
-        log::ok "All items already applied"
+        log::ok "All groups already applied"
     fi
 }
 
 # ── Select apply ────────────────────────────────────────
 
 _dotfiles::select_apply() {
-    local item
+    local mapping src_prefix
     local pending=()
 
-    while IFS= read -r item; do
-        if ! _dotfiles::is_linked "$item"; then
-            pending+=("$item")
-        fi
-    done < <(_dotfiles::list_items)
+    for mapping in "${_DOTFILES_MAP[@]}"; do
+        src_prefix="${mapping%%:*}"
+        _dotfiles::group_has_items "$src_prefix" || continue
+        _dotfiles::group_has_pending "$src_prefix" && pending+=("$src_prefix")
+    done
 
     if [[ ${#pending[@]} -eq 0 ]]; then
-        log::ok "All items already applied"
+        log::ok "All groups already applied"
         return
     fi
 
     local selected
     selected="$(gum::choose --no-limit \
-        --header "Select items to apply:" \
+        --header "Select groups to apply:" \
         --header.foreground "$HEX_LAVENDER" \
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
@@ -355,37 +439,53 @@ _dotfiles::select_apply() {
         return
     fi
 
-    local name count=0
-    while IFS= read -r name; do
-        _dotfiles::link "$name" && count=$((count + 1))
+    local group count=0
+    while IFS= read -r group; do
+        local target_prefix=""
+        for mapping in "${_DOTFILES_MAP[@]}"; do
+            src_prefix="${mapping%%:*}"
+            if [[ "$src_prefix" == "$group" ]]; then
+                target_prefix="${mapping#*:}"
+                break
+            fi
+        done
+        [[ -n "$target_prefix" ]] || continue
+
+        log::info "Applying ${group}"
+        if _dotfiles::stow_apply "$group" "$target_prefix"; then
+            log::ok "${group} applied"
+            count=$((count + 1))
+        else
+            log::error "Failed to apply ${group} (conflict?)"
+        fi
     done <<< "$selected"
 
     if [[ $count -gt 0 ]]; then
         log::break
-        log::ok "${count} item(s) applied"
+        log::ok "${count} group(s) applied"
     fi
 }
 
 # ── Select remove ───────────────────────────────────────
 
 _dotfiles::select_remove() {
-    local item
+    local mapping src_prefix
     local applied=()
 
-    while IFS= read -r item; do
-        if _dotfiles::is_linked "$item"; then
-            applied+=("$item")
-        fi
-    done < <(_dotfiles::list_items)
+    for mapping in "${_DOTFILES_MAP[@]}"; do
+        src_prefix="${mapping%%:*}"
+        _dotfiles::group_has_items "$src_prefix" || continue
+        _dotfiles::group_has_applied "$src_prefix" && applied+=("$src_prefix")
+    done
 
     if [[ ${#applied[@]} -eq 0 ]]; then
-        log::ok "No items applied"
+        log::ok "No groups applied"
         return
     fi
 
     local selected
     selected="$(gum::choose --no-limit \
-        --header "Select items to remove:" \
+        --header "Select groups to remove:" \
         --header.foreground "$HEX_LAVENDER" \
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
@@ -396,14 +496,30 @@ _dotfiles::select_remove() {
         return
     fi
 
-    local name count=0
-    while IFS= read -r name; do
-        _dotfiles::unlink "$name" && count=$((count + 1))
+    local group count=0
+    while IFS= read -r group; do
+        local target_prefix=""
+        for mapping in "${_DOTFILES_MAP[@]}"; do
+            src_prefix="${mapping%%:*}"
+            if [[ "$src_prefix" == "$group" ]]; then
+                target_prefix="${mapping#*:}"
+                break
+            fi
+        done
+        [[ -n "$target_prefix" ]] || continue
+
+        log::info "Removing ${group}"
+        if _dotfiles::stow_remove "$group" "$target_prefix"; then
+            log::ok "${group} removed"
+            count=$((count + 1))
+        else
+            log::error "Failed to remove ${group}"
+        fi
     done <<< "$selected"
 
     if [[ $count -gt 0 ]]; then
         log::break
-        log::ok "${count} item(s) removed"
+        log::ok "${count} group(s) removed"
     fi
 }
 
@@ -421,20 +537,17 @@ _dotfiles::update() {
 # ── Help ────────────────────────────────────────────────
 
 _dotfiles::help() {
-    log::info "Dotfiles repo structure (symlinks)"
+    log::info "Dotfiles repo structure (GNU Stow)"
     log::break
 
     printf "%b" "${COLOR_OVERLAY1}"
     cat <<'HELP'
-  Top-level directories map to fixed targets:
+  Top-level directories map to fixed targets via GNU Stow:
 
     home/*                       -> ~/
     config/*                     -> ~/.config/
     local/bin/*                  -> ~/.local/bin/
     local/share/completions/*    -> ~/.local/share/bash-completion/completions/
-
-  Each entry gets its own symlink (files as file symlinks,
-  directories as directory symlinks).
 
   dotfiles/
   ├── home/
@@ -454,16 +567,19 @@ _dotfiles::help() {
 
   Results in:
     ~/.bashrc           -> ~/.dotfiles/home/.bashrc
-    ~/.bash_aliases     -> ~/.dotfiles/home/.bash_aliases
     ~/.config/alacritty -> ~/.dotfiles/config/alacritty
-    ~/.config/starship.toml -> ~/.dotfiles/config/starship.toml
-    ~/.local/bin/backup.sh -> ~/.dotfiles/local/bin/backup.sh
 
-  No extra dependencies required (no GNU Stow needed).
+  Standalone usage (works on any system with stow):
 
-  Conflicts: if a regular file/dir already exists at the target,
-  the item is skipped with a warning. Remove or move the file
-  first, then retry.
+    stow -d ~/.dotfiles -t ~        home
+    stow -d ~/.dotfiles -t ~/.config config
+    stow -d ~/.dotfiles/local -t ~/.local/bin bin
+    stow -d ~/.dotfiles/local/share \
+         -t ~/.local/share/bash-completion/completions completions
+
+  Remove with -D flag:
+
+    stow -d ~/.dotfiles -t ~ -D home
 HELP
     printf "%b" "${COLOR_RESET}"
 

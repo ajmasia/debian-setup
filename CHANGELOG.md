@@ -2,15 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.21] - 2026-02-13
+
+### Changed
+
+- **Dotfiles** module now uses GNU Stow for symlink management, ensuring full compatibility between debian-setup and standalone stow usage
+- Apply/remove operates at group level (home, config, local/bin, local/share/completions)
+- Show view displays group status (applied/partial/not applied) with per-item detail
+
 ## [0.12.20] - 2026-02-13
 
 ### Changed
 
-- **Dotfiles** module rewritten to use custom symlinks instead of GNU Stow
-  - Hardcoded mappings: `home/` -> `~/`, `config/` -> `~/.config/`, `local/bin/` -> `~/.local/bin/`, `local/share/completions/` -> `~/.local/share/bash-completion/completions/`
-  - Conflict detection: warns on existing files/dirs or foreign symlinks, skips safely
-  - Show items grouped by category with applied/not-applied status
-  - No external dependencies required (removes Stow requirement)
+- **Dotfiles** module rewritten with directory-based mapping structure (home, config, local/bin, local/share/completions)
 
 ## [0.12.19] - 2026-02-13
 
