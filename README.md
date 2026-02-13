@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.13.1-blue)
+![Version](https://img.shields.io/badge/version-0.13.2-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -93,7 +93,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
   - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
 - **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
 - **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak / APT + Nautilus plugin), LocalSend (Flatpak), Balena Etcher (GitHub zip)
-- **Fonts** -- Nerd Fonts (Noto, Symbols Only, Hack, CaskaydiaCove, FiraCode) from GitHub releases
+- **Fonts** -- Nerd Fonts (Noto, Symbols Only, Hack, CaskaydiaCove, CaskaydiaMono, FiraCode) from GitHub releases
 
 ### UI and Theming
 - **Appearance**
