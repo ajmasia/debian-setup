@@ -89,8 +89,16 @@ icons::apply() {
 }
 
 _icons::install_base() {
-    # Install papirus base if missing
-    if ! dpkg -l papirus-icon-theme 2>/dev/null | grep -q '^ii'; then
+    # Install or reinstall papirus (reinstall cleans Catppuccin folder overrides)
+    if dpkg -l papirus-icon-theme 2>/dev/null | grep -q '^ii'; then
+        log::info "Reinstalling Papirus icon theme (clean state)"
+        ui::flush_input
+        if ! sudo apt-get install -y --reinstall papirus-icon-theme </dev/tty; then
+            log::error "Failed to reinstall Papirus"
+            return 1
+        fi
+        log::ok "Papirus reinstalled"
+    else
         log::info "Installing Papirus icon theme"
         ui::flush_input
         if ! sudo apt-get install -y papirus-icon-theme </dev/tty; then
@@ -99,8 +107,6 @@ _icons::install_base() {
         fi
         hash -r
         log::ok "Papirus installed"
-    else
-        log::ok "Papirus already installed"
     fi
 
     gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark" || true
