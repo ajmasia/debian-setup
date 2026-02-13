@@ -56,6 +56,19 @@ _appthemes::ensure_config() {
     [[ -f "$file" ]] || touch "$file"
 }
 
+_appthemes::confirm_config() {
+    local config_file="$1"
+    local answer
+    answer="$(gum::choose \
+        --header "Apply to ${config_file/$HOME/\~}?" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "Yes" "No")"
+    [[ "$answer" == "Yes" ]]
+}
+
 # ── btop ────────────────────────────────────────────────────────────
 
 _BTOP_LABEL="btop Theme"
@@ -79,14 +92,18 @@ _appthemes::btop_install() {
     fi
     log::ok "Theme file downloaded"
 
-    _appthemes::ensure_config "$_BTOP_CONFIG"
-    _appthemes::remove_marker_block "$_BTOP_CONFIG"
-    {
-        printf '\n%s\n' "$_APPTHEMES_MARKER_START"
-        printf 'color_theme = "catppuccin_mocha"\n'
-        printf '%s\n' "$_APPTHEMES_MARKER_END"
-    } >> "$_BTOP_CONFIG"
-    log::ok "btop theme installed"
+    if _appthemes::confirm_config "$_BTOP_CONFIG"; then
+        _appthemes::ensure_config "$_BTOP_CONFIG"
+        _appthemes::remove_marker_block "$_BTOP_CONFIG"
+        {
+            printf '\n%s\n' "$_APPTHEMES_MARKER_START"
+            printf 'color_theme = "catppuccin_mocha"\n'
+            printf '%s\n' "$_APPTHEMES_MARKER_END"
+        } >> "$_BTOP_CONFIG"
+        log::ok "btop theme installed"
+    else
+        log::ok "Theme file saved — configure manually in ${_BTOP_CONFIG/$HOME/\~}"
+    fi
 }
 
 _appthemes::btop_remove() {
@@ -176,16 +193,20 @@ _appthemes::alacritty_install() {
     fi
     log::ok "Theme file downloaded"
 
-    _appthemes::ensure_config "$_ALACRITTY_CONFIG"
-    if ! _appthemes::has_marker "$_ALACRITTY_CONFIG"; then
-        {
-            printf '\n%s\n' "$_APPTHEMES_MARKER_START"
-            printf '[general]\nimport = ["~/.config/alacritty/catppuccin-mocha.toml"]\n'
-            printf '%s\n' "$_APPTHEMES_MARKER_END"
-        } >> "$_ALACRITTY_CONFIG"
-        log::ok "Import added to alacritty.toml"
+    if _appthemes::confirm_config "$_ALACRITTY_CONFIG"; then
+        _appthemes::ensure_config "$_ALACRITTY_CONFIG"
+        if ! _appthemes::has_marker "$_ALACRITTY_CONFIG"; then
+            {
+                printf '\n%s\n' "$_APPTHEMES_MARKER_START"
+                printf '[general]\nimport = ["~/.config/alacritty/catppuccin-mocha.toml"]\n'
+                printf '%s\n' "$_APPTHEMES_MARKER_END"
+            } >> "$_ALACRITTY_CONFIG"
+            log::ok "Import added to alacritty.toml"
+        fi
+        log::ok "Alacritty theme installed"
+    else
+        log::ok "Theme file saved — configure manually in ${_ALACRITTY_CONFIG/$HOME/\~}"
     fi
-    log::ok "Alacritty theme installed"
 }
 
 _appthemes::alacritty_remove() {
@@ -285,15 +306,19 @@ _appthemes::atuin_install() {
     fi
     log::ok "Theme file downloaded"
 
-    _appthemes::ensure_config "$_ATUIN_CONFIG"
-    _appthemes::remove_marker_block "$_ATUIN_CONFIG"
-    {
-        printf '\n%s\n' "$_APPTHEMES_MARKER_START"
-        printf '[theme]\n'
-        printf 'name = "catppuccin-mocha-%s"\n' "$accent"
-        printf '%s\n' "$_APPTHEMES_MARKER_END"
-    } >> "$_ATUIN_CONFIG"
-    log::ok "Atuin theme installed"
+    if _appthemes::confirm_config "$_ATUIN_CONFIG"; then
+        _appthemes::ensure_config "$_ATUIN_CONFIG"
+        _appthemes::remove_marker_block "$_ATUIN_CONFIG"
+        {
+            printf '\n%s\n' "$_APPTHEMES_MARKER_START"
+            printf '[theme]\n'
+            printf 'name = "catppuccin-mocha-%s"\n' "$accent"
+            printf '%s\n' "$_APPTHEMES_MARKER_END"
+        } >> "$_ATUIN_CONFIG"
+        log::ok "Atuin theme installed"
+    else
+        log::ok "Theme file saved — configure manually in ${_ATUIN_CONFIG/$HOME/\~}"
+    fi
 }
 
 _appthemes::atuin_remove() {
@@ -420,14 +445,18 @@ _appthemes::bat_install() {
     log::ok "bat cache rebuilt"
 
     local bat_config="${config_dir}/config"
-    _appthemes::ensure_config "$bat_config"
-    _appthemes::remove_marker_block "$bat_config"
-    {
-        printf '\n%s\n' "$_APPTHEMES_MARKER_START"
-        printf '%s\n' '--theme="Catppuccin Mocha"'
-        printf '%s\n' "$_APPTHEMES_MARKER_END"
-    } >> "$bat_config"
-    log::ok "bat theme installed"
+    if _appthemes::confirm_config "$bat_config"; then
+        _appthemes::ensure_config "$bat_config"
+        _appthemes::remove_marker_block "$bat_config"
+        {
+            printf '\n%s\n' "$_APPTHEMES_MARKER_START"
+            printf '%s\n' '--theme="Catppuccin Mocha"'
+            printf '%s\n' "$_APPTHEMES_MARKER_END"
+        } >> "$bat_config"
+        log::ok "bat theme installed"
+    else
+        log::ok "Theme file saved — configure manually in ${bat_config/$HOME/\~}"
+    fi
 }
 
 _appthemes::bat_remove() {
@@ -524,15 +553,20 @@ _appthemes::cava_install() {
         log::error "Failed to download cava theme"
         return
     fi
+    log::ok "Theme downloaded"
 
-    _appthemes::ensure_config "$_CAVA_CONFIG"
-    _appthemes::remove_marker_block "$_CAVA_CONFIG"
-    {
-        printf '\n%s\n' "$_APPTHEMES_MARKER_START"
-        printf '%s\n' "$theme_content"
-        printf '%s\n' "$_APPTHEMES_MARKER_END"
-    } >> "$_CAVA_CONFIG"
-    log::ok "cava theme installed"
+    if _appthemes::confirm_config "$_CAVA_CONFIG"; then
+        _appthemes::ensure_config "$_CAVA_CONFIG"
+        _appthemes::remove_marker_block "$_CAVA_CONFIG"
+        {
+            printf '\n%s\n' "$_APPTHEMES_MARKER_START"
+            printf '%s\n' "$theme_content"
+            printf '%s\n' "$_APPTHEMES_MARKER_END"
+        } >> "$_CAVA_CONFIG"
+        log::ok "cava theme installed"
+    else
+        log::ok "Theme downloaded — add manually to ${_CAVA_CONFIG/$HOME/\~}"
+    fi
 }
 
 _appthemes::cava_remove() {
@@ -697,15 +731,20 @@ _appthemes::lazygit_install() {
         log::error "Failed to download lazygit theme"
         return
     fi
+    log::ok "Theme downloaded"
 
-    _appthemes::ensure_config "$_LAZYGIT_CONFIG"
-    _appthemes::remove_marker_block "$_LAZYGIT_CONFIG"
-    {
-        printf '\n%s\n' "$_APPTHEMES_MARKER_START"
-        printf '%s\n' "$theme_content"
-        printf '%s\n' "$_APPTHEMES_MARKER_END"
-    } >> "$_LAZYGIT_CONFIG"
-    log::ok "lazygit theme installed"
+    if _appthemes::confirm_config "$_LAZYGIT_CONFIG"; then
+        _appthemes::ensure_config "$_LAZYGIT_CONFIG"
+        _appthemes::remove_marker_block "$_LAZYGIT_CONFIG"
+        {
+            printf '\n%s\n' "$_APPTHEMES_MARKER_START"
+            printf '%s\n' "$theme_content"
+            printf '%s\n' "$_APPTHEMES_MARKER_END"
+        } >> "$_LAZYGIT_CONFIG"
+        log::ok "lazygit theme installed"
+    else
+        log::ok "Theme downloaded — add manually to ${_LAZYGIT_CONFIG/$HOME/\~}"
+    fi
 }
 
 _appthemes::lazygit_remove() {
@@ -785,33 +824,38 @@ _appthemes::starship_install() {
         log::error "Failed to download Starship palette"
         return
     fi
+    log::ok "Palette downloaded"
 
-    _appthemes::ensure_config "$_STARSHIP_CONFIG"
+    if _appthemes::confirm_config "$_STARSHIP_CONFIG"; then
+        _appthemes::ensure_config "$_STARSHIP_CONFIG"
 
-    # Remove any previous blocks
-    _appthemes::remove_marker_block "$_STARSHIP_CONFIG" "$_STARSHIP_PALETTE_MARKER"
-    _appthemes::remove_marker_block "$_STARSHIP_CONFIG" "$_STARSHIP_TABLE_MARKER"
+        # Remove any previous blocks
+        _appthemes::remove_marker_block "$_STARSHIP_CONFIG" "$_STARSHIP_PALETTE_MARKER"
+        _appthemes::remove_marker_block "$_STARSHIP_CONFIG" "$_STARSHIP_TABLE_MARKER"
 
-    # Prepend palette line at the top of the file
-    local tmp
-    tmp="$(mktemp)"
-    {
-        printf '%s\n' "# debian-setup: ${_STARSHIP_PALETTE_MARKER} start"
-        printf 'palette = "catppuccin_mocha"\n'
-        printf '%s\n' "# debian-setup: ${_STARSHIP_PALETTE_MARKER} end"
-        printf '\n'
-        cat "$_STARSHIP_CONFIG"
-    } > "$tmp"
-    mv "$tmp" "$_STARSHIP_CONFIG"
-    log::ok "Palette line added"
+        # Prepend palette line at the top of the file
+        local tmp
+        tmp="$(mktemp)"
+        {
+            printf '%s\n' "# debian-setup: ${_STARSHIP_PALETTE_MARKER} start"
+            printf 'palette = "catppuccin_mocha"\n'
+            printf '%s\n' "# debian-setup: ${_STARSHIP_PALETTE_MARKER} end"
+            printf '\n'
+            cat "$_STARSHIP_CONFIG"
+        } > "$tmp"
+        mv "$tmp" "$_STARSHIP_CONFIG"
+        log::ok "Palette line added"
 
-    # Append palette table at the end
-    {
-        printf '\n%s\n' "# debian-setup: ${_STARSHIP_TABLE_MARKER} start"
-        printf '%s\n' "$palette_table"
-        printf '%s\n' "# debian-setup: ${_STARSHIP_TABLE_MARKER} end"
-    } >> "$_STARSHIP_CONFIG"
-    log::ok "Starship palette installed"
+        # Append palette table at the end
+        {
+            printf '\n%s\n' "# debian-setup: ${_STARSHIP_TABLE_MARKER} start"
+            printf '%s\n' "$palette_table"
+            printf '%s\n' "# debian-setup: ${_STARSHIP_TABLE_MARKER} end"
+        } >> "$_STARSHIP_CONFIG"
+        log::ok "Starship palette installed"
+    else
+        log::ok "Palette downloaded — add manually to ${_STARSHIP_CONFIG/$HOME/\~}"
+    fi
 }
 
 _appthemes::starship_remove() {

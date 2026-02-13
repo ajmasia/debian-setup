@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.19] - 2026-02-13
+
+### Changed
+
+- App Themes now prompt before writing to dotfiles — theme files are downloaded first, then user confirms whether to apply config (btop, Alacritty, Atuin, bat, cava, lazygit, Starship)
+
 ## [0.12.18] - 2026-02-13
 
 ### Fixed
