@@ -572,10 +572,15 @@ _dotfiles::select_apply() {
         return
     fi
 
-    local name count=0
+    local name items=()
     while IFS= read -r name; do
-        _dotfiles::link_item "$name" && count=$((count + 1))
+        items+=("$name")
     done <<< "$selected"
+
+    local count=0
+    for name in "${items[@]}"; do
+        _dotfiles::link_item "$name" && count=$((count + 1))
+    done
 
     log::break
     if [[ $count -gt 0 ]]; then

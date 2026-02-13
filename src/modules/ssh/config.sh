@@ -23,16 +23,28 @@ _ssh_config::_list_custom() {
 }
 
 ssh_config::check() {
-    _ssh_config::has_github && _ssh_config::has_gitlab
+    _ssh_config::has_github && return 0
+    _ssh_config::has_gitlab && return 0
+    local custom
+    custom="$(_ssh_config::_list_custom)"
+    [[ -n "$custom" ]] && return 0
+    return 1
 }
 
 ssh_config::status() {
-    local issues=()
-    _ssh_config::has_github || issues+=("no GitHub")
-    _ssh_config::has_gitlab || issues+=("no GitLab")
-    if [[ ${#issues[@]} -gt 0 ]]; then
-        local IFS=", "
-        printf '%s' "${issues[*]}"
+    local configured=()
+    _ssh_config::has_github && configured+=("GitHub")
+    _ssh_config::has_gitlab && configured+=("GitLab")
+    local custom
+    custom="$(_ssh_config::_list_custom)"
+    if [[ -n "$custom" ]]; then
+        local srv
+        while IFS= read -r srv; do
+            configured+=("$srv")
+        done <<< "$custom"
+    fi
+    if [[ ${#configured[@]} -eq 0 ]]; then
+        printf '%s' "no services configured"
     fi
 }
 

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.2] - 2026-02-14
+
+### Fixed
+
+- Commit signing setup exits without allowing data input (missing stdin flush before input prompts)
+- SSH Config verification fails when only one service is configured (now passes with any GitHub, GitLab, or custom server)
+- Dotfiles select-to-apply loop breaks when a file conflict prompt appears (stdin consumed by heredoc)
+
+### Added
+
+- CaskaydiaMono Nerd Font to font list
+
 ## [0.13.0] - 2026-02-13
 
 ### Changed

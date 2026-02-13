@@ -223,6 +223,7 @@ _ssh_signing::_setup_conditional() {
     local config_file="$HOME/.gitconfig-${suffix}"
 
     # Ask for gitdir pattern
+    ui::flush_input
     local gitdir
     gitdir="$(gum::input \
         --header "gitdir pattern for ${suffix}:" \
@@ -320,6 +321,7 @@ _ssh_signing::_allowed_signers() {
     local git_email
     git_email="$(git config --global user.email 2>/dev/null || true)"
 
+    ui::flush_input
     local email
     email="$(gum::input \
         --header "Email for allowed signers:" \
