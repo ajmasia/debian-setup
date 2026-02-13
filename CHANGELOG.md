@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.18] - 2026-02-13
+
+### Fixed
+
+- Standalone Papirus install now reinstalls the APT package to clear leftover Catppuccin folder color overrides from a previous full install
+
 ## [0.12.17] - 2026-02-13
 
 ### Added
