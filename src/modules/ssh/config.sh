@@ -18,8 +18,16 @@ _ssh_config::has_gitlab() {
 
 _ssh_config::_list_custom() {
     [[ -f "$_SSH_CONFIG_FILE" ]] || return 0
-    awk '/^# /{name=substr($0,3); next} name && /^Host /{print name} {name=""}' \
-        "$_SSH_CONFIG_FILE" 2>/dev/null | grep -vE '^(GitHub|GitLab)$' || true
+    awk '
+        /^# /{name=substr($0,3); next}
+        /^Host / {
+            host=substr($0,6)
+            if (name) { print name } else { print host }
+            name=""
+            next
+        }
+        {name=""}
+    ' "$_SSH_CONFIG_FILE" 2>/dev/null | grep -vE '^(GitHub|GitLab|\*)$' || true
 }
 
 ssh_config::check() {
@@ -307,6 +315,9 @@ _ssh_config::_write_entry() {
     if grep -q "^# ${service}$" "$_SSH_CONFIG_FILE" 2>/dev/null; then
         sed -i "/^# ${service}$/,/^$/d" "$_SSH_CONFIG_FILE"
         log::info "Replaced existing ${service} entry"
+    elif grep -q "^Host ${host}$" "$_SSH_CONFIG_FILE" 2>/dev/null; then
+        sed -i "/^Host ${host}$/,/^$/d" "$_SSH_CONFIG_FILE"
+        log::info "Replaced existing ${host} entry"
     fi
 
     # Ensure config file and directory exist
@@ -335,7 +346,11 @@ _ssh_config::_remove_entry() {
     local service="$1"
 
     log::info "Removing ${service} from SSH config"
-    sed -i "/^# ${service}$/,/^$/d" "$_SSH_CONFIG_FILE"
+    if grep -q "^# ${service}$" "$_SSH_CONFIG_FILE" 2>/dev/null; then
+        sed -i "/^# ${service}$/,/^$/d" "$_SSH_CONFIG_FILE"
+    else
+        sed -i "/^Host ${service}$/,/^$/d" "$_SSH_CONFIG_FILE"
+    fi
     log::ok "${service} removed from ${_SSH_CONFIG_FILE}"
 }
 
