@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.12.16-blue)
+![Version](https://img.shields.io/badge/version-0.12.17-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -96,7 +96,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 ### UI
 - **Appearance**
   - **GTK Theme** -- Catppuccin Mocha GTK theme with accent color selection, dark mode toggle, GTK4/libadwaita symlinks
-  - **Icons** -- Papirus icons with Catppuccin folder colors
+  - **Icons** -- Papirus icons (standalone or with Catppuccin folder colors)
   - **Cursors** -- Catppuccin Mocha cursors (variant selection)
   - **Terminal Profile** -- Catppuccin color profiles for GNOME Terminal
 - **Keyboard** -- English intl layout (AltGr dead keys), 4 fixed workspaces, Super+W close, Super+Return terminal, Super+1-4/Shift+1-4 workspace switching

@@ -51,7 +51,7 @@ icons::apply() {
         if $installed; then
             options+=("Revert Icons")
         else
-            options+=("Install Papirus + Catppuccin")
+            options+=("Install Papirus" "Install Papirus + Catppuccin")
         fi
 
         options+=("Back" "Exit")
@@ -72,6 +72,10 @@ icons::apply() {
                 ui::clear_content
                 ui::goodbye
                 ;;
+            "Install Papirus")
+                log::break
+                _icons::install_base
+                ;;
             "Install Papirus + Catppuccin")
                 log::break
                 _icons::install
@@ -84,20 +88,27 @@ icons::apply() {
     done
 }
 
-_icons::install() {
+_icons::install_base() {
     # Install papirus base if missing
     if ! dpkg -l papirus-icon-theme 2>/dev/null | grep -q '^ii'; then
         log::info "Installing Papirus icon theme"
         ui::flush_input
         if ! sudo apt-get install -y papirus-icon-theme </dev/tty; then
             log::error "Failed to install Papirus"
-            return
+            return 1
         fi
         hash -r
         log::ok "Papirus installed"
     else
         log::ok "Papirus already installed"
     fi
+
+    gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark" || true
+    log::ok "Papirus-Dark icon theme applied"
+}
+
+_icons::install() {
+    _icons::install_base || return
 
     # Choose accent
     local accent
@@ -144,9 +155,6 @@ _icons::install() {
     fi
 
     rm -rf "$tmpdir"
-
-    gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark" || true
-    log::ok "Papirus-Dark icon theme applied"
 }
 
 _icons::revert() {

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.17] - 2026-02-13
+
+### Added
+
+- **Icons** wizard now offers "Install Papirus" standalone option alongside the existing "Install Papirus + Catppuccin" for users who want the icon theme without Catppuccin folder colors
+
 ## [0.12.16] - 2026-02-13
 
 ### Added
