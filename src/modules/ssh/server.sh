@@ -45,7 +45,7 @@ ssh_server::apply() {
         _ssh_server::running && running=true
 
         ui::clear_content
-        log::nav "System Essentials > OpenSSH Server"
+        log::nav "OpenSSH Server > OpenSSH Server"
         log::break
 
         log::info "Current SSH server configuration"

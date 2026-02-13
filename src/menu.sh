@@ -7,6 +7,7 @@ _MENU_LOADED=1
 _SEARCH_ARRAYS=(
     _SYSTEM_TASKS
     _PACKAGES_TASKS
+    _SSH_TASKS
     _DOTFILES_TASKS
     _SHELL_TASKS
     _HARDWARE_TASKS
@@ -36,10 +37,10 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("Package Managers" "Hardware" "System Essentials" "Dotfiles" "Shell" "Development" "UI and Theming" "Software" "Virtualization" "Health" "Exit")
+        items=("Hardware Support" "Package Managers" "System Essentials" "Dotfiles" "Shell Tools" "OpenSSH Server" "Development" "UI and Theming" "Software" "Virtualization" "Health" "Exit")
 
         choice="$(gum::filter \
-            --height 12 \
+            --height 14 \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
             --indicator.foreground "$HEX_BLUE" \
@@ -50,12 +51,12 @@ menu::main() {
             "${items[@]}")"
 
         case "$choice" in
-            "Package Managers")
-                packages::run
+            "Hardware Support")
+                hardware::run
                 ui::clear_content
                 ;;
-            "Hardware")
-                hardware::run
+            "Package Managers")
+                packages::run
                 ui::clear_content
                 ;;
             "System Essentials")
@@ -66,8 +67,12 @@ menu::main() {
                 dotfiles::apply
                 ui::clear_content
                 ;;
-            "Shell")
+            "Shell Tools")
                 shell::run
+                ui::clear_content
+                ;;
+            "OpenSSH Server")
+                ssh::run
                 ui::clear_content
                 ;;
             "Development")

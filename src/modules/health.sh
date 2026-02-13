@@ -44,6 +44,8 @@ health::run() {
     log::break
     health::_check_packages_tasks
     log::break
+    health::_check_ssh_tasks
+    log::break
     health::_check_devtools_tasks
     log::break
     health::_check_shell_tasks
@@ -91,6 +93,22 @@ health::_check_packages_tasks() {
     done
 }
 
+health::_check_ssh_tasks() {
+    local task label desc_var check_fn apply_fn status_fn
+
+    log::info "SSH tasks"
+    for task in "${_SSH_TASKS[@]}"; do
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        if "$check_fn"; then
+            log::ok "${label}"
+        else
+            local detail
+            detail="$($status_fn)"
+            log::warn "${label} (${detail})"
+        fi
+    done
+}
+
 health::_check_devtools_tasks() {
     local task label desc_var check_fn apply_fn status_fn
 
@@ -114,7 +132,7 @@ health::_check_devtools_tasks() {
 health::_check_shell_tasks() {
     local task label desc_var check_fn apply_fn status_fn
 
-    log::info "Shell tools tasks"
+    log::info "Shell Tools tasks"
     for task in "${_SHELL_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
@@ -130,7 +148,7 @@ health::_check_shell_tasks() {
 health::_check_hardware_tasks() {
     local task label desc_var check_fn apply_fn status_fn
 
-    log::info "Hardware tasks"
+    log::info "Hardware Support tasks"
     for task in "${_HARDWARE_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
