@@ -14,6 +14,10 @@ All notable changes to this project will be documented in this file.
 - **Diagnostics renamed to "Health"** — shorter, more descriptive label
 - All breadcrumbs updated to match new menu labels
 
+### Fixed
+
+- SSH Config wizard crash on machines without `~/.ssh/config`
+
 ## [0.12.22] - 2026-02-13
 
 ### Added
