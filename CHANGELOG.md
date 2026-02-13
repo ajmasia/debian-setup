@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.20] - 2026-02-13
+
+### Changed
+
+- **Dotfiles** module rewritten to use custom symlinks instead of GNU Stow
+  - Hardcoded mappings: `home/` -> `~/`, `config/` -> `~/.config/`, `local/bin/` -> `~/.local/bin/`, `local/share/completions/` -> `~/.local/share/bash-completion/completions/`
+  - Conflict detection: warns on existing files/dirs or foreign symlinks, skips safely
+  - Show items grouped by category with applied/not-applied status
+  - No external dependencies required (removes Stow requirement)
+
 ## [0.12.19] - 2026-02-13
 
 ### Changed
@@ -215,10 +225,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **Dotfiles module** under Shell -- clone and apply dotfiles via GNU Stow
-  - Clone repo to `~/.dotfiles`, apply/remove individual packages
-  - Built-in help with repo structure guide and Stow usage tips
-  - Portable: dotfiles repo works independently on any system with `stow`
+- **Dotfiles module** under Shell -- clone and apply dotfiles via symlinks
+  - Clone repo to `~/.dotfiles`, apply/remove individual items
+  - Built-in help with repo structure guide
 
 ## [0.10.5] - 2026-02-09
 
