@@ -6,12 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- **Main menu reorganized**: new order — Package Managers, Hardware, System Essentials, Dotfiles, Shell, Development, UI and Theming, Software, Virtualization, Health
-- **SSH tasks moved into System Essentials** — no longer a standalone top-level menu item (14 tasks total)
+- **Main menu reorganized**: new order — Hardware Support, Package Managers, System Essentials, Dotfiles, Shell Tools, OpenSSH Server, Development, UI and Theming, Software, Virtualization, Health
 - **Dotfiles promoted to main menu** — accessible directly instead of through Shell submenu
+- **Hardware renamed to "Hardware Support"** — clearer label
+- **Shell renamed to "Shell Tools"** — clearer label
 - **UI renamed to "UI and Theming"** — clearer label for GNOME customization module
 - **Diagnostics renamed to "Health"** — shorter, more descriptive label
-- SSH breadcrumbs updated to reflect new location under System Essentials
+- All breadcrumbs updated to match new menu labels
 
 ## [0.12.22] - 2026-02-13
 
