@@ -8,7 +8,7 @@ diagnostics::run() {
 
     while true; do
         ui::clear_content
-        log::nav "Diagnostics"
+        log::nav "Health"
         log::break
 
         choice="$(gum::choose \

@@ -44,8 +44,6 @@ health::run() {
     log::break
     health::_check_packages_tasks
     log::break
-    health::_check_ssh_tasks
-    log::break
     health::_check_devtools_tasks
     log::break
     health::_check_shell_tasks
@@ -82,22 +80,6 @@ health::_check_packages_tasks() {
 
     log::info "Package manager tasks"
     for task in "${_PACKAGES_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
-        if "$check_fn"; then
-            log::ok "${label}"
-        else
-            local detail
-            detail="$($status_fn)"
-            log::warn "${label} (${detail})"
-        fi
-    done
-}
-
-health::_check_ssh_tasks() {
-    local task label desc_var check_fn apply_fn status_fn
-
-    log::info "SSH tasks"
-    for task in "${_SSH_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then
             log::ok "${label}"
@@ -196,7 +178,7 @@ health::_check_software_tasks() {
 health::_check_ui_tasks() {
     local task label desc_var check_fn apply_fn status_fn
 
-    log::info "UI tasks"
+    log::info "UI and Theming tasks"
     for task in "${_UI_TASKS[@]}"; do
         IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
         if "$check_fn"; then

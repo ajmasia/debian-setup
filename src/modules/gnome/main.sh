@@ -44,7 +44,7 @@ ui_module::run() {
 
     while true; do
         ui::clear_content
-        log::nav "UI"
+        log::nav "UI and Theming"
         log::break
 
         # Build menu items (strip "Configure " prefix)
