@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.16] - 2026-02-13
+
+### Added
+
+- **Nala** module under Package Managers -- install/remove Nala, a prettier APT frontend with parallel downloads and a cleaner interface
+
 ## [0.12.15] - 2026-02-11
 
 ### Added

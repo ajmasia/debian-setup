@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.12.15-blue)
+![Version](https://img.shields.io/badge/version-0.12.16-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -30,6 +30,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **System Upgrade** -- Update, dist-upgrade and autoremove in one step
 - **APT Sources** -- Modernize to DEB822, toggle non-free/backports/deb-src/testing
 - **Flatpak** -- Install Flatpak with Flathub repository
+- **Nala** -- Install/remove Nala, a prettier APT frontend with parallel downloads
 - **Nix** -- Install/remove Nix package manager (multi-user daemon, flakes toggle)
 - **Homebrew** -- Install/remove Homebrew on Linux with automatic dependency setup
 
