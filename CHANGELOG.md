@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.5] - 2026-02-14
+
+### Added
+
+- **Git** module under Development > Tools -- install/remove git, configure global settings (user.name, user.email, init.defaultBranch, pull.rebase, push.autoSetupRemote, fetch.prune, rerere.enabled, diff.colorMoved), configure local repository overrides, and large file guard (global pre-commit hook with configurable size limit)
+- Help descriptions on optional git settings (e.g. "rebase instead of merge on pull")
+- Gitconfig formatting: blank lines between sections after every write
+
 ## [0.13.4] - 2026-02-14
 
 ### Changed

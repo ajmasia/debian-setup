@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.13.4-blue)
+![Version](https://img.shields.io/badge/version-0.13.5-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -46,6 +46,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Go** -- Go via APT or official tarball
 
 #### Tools
+- **Git** -- Install git, configure global/local settings (identity, default branch, pull strategy, fetch pruning, rerere, colorMoved), large file guard (global pre-commit hook)
 - **Build Essentials** -- Core compilation tools and development libraries
 - **GitHub CLI** -- Official GitHub CLI (apt repo)
 - **AWS CLI** -- AWS CLI v2 (binary installer)

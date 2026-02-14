@@ -8,6 +8,7 @@ _DEVTOOLS_DESC="Install and configure development tools."
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _DEVTOOLS_TASKS=(
+    "${_GIT_CONFIG_LABEL}|_GIT_CONFIG_DESC|git_config::check|git_config::apply|git_config::status"
     "${_BUILD_LABEL}|_BUILD_DESC|build::check|build::apply|build::status"
     "${_GHCLI_LABEL}|_GHCLI_DESC|ghcli::check|ghcli::apply|ghcli::status"
     "${_AWSCLI_LABEL}|_AWSCLI_DESC|awscli::check|awscli::apply|awscli::status"
