@@ -5,6 +5,7 @@ _MOD_SHELL_LOADED=1
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _SHELL_TASKS=(
+    "${_UTILS_LABEL}|_UTILS_DESC|utils::check|utils::apply|utils::status"
     "${_STARSHIP_LABEL}|_STARSHIP_DESC|starship::check|starship::apply|starship::status"
     "${_ZOXIDE_LABEL}|_ZOXIDE_DESC|zoxide::check|zoxide::apply|zoxide::status"
     "${_ATUIN_LABEL}|_ATUIN_DESC|atuin::check|atuin::apply|atuin::status"
