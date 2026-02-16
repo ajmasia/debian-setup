@@ -5,14 +5,13 @@ _MOD_SOFTWARE_LOADED=1
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _SOFTWARE_TASKS=(
-    "${_UTILS_LABEL}|_UTILS_DESC|utils::check|utils::apply|utils::status"
-    "${_MEDIA_LABEL}|_MEDIA_DESC|media::check|media::apply|media::status"
+    "${_BROWSERS_LABEL}|_BROWSERS_DESC|browsers::check|browsers::run|browsers::status"
     "${_EDITORS_LABEL}|_EDITORS_DESC|editors::check|editors::run|editors::status"
     "${_TERMINALS_LABEL}|_TERMINALS_DESC|terminals::check|terminals::run|terminals::status"
-    "${_BROWSERS_LABEL}|_BROWSERS_DESC|browsers::check|browsers::run|browsers::status"
-    "${_SECURITY_LABEL}|_SECURITY_DESC|security::check|security::run|security::status"
-    "${_MESSAGING_LABEL}|_MESSAGING_DESC|messaging::check|messaging::run|messaging::status"
     "${_PRODUCTIVITY_LABEL}|_PRODUCTIVITY_DESC|productivity::check|productivity::run|productivity::status"
+    "${_MESSAGING_LABEL}|_MESSAGING_DESC|messaging::check|messaging::run|messaging::status"
+    "${_MEDIA_LABEL}|_MEDIA_DESC|media::check|media::apply|media::status"
+    "${_SECURITY_LABEL}|_SECURITY_DESC|security::check|security::run|security::status"
 )
 
 software::log_status() {

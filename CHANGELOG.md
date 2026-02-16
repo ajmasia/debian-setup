@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.6] - 2026-02-16
+
+### Changed
+
+- **LocalSend** switched from Flatpak to .deb from GitHub releases (latest version auto-detected), with tray icon dependency (`gir1.2-ayatanaappindicator3-0.1`)
+- **LocalSend** wizard now offers "Update" option when already installed
+- **Software** menu reordered: Browsers, Editors, Terminals, Productivity, Messaging first
+- **Utilities** moved from Software to Shell Tools
+- `cmatrix` added to CLI utilities package list
+
 ## [0.13.5] - 2026-02-14
 
 ### Added

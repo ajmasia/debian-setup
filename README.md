@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.13.5-blue)
+![Version](https://img.shields.io/badge/version-0.13.6-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -64,6 +64,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Dotfiles** -- Clone and apply dotfiles via GNU Stow (portable, compatible with standalone usage)
 
 ### Shell Tools
+- **Utilities** -- CLI utilities (fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, cmatrix, etc.)
 - **Starship** -- Cross-shell prompt
 - **Zoxide** -- Smarter cd command
 - **Atuin** -- Shell history search
@@ -81,19 +82,18 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **QEMU/KVM** -- QEMU, libvirt, virt-manager with user groups, libvirtd service, and default network
 
 ### Software
-- **Utilities** -- CLI utilities (fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, etc.)
-- **Media** -- Media tools and codecs
+- **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium
 - **Editors** -- VS Code (with extensions management) and Neovim (LazyVim + dependencies wizard)
 - **Terminals** -- Alacritty (build from source), Kitty (user-space installer), Ptyxis (APT)
-- **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium
+- **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak / APT + Nautilus plugin), LocalSend (GitHub .deb), Balena Etcher (GitHub zip)
+- **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
+- **Media** -- Media tools and codecs
 - **Security**
   - **VPN** -- Mullvad VPN, Proton VPN
   - **Password Managers** -- Proton Pass, Proton Pass CLI, KeePassXC (Flatpak), Bitwarden CLI
   - **Authenticators** -- Proton Authenticator, Yubico Authenticator (Flatpak)
   - **Hardware Keys** -- YubiKey Manager, Nitrokey App2 (Flatpak)
   - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
-- **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
-- **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak / APT + Nautilus plugin), LocalSend (Flatpak), Balena Etcher (GitHub zip)
 
 ### UI and Theming
 - **Appearance**
@@ -181,14 +181,14 @@ debian-setup/
 │   │   │   ├── tools.sh           # Build, GitHub CLI, AWS CLI, Docker, ...
 │   │   │   ├── ai.sh             # Claude Code, OpenCode, Copilot CLI, ...
 │   │   │   ├── ...
-│   │   ├── shell/                  # Shell Tools: Starship, Zoxide, Atuin, Tmux, Zellij, Dotfiles
+│   │   ├── shell/                  # Shell Tools: Utilities, Starship, Zoxide, Atuin, Tmux, Zellij, Dotfiles
 │   │   │   ├── ...
 │   │   ├── hardware/               # Slimbook EVO
 │   │   │   ├── ...
 │   │   ├── virtualization/         # QEMU/KVM
 │   │   │   ├── ...
-│   │   ├── software/               # Utilities, Media, Editors, Terminals,
-│   │   │   ├── ...                 # Browsers, Security, Messaging, Productivity, Fonts
+│   │   ├── software/               # Browsers, Editors, Terminals, Productivity,
+│   │   │   ├── ...                 # Messaging, Media, Security, Fonts
 │   │   ├── gnome/                  # UI and Theming: Appearance, Keyboard, CSS, Extensions, Themes
 │   │   │   ├── ...
 │   │   ├── ssh/                    # OpenSSH Server, Access, Keys, Config, Signing

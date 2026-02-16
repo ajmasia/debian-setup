@@ -14,3 +14,4 @@ trash-cli
 xclip
 unzip
 p7zip-full
+cmatrix
