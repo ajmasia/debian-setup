@@ -3,7 +3,8 @@
 [[ -n "${_MOD_HEALTH_LOADED:-}" ]] && return 0
 _MOD_HEALTH_LOADED=1
 
-_HEALTH_DEPS=(gum curl sudo git)
+_HEALTH_DEPS=(gum curl git)
+[[ $EUID -ne 0 ]] && _HEALTH_DEPS+=(sudo)
 
 health::_check_deps() {
     local dep version

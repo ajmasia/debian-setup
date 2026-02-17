@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.7] - 2026-02-17
+
+### Added
+
+- **Root support** -- auto-detect root user (`EUID == 0`) and define `sudo()` pass-through function so all modules work without modification when running as root (e.g., in a VM without sudo installed)
+- Health check conditionally excludes `sudo` from dependency list when running as root
+
 ## [0.13.6] - 2026-02-16
 
 ### Changed
