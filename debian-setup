@@ -17,6 +17,12 @@ source "${SCRIPT_DIR}/src/lib/colors.sh"
 source "${SCRIPT_DIR}/src/lib/xdg.sh"
 source "${SCRIPT_DIR}/src/lib/log.sh"
 source "${SCRIPT_DIR}/src/lib/system.sh"
+
+# When running as root, sudo is unnecessary — define pass-through
+if [[ $EUID -eq 0 ]]; then
+    sudo() { case "${1:-}" in -n) shift ;; esac; "$@"; }
+fi
+
 source "${SCRIPT_DIR}/src/lib/gum.sh"
 source "${SCRIPT_DIR}/src/lib/ui.sh"
 source "${SCRIPT_DIR}/src/lib/apt.sh"
