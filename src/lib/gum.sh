@@ -32,9 +32,20 @@ gum::_install() {
 
     log::break
 
+    # Ensure gpg is available (minimal installs may lack it)
+    if ! command -v gpg &>/dev/null; then
+        log::info "Installing gpg (required for APT key)"
+        if $use_sudo; then
+            sudo apt-get update -qq
+            sudo apt-get install -y gpg
+        else
+            su -c "apt-get update -qq && apt-get install -y gpg" </dev/tty
+        fi
+    fi
+
     local tmpkey
     tmpkey="$(mktemp)"
-    if ! curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o "$tmpkey" 2>/dev/null; then
+    if ! curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o "$tmpkey"; then
         rm -f "$tmpkey"
         log::error "Failed to download GPG key"
         exit 1
