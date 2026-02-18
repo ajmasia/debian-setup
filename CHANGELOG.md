@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.8] - 2026-02-18
+
+### Added
+
+- **Obsidian** module under Software > Productivity -- note-taking app from GitHub .deb releases with auto-version detection, install/update/remove
+- `fastfetch` added to CLI utilities package list
+
 ## [0.13.7] - 2026-02-17
 
 ### Added

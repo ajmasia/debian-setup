@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-0.13.7-blue)
+![Version](https://img.shields.io/badge/version-0.13.8-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -64,7 +64,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Dotfiles** -- Clone and apply dotfiles via GNU Stow (portable, compatible with standalone usage)
 
 ### Shell Tools
-- **Utilities** -- CLI utilities (fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, cmatrix, etc.)
+- **Utilities** -- CLI utilities (fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, cmatrix, fastfetch, etc.)
 - **Starship** -- Cross-shell prompt
 - **Zoxide** -- Smarter cd command
 - **Atuin** -- Shell history search
@@ -85,7 +85,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 - **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium
 - **Editors** -- VS Code (with extensions management) and Neovim (LazyVim + dependencies wizard)
 - **Terminals** -- Alacritty (build from source), Kitty (user-space installer), Ptyxis (APT)
-- **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak / APT + Nautilus plugin), LocalSend (GitHub .deb), Balena Etcher (GitHub zip)
+- **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak / APT + Nautilus plugin), LocalSend (GitHub .deb), Balena Etcher (GitHub zip), Obsidian (GitHub .deb)
 - **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
 - **Media** -- Media tools and codecs
 - **Security**

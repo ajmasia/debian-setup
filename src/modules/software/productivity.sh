@@ -15,6 +15,7 @@ _PRODUCTIVITY_TASKS=(
     "${_NEXTCLOUD_LABEL}|_NEXTCLOUD_DESC|nextcloud::check|nextcloud::apply|nextcloud::status"
     "${_LOCALSEND_LABEL}|_LOCALSEND_DESC|localsend::check|localsend::apply|localsend::status"
     "${_ETCHER_LABEL}|_ETCHER_DESC|etcher::check|etcher::apply|etcher::status"
+    "${_OBSIDIAN_LABEL}|_OBSIDIAN_DESC|obsidian::check|obsidian::apply|obsidian::status"
 )
 
 productivity::check() {
