@@ -53,7 +53,7 @@ nerdfonts::apply() {
 
     while true; do
         ui::clear_content
-        log::nav "Software > Fonts > Nerd Fonts"
+        log::nav "UI and Theming > Fonts > Nerd Fonts"
         log::break
 
         log::info "Nerd Fonts"
