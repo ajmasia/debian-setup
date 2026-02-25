@@ -11,6 +11,7 @@
 - **Baseline commit** before starting any work — ensures a clean rollback point
 - **One commit per completed feature/fix** — each commit is a safe rollback point
 - **If something breaks**, `git checkout` to revert to the last known good commit instead of trying to debug a broken state
+- **Always ask before moving to the next task** — let the user validate and confirm before proceeding
 
 ## Release cycle
 
