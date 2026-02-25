@@ -10,8 +10,7 @@ _SOFTWARE_TASKS=(
     "${_TERMINALS_LABEL}|_TERMINALS_DESC|terminals::check|terminals::run|terminals::status"
     "${_PRODUCTIVITY_LABEL}|_PRODUCTIVITY_DESC|productivity::check|productivity::run|productivity::status"
     "${_MESSAGING_LABEL}|_MESSAGING_DESC|messaging::check|messaging::run|messaging::status"
-    "${_MEDIA_LABEL}|_MEDIA_DESC|media::check|media::apply|media::status"
-    "${_SPOTIFY_LABEL}|_SPOTIFY_DESC|spotify::check|spotify::apply|spotify::status"
+    "${_MEDIA_LABEL}|_MEDIA_DESC|media::check|media::run|media::status"
     "${_SECURITY_LABEL}|_SECURITY_DESC|security::check|security::run|security::status"
 )
 
