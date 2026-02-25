@@ -27,7 +27,7 @@ health::run() {
     log::break
 
     cpu_usage="$(top -bn1 | grep '%Cpu' | awk '{printf "%.1f%%", 100 - $8}')"
-    mem_info="$(free -h | awk '/^Mem:/ {printf "%s / %s (%.1f%%)", $3, $2, ($3/$2)*100}')"
+    mem_info="$(free --mebi | awk '/^Mem:/ {printf "%.1fGi / %.1fGi (%.1f%%)", $3/1024, $2/1024, ($3/$2)*100}')"
     disk_usage="$(df -h / | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
     uptime_str="$(system::uptime)"
 
