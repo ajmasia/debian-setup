@@ -3,7 +3,7 @@
 [[ -n "${_MOD_APT_LOADED:-}" ]] && return 0
 _MOD_APT_LOADED=1
 
-_APT_LABEL="Configure APT sources"
+_APT_LABEL="Configure APT Sources"
 _APT_DESC="Manage Debian package sources: format, components,
 backports, source packages (deb-src), and testing repository."
 
