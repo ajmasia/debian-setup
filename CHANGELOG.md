@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-02-25
+
+### Added
+
+- **`--list` flag** -- print all available tasks to stdout (for scripting and shell completions)
+- **`-o/--option` flag** -- jump directly to a task or category by name (case-insensitive substring match)
+- **Shell completions** -- bash and zsh tab completion for flags and `-o` task names, cache-based via `~/.cache/debian-setup/tasks.txt`
+- **Settings submenu** -- replaces Health with grouped CLI management: System Health, Logs, Completions, About
+- **Completions manager** -- install/remove bash and zsh completions separately from Settings > Completions
+- **About screen** -- version, install path, log directory, shell version
+- **Customizable Neovim alias** -- prompt for alias name when adding Neovim configs to `.bash_aliases`
+- **GTK Theme tweaks** -- macos (semaphore buttons), black, float (panel), outline (2px border) via `--tweaks`
+- **Change Accent** option for GTK Theme, Icons (folder color), and Cursors (variant) without reinstalling
+- **Window Buttons** module -- configure button layout with presets (right/left/macOS) or custom input
+- **User Themes extension check** -- GTK Theme install verifies and offers to install the extension
+
+### Changed
+
+- **Search functions** refactored with shared helpers (`menu::_collect_leaf_tasks`, `menu::_run_choice`)
+- **Health** renamed to **Settings** with simplified health check (machine status + group counters)
+- **Health check** uses generic `health::_check_group` iterator instead of 9 duplicated functions
+
 ## [0.13.10] - 2026-02-25
 
 ### Added
