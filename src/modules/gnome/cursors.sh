@@ -66,6 +66,7 @@ cursors::apply() {
             if ! $installed; then
                 options+=("Apply Catppuccin Cursors")
             fi
+            options+=("Change Variant")
             options+=("Remove Catppuccin Cursors")
         fi
 
@@ -95,6 +96,10 @@ cursors::apply() {
                 log::break
                 gsettings set org.gnome.desktop.interface cursor-theme "$cursor_name" || true
                 log::ok "Cursor theme applied: ${cursor_name}"
+                ;;
+            "Change Variant")
+                log::break
+                _cursors::install
                 ;;
             "Remove Catppuccin Cursors")
                 log::break
