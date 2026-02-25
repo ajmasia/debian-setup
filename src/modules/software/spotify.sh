@@ -82,42 +82,43 @@ spotify::apply() {
                 ;;
             "Install Spotify")
                 log::break
-                _spotify::install
+                _spotify::install || true
                 ;;
             "Fix desktop entry")
                 log::break
-                _spotify::fix_desktop
+                _spotify::fix_desktop || true
                 ;;
             "Remove Spotify")
                 log::break
-                _spotify::remove
+                _spotify::remove || true
                 ;;
         esac
     done
 }
 
 _spotify::install() {
-    # Add GPG key
+    log::info "Adding Spotify repository"
+    ui::flush_input
+
+    # Download GPG key and dearmor (same pattern as Docker module)
     if [[ ! -f "$_SPOTIFY_KEYRING" ]]; then
-        log::info "Adding Spotify GPG key"
-        ui::flush_input
-        if ! curl -fsSL https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg \
-            | sudo gpg --dearmor -o "$_SPOTIFY_KEYRING" </dev/tty; then
-            log::error "Failed to add GPG key"
+        if ! curl -fsSL https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.gpg \
+            | sudo gpg --dearmor --yes -o "$_SPOTIFY_KEYRING"; then
+            log::error "Failed to download Spotify GPG key"
+            ui::return_or_exit
             return
         fi
+        sudo chmod 644 "$_SPOTIFY_KEYRING"
     fi
 
     # Add repository
     local sources_file="/etc/apt/sources.list.d/spotify.list"
     if [[ ! -f "$sources_file" ]]; then
-        log::info "Adding Spotify repository"
         printf 'deb [signed-by=%s] %s stable non-free\n' "$_SPOTIFY_KEYRING" "$_SPOTIFY_REPO_URL" \
             | sudo tee "$sources_file" >/dev/null
     fi
 
     log::info "Installing Spotify"
-    ui::flush_input
     if sudo apt-get update -o Dir::Etc::sourcelist="$sources_file" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0" -qq </dev/tty \
         && sudo apt-get install -y spotify-client </dev/tty; then
         hash -r
@@ -126,6 +127,7 @@ _spotify::install() {
     else
         log::error "Failed to install Spotify"
     fi
+    ui::return_or_exit
 }
 
 _spotify::fix_desktop() {
