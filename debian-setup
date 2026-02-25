@@ -155,8 +155,10 @@ source "${SCRIPT_DIR}/src/modules/gnome/extensions.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/browserthemes.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/appthemes.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/main.sh"
-source "${SCRIPT_DIR}/src/modules/diagnostics/logs.sh"
-source "${SCRIPT_DIR}/src/modules/diagnostics/main.sh"
+source "${SCRIPT_DIR}/src/modules/settings/completions.sh"
+source "${SCRIPT_DIR}/src/modules/settings/about.sh"
+source "${SCRIPT_DIR}/src/modules/settings/logs.sh"
+source "${SCRIPT_DIR}/src/modules/settings/main.sh"
 
 show_version() {
     printf "debian-setup %s\n" "$VERSION"

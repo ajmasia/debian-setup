@@ -107,7 +107,7 @@ _MENU_CATEGORIES=(
     "UI and Theming|ui_module::run"
     "Software|software::run"
     "Virtualization|virtualization::run"
-    "Health|diagnostics::run"
+    "Settings|settings::run"
 )
 
 # Jumps directly to a task or category matching the query.
@@ -197,7 +197,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System Essentials" "Package Managers" "Hardware Support" "OpenSSH Server" "Git" "Shell Tools" "Development" "Dotfiles" "UI and Theming" "Software" "Virtualization" "Health" "Exit")
+        items=("System Essentials" "Package Managers" "Hardware Support" "OpenSSH Server" "Git" "Shell Tools" "Development" "Dotfiles" "UI and Theming" "Software" "Virtualization" "⚙ Settings" "Exit")
 
         choice="$(gum::filter \
             --height 15 \
@@ -255,8 +255,8 @@ menu::main() {
                 virtualization::run
                 ui::clear_content
                 ;;
-            "Health")
-                diagnostics::run
+            "⚙ Settings")
+                settings::run
                 ui::clear_content
                 ;;
             ""|"Exit")
