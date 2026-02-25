@@ -6,6 +6,12 @@
 2. Frequent commits using semantic commits (`feat`, `fix`, `refactor`, etc.)
 3. Push to `origin/develop` as needed
 
+## Safe working strategy
+
+- **Baseline commit** before starting any work — ensures a clean rollback point
+- **One commit per completed feature/fix** — each commit is a safe rollback point
+- **If something breaks**, `git checkout` to revert to the last known good commit instead of trying to debug a broken state
+
 ## Release cycle
 
 When changes on `develop` are ready for release:
