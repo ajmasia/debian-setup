@@ -14,6 +14,7 @@ _SEARCH_ARRAYS=(
     _VIRTUALIZATION_TASKS
     _DEVELOPMENT_TASKS
     _ENVIRONMENTS_TASKS
+    _GIT_TASKS
     _DEVTOOLS_TASKS
     _AI_TASKS
     _SOFTWARE_TASKS
@@ -37,10 +38,10 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("Hardware Support" "Package Managers" "System Essentials" "Dotfiles" "Shell Tools" "OpenSSH Server" "Development" "UI and Theming" "Software" "Virtualization" "Health" "Exit")
+        items=("System Essentials" "Package Managers" "Hardware Support" "OpenSSH Server" "Git" "Shell Tools" "Development" "Dotfiles" "UI and Theming" "Software" "Virtualization" "Health" "Exit")
 
         choice="$(gum::filter \
-            --height 14 \
+            --height 15 \
             --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
             --indicator.foreground "$HEX_BLUE" \
@@ -73,6 +74,10 @@ menu::main() {
                 ;;
             "OpenSSH Server")
                 ssh::run
+                ui::clear_content
+                ;;
+            "Git")
+                git_config::apply
                 ui::clear_content
                 ;;
             "Development")

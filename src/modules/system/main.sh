@@ -9,7 +9,6 @@ _SYSTEM_TASKS=(
     "${_PWFEEDBACK_LABEL}|_PWFEEDBACK_DESC|pwfeedback::check|pwfeedback::apply|pwfeedback::status"
     "${_EDITOR_LABEL}|_EDITOR_DESC|editor::check|editor::apply|editor::status"
     "${_ZRAM_LABEL}|_ZRAM_DESC|zram::check|zram::apply|zram::status"
-    "${_KERNEL_LABEL}|_KERNEL_DESC|kernel::check|kernel::apply|kernel::status"
     "${_WATCHERS_LABEL}|_WATCHERS_DESC|watchers::check|watchers::apply|watchers::status"
     "${_PLYMOUTH_LABEL}|_PLYMOUTH_DESC|plymouth::check|plymouth::apply|plymouth::status"
     "${_GRUB_LABEL}|_GRUB_DESC|grub::check|grub::apply|grub::status"

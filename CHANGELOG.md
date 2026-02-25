@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.9] - 2026-02-25
+
+### Added
+
+- **Spotify** module under Software > Media -- Flatpak-based install/remove
+- **Node.js memory limit** configuration in Development > Node.js -- RAM-aware options with recommended value
+- **Caffeine** GNOME Shell extension added to extensions list
+- **Extensions Manager** and **Extensions app** install/remove options in GNOME Extensions wizard
+- **GNOME Extensions** reworked -- D-Bus download via API, gsettings disable after install, uninstall support, individual APT tool management
+
+### Changed
+
+- **Main menu** reordered for logical new machine setup flow
+- **Git** promoted to top-level menu (was under Development > Tools)
+- **Kernel** moved from System Essentials to Hardware Support
+- **Dotfiles** positioned before UI and Theming
+- **Slimbook** label simplified (was "Slimbook EVO")
+- **Claude Code** switched to native installer (was npm)
+
+### Fixed
+
+- Appthemes label variables renamed to avoid collision with module globals
+- Health check memory percentage uses numeric `free` output for portability
+- Browserthemes unnecessary while loop removed
+- Spinner stopped on Ctrl+C to prevent orphaned subshell
+- Unknown CLI flags rejected with error message
+- `read` calls guarded against `set -e` in gum and ui libs
+- Nerd Fonts OTF detection and breadcrumb path corrected
+- APT Sources label capitalized to match Title Case convention
+- Dead `vscode.txt` package list removed
+- QEMU default network uses `sudo virsh` consistently and shows actual errors on failure
+
 ## [0.13.8] - 2026-02-18
 
 ### Added

@@ -51,7 +51,7 @@ kernel::apply() {
         _kernel::has_backports && backports_available=true
 
         ui::clear_content
-        log::nav "System core > Backports kernel"
+        log::nav "Hardware Support > Backports kernel"
         log::break
 
         log::info "Current kernel: $(_kernel::_running_version)"

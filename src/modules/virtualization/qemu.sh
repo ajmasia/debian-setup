@@ -37,13 +37,12 @@ _qemu::libvirtd_enabled() {
     systemctl is-enabled --quiet libvirtd 2>/dev/null
 }
 
-# virsh without sudo — works if user is in libvirt group, fails gracefully otherwise
 _qemu::default_net_active() {
-    virsh net-info default 2>/dev/null | grep -q 'Active:.*yes'
+    sudo virsh net-info default 2>/dev/null | grep -q 'Active:.*yes'
 }
 
 _qemu::default_net_autostart() {
-    virsh net-info default 2>/dev/null | grep -q 'Autostart:.*yes'
+    sudo virsh net-info default 2>/dev/null | grep -q 'Autostart:.*yes'
 }
 
 # --- Public API ---
@@ -268,7 +267,11 @@ _qemu::enable_network() {
     if ! sudo virsh net-info default &>/dev/null; then
         # Network not defined — try to define it from template
         if [[ -f /usr/share/libvirt/networks/default.xml ]]; then
-            sudo virsh net-define /usr/share/libvirt/networks/default.xml </dev/tty || true
+            local output
+            if ! output="$(sudo virsh net-define /usr/share/libvirt/networks/default.xml 2>&1 </dev/tty)"; then
+                log::error "Failed to define default network: ${output}"
+                return
+            fi
         else
             log::warn "Default network not defined and template not found"
             return
@@ -280,11 +283,17 @@ _qemu::enable_network() {
     sudo virsh net-info default 2>/dev/null | grep -q 'Autostart:.*yes' && autostart=true
 
     if ! $active; then
-        sudo virsh net-start default </dev/tty || true
+        local output
+        if ! output="$(sudo virsh net-start default 2>&1 </dev/tty)"; then
+            log::error "Failed to start default network: ${output}"
+        fi
     fi
 
     if ! $autostart; then
-        sudo virsh net-autostart default </dev/tty || true
+        local output
+        if ! output="$(sudo virsh net-autostart default 2>&1 </dev/tty)"; then
+            log::error "Failed to set autostart: ${output}"
+        fi
     fi
 
     # Recheck
@@ -297,6 +306,14 @@ _qemu::enable_network() {
         log::ok "Default network: active with autostart"
     else
         log::warn "Default network may need manual configuration"
+        log::break
+        gum::choose \
+            --header "Press Enter to continue" \
+            --header.foreground "$HEX_LAVENDER" \
+            --cursor.foreground "$HEX_BLUE" \
+            --item.foreground "$HEX_TEXT" \
+            --selected.foreground "$HEX_GREEN" \
+            "OK"
     fi
 }
 

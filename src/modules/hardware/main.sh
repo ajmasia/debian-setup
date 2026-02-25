@@ -5,6 +5,7 @@ _MOD_HARDWARE_LOADED=1
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _HARDWARE_TASKS=(
+    "${_KERNEL_LABEL}|_KERNEL_DESC|kernel::check|kernel::apply|kernel::status"
     "${_SLIMBOOK_LABEL}|_SLIMBOOK_DESC|slimbook::check|slimbook::apply|slimbook::status"
 )
 

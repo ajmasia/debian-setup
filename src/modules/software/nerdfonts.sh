@@ -22,7 +22,7 @@ _nerdfonts::read_list() {
 _nerdfonts::is_font_installed() {
     local archive="$1"
     local dir="${_NERDFONTS_DIR}/${archive}"
-    [[ -d "$dir" ]] && ls "$dir"/*.ttf &>/dev/null
+    [[ -d "$dir" ]] && { ls "$dir"/*.ttf &>/dev/null || ls "$dir"/*.otf &>/dev/null; }
 }
 
 # ── Public API ──────────────────────────────────────────
@@ -53,7 +53,7 @@ nerdfonts::apply() {
 
     while true; do
         ui::clear_content
-        log::nav "Software > Fonts > Nerd Fonts"
+        log::nav "UI and Theming > Fonts > Nerd Fonts"
         log::break
 
         log::info "Nerd Fonts"

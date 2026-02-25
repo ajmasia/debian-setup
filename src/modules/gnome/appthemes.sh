@@ -173,8 +173,8 @@ _appthemes::btop_apply() {
 
 # ── Alacritty ───────────────────────────────────────────────────────
 
-_ALACRITTY_LABEL="Alacritty Theme"
-_ALACRITTY_DESC="Catppuccin Mocha theme for Alacritty."
+_APPTHEMES_ALACRITTY_LABEL="Alacritty Theme"
+_APPTHEMES_ALACRITTY_DESC="Catppuccin Mocha theme for Alacritty."
 _ALACRITTY_CONFIG_DIR="${HOME}/.config/alacritty"
 _ALACRITTY_THEME_FILE="${_ALACRITTY_CONFIG_DIR}/catppuccin-mocha.toml"
 _ALACRITTY_CONFIG="${_ALACRITTY_CONFIG_DIR}/alacritty.toml"
@@ -276,8 +276,8 @@ _appthemes::alacritty_apply() {
 
 # ── Atuin ───────────────────────────────────────────────────────────
 
-_ATUIN_LABEL="Atuin Theme"
-_ATUIN_DESC="Catppuccin Mocha theme for Atuin."
+_APPTHEMES_ATUIN_LABEL="Atuin Theme"
+_APPTHEMES_ATUIN_DESC="Catppuccin Mocha theme for Atuin."
 _ATUIN_CONFIG_DIR="${HOME}/.config/atuin"
 _ATUIN_THEMES_DIR="${_ATUIN_CONFIG_DIR}/themes"
 _ATUIN_CONFIG="${_ATUIN_CONFIG_DIR}/config.toml"
@@ -805,8 +805,8 @@ _appthemes::lazygit_apply() {
 
 # ── Starship ────────────────────────────────────────────────────────
 
-_STARSHIP_LABEL="Starship Theme"
-_STARSHIP_DESC="Catppuccin Mocha palette for Starship."
+_APPTHEMES_STARSHIP_LABEL="Starship Theme"
+_APPTHEMES_STARSHIP_DESC="Catppuccin Mocha palette for Starship."
 _STARSHIP_CONFIG="${HOME}/.config/starship.toml"
 _STARSHIP_URL="https://raw.githubusercontent.com/catppuccin/starship/main/themes/mocha.toml"
 _STARSHIP_PALETTE_MARKER="catppuccin-mocha-palette"
@@ -919,13 +919,13 @@ _appthemes::starship_apply() {
 
 _APPTHEMES_TASKS=(
     "${_BTOP_LABEL}|_BTOP_DESC|_appthemes::btop_installed|_appthemes::btop_apply|_appthemes::btop_status"
-    "${_ALACRITTY_LABEL}|_ALACRITTY_DESC|_appthemes::alacritty_installed|_appthemes::alacritty_apply|_appthemes::alacritty_status"
-    "${_ATUIN_LABEL}|_ATUIN_DESC|_appthemes::atuin_installed|_appthemes::atuin_apply|_appthemes::atuin_status"
+    "${_APPTHEMES_ALACRITTY_LABEL}|_APPTHEMES_ALACRITTY_DESC|_appthemes::alacritty_installed|_appthemes::alacritty_apply|_appthemes::alacritty_status"
+    "${_APPTHEMES_ATUIN_LABEL}|_APPTHEMES_ATUIN_DESC|_appthemes::atuin_installed|_appthemes::atuin_apply|_appthemes::atuin_status"
     "${_BAT_LABEL}|_BAT_DESC|_appthemes::bat_installed|_appthemes::bat_apply|_appthemes::bat_status"
     "${_CAVA_LABEL}|_CAVA_DESC|_appthemes::cava_installed|_appthemes::cava_apply|_appthemes::cava_status"
     "${_EZA_LABEL}|_EZA_DESC|_appthemes::eza_installed|_appthemes::eza_apply|_appthemes::eza_status"
     "${_LAZYGIT_LABEL}|_LAZYGIT_DESC|_appthemes::lazygit_installed|_appthemes::lazygit_apply|_appthemes::lazygit_status"
-    "${_STARSHIP_LABEL}|_STARSHIP_DESC|_appthemes::starship_installed|_appthemes::starship_apply|_appthemes::starship_status"
+    "${_APPTHEMES_STARSHIP_LABEL}|_APPTHEMES_STARSHIP_DESC|_appthemes::starship_installed|_appthemes::starship_apply|_appthemes::starship_status"
 )
 
 # ── Top-level functions ────────────────────────────────────────────

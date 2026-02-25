@@ -6,6 +6,11 @@ _MOD_GIT_CONFIG_LOADED=1
 _GIT_CONFIG_LABEL="Configure Git"
 _GIT_CONFIG_DESC="Install git and configure global/local settings."
 
+# Task registry for search support
+_GIT_TASKS=(
+    "${_GIT_CONFIG_LABEL}|_GIT_CONFIG_DESC|git_config::check|git_config::apply|git_config::status"
+)
+
 _GIT_CONFIG_HOOKS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/git/hooks"
 _GIT_CONFIG_PRECOMMIT="${_GIT_CONFIG_HOOKS_DIR}/pre-commit"
 _GIT_CONFIG_DEFAULT_MAX_SIZE="5"
@@ -75,7 +80,7 @@ git_config::apply() {
         _git_config::is_installed && installed=true
 
         ui::clear_content
-        log::nav "Development > Tools > Git"
+        log::nav "Git"
         log::break
 
         log::info "Git Configuration"

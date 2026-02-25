@@ -12,7 +12,7 @@ gum::_install() {
     log::break
 
     printf "%b%s%b " "${COLOR_YELLOW}" "Install gum now? [y/N]" "${COLOR_RESET}"
-    read -r response
+    read -r response || true
 
     if [[ "${response,,}" != "y" ]]; then
         log::error "Cannot continue without gum"

@@ -11,16 +11,15 @@ browserthemes::check() { return 0; }
 browserthemes::status() { :; }
 
 browserthemes::apply() {
-    while true; do
-        ui::clear_content
-        log::nav "UI > Browser Themes"
-        log::break
+    ui::clear_content
+    log::nav "UI > Browser Themes"
+    log::break
 
-        log::info "Catppuccin Mocha — Browser themes"
-        log::break
+    log::info "Catppuccin Mocha — Browser themes"
+    log::break
 
-        printf "%b" "${COLOR_OVERLAY1}"
-        cat <<'HELP'
+    printf "%b" "${COLOR_OVERLAY1}"
+    cat <<'HELP'
   Brave / Chromium (Chrome Web Store)
   ────────────────────────────────────
   1. Open the Chrome Web Store link below in your browser
@@ -51,9 +50,7 @@ browserthemes::apply() {
     Chrome/Brave  https://github.com/catppuccin/chrome
     Firefox       https://github.com/catppuccin/firefox
 HELP
-        printf "%b" "${COLOR_RESET}"
+    printf "%b" "${COLOR_RESET}"
 
-        ui::return_or_exit
-        return
-    done
+    ui::return_or_exit
 }
