@@ -308,6 +308,7 @@ _neovim::configure_lazyvim() {
         log::break
         log::info "Custom config directory: ${config_name}"
         log::warn "Run with: NVIM_APPNAME=${config_name} nvim"
+        log::break
 
         local add_alias
         add_alias="$(gum::choose \
@@ -319,15 +320,27 @@ _neovim::configure_lazyvim() {
             "Yes" "No")"
 
         if [[ "$add_alias" == "Yes" ]]; then
-            local alias_line="alias ${config_name}='NVIM_APPNAME=${config_name} nvim'"
-            local aliases_file="$HOME/.bash_aliases"
+            local alias_name
+            alias_name="$(gum::input \
+                --header "Alias name:" \
+                --header.foreground "$HEX_LAVENDER" \
+                --value "$config_name" \
+                --placeholder "Alias name")"
 
-            if [[ -f "$aliases_file" ]] && grep -Fq "$alias_line" "$aliases_file"; then
-                log::ok "Alias already exists"
+            # Validate: non-empty, valid identifier (letters, digits, underscore, hyphen)
+            if [[ -z "$alias_name" || ! "$alias_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+                log::warn "Invalid alias name, skipping"
             else
-                printf '\n# LazyVim (%s)\n%s\n' "$config_name" "$alias_line" >> "$aliases_file"
-                log::ok "Added alias: ${config_name}"
-                log::warn "Restart your shell or run: source ~/.bash_aliases"
+                local alias_line="alias ${alias_name}='NVIM_APPNAME=${config_name} nvim'"
+                local aliases_file="$HOME/.bash_aliases"
+
+                if [[ -f "$aliases_file" ]] && grep -q "NVIM_APPNAME=${config_name}" "$aliases_file"; then
+                    log::ok "Alias for ${config_name} already exists"
+                else
+                    printf '\n# LazyVim (%s)\n%s\n' "$alias_name" "$alias_line" >> "$aliases_file"
+                    log::ok "Added alias: ${alias_name}"
+                    log::warn "Restart your shell or run: source ~/.bash_aliases"
+                fi
             fi
         fi
     fi
@@ -774,14 +787,13 @@ _neovim::remove_lazyvim() {
 
     log::ok "LazyVim data removed"
 
-    # Clean alias from .bash_aliases if present
+    # Clean alias from .bash_aliases if present (search by NVIM_APPNAME pattern)
     local aliases_file="$HOME/.bash_aliases"
     if [[ "$config_name" != "nvim" && -f "$aliases_file" ]]; then
-        local alias_line="alias ${config_name}='NVIM_APPNAME=${config_name} nvim'"
-        if grep -Fq "$alias_line" "$aliases_file"; then
+        if grep -q "NVIM_APPNAME=${config_name}" "$aliases_file"; then
             local tmp
             tmp="$(mktemp)"
-            grep -Fv "$alias_line" "$aliases_file" | grep -v "# LazyVim (${config_name})" > "$tmp" || true
+            grep -v "NVIM_APPNAME=${config_name}" "$aliases_file" | grep -v "# LazyVim (" > "$tmp" || true
             mv "$tmp" "$aliases_file"
             log::ok "Cleaned alias from .bash_aliases"
         fi
