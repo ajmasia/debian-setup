@@ -21,12 +21,15 @@ _debian_setup() {
         '--uninstall:Remove debian-setup'
     )
 
-    # After -o/--option, complete with task names
+    # After -o/--option, complete from cached task list
     case "${words[CURRENT-1]}" in
         -o|--option)
-            local tasks
-            tasks=(${(f)"$(debian-setup --list 2>/dev/null)"})
-            compadd -a tasks
+            local cache="${XDG_CACHE_HOME:-$HOME/.cache}/debian-setup/tasks.txt"
+            if [[ -f "$cache" ]]; then
+                local -a tasks
+                tasks=("${(@f)$(cat "$cache")}")
+                compadd -a tasks
+            fi
             return
             ;;
     esac

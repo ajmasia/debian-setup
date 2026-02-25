@@ -11,6 +11,10 @@ BIN_PATH="${BIN_DIR}/${APP_NAME}"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/${APP_NAME}"
 BASHRC="$HOME/.bashrc"
 PATH_MARKER="# debian-setup"
+BASH_COMP_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_COMP_DIR="$HOME/.local/share/zsh/site-functions"
+BASH_COMP_LINK="${BASH_COMP_DIR}/debian-setup"
+ZSH_COMP_LINK="${ZSH_COMP_DIR}/_debian-setup"
 
 # Colors (self-contained, no deps)
 RED='\033[0;31m'
@@ -66,6 +70,25 @@ ensure_path() {
     info "Adding ${BIN_DIR} to PATH in ${BASHRC}"
     printf '\nexport PATH="%s:$PATH" %s\n' "$BIN_DIR" "$PATH_MARKER" >> "$BASHRC"
     ok "PATH updated (restart your shell or run: source ~/.bashrc)"
+}
+
+refresh_completions() {
+    local refreshed=false
+    if [[ -L "$BASH_COMP_LINK" ]]; then
+        ln -sf "${INSTALL_DIR}/completions/debian-setup.bash" "$BASH_COMP_LINK"
+        refreshed=true
+    fi
+    if [[ -L "$ZSH_COMP_LINK" ]]; then
+        ln -sf "${INSTALL_DIR}/completions/debian-setup.zsh" "$ZSH_COMP_LINK"
+        refreshed=true
+    fi
+    $refreshed && ok "Shell completions refreshed"
+}
+
+remove_completions() {
+    [[ -L "$BASH_COMP_LINK" ]] && rm "$BASH_COMP_LINK"
+    [[ -L "$ZSH_COMP_LINK" ]] && rm "$ZSH_COMP_LINK"
+    ok "Shell completions removed"
 }
 
 clean_path() {
@@ -147,6 +170,9 @@ do_update() {
     mkdir -p "$BIN_DIR"
     ln -sf "${INSTALL_DIR}/${APP_NAME}" "$BIN_PATH"
 
+    # Refresh completions if installed
+    refresh_completions
+
     local new_version
     new_version=$(get_version)
 
@@ -199,6 +225,9 @@ do_uninstall() {
             info "Logs kept at: ${STATE_DIR}"
         fi
     fi
+
+    # Remove completions
+    remove_completions
 
     # Clean PATH from .bashrc
     clean_path

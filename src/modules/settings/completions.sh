@@ -18,13 +18,19 @@ _completions::zsh_installed() {
     [[ -L "$_COMPLETIONS_ZSH_LINK" ]]
 }
 
+_completions::current_shell() {
+    basename "${SHELL:-unknown}"
+}
+
 completions::run() {
-    local choice
+    local choice current_shell
 
     while true; do
         ui::clear_content
         log::nav "Settings > Completions"
         log::break
+
+        current_shell="$(_completions::current_shell)"
 
         log::info "Shell completions"
 
@@ -44,12 +50,24 @@ completions::run() {
 
         local options=()
 
-        if _completions::bash_installed && _completions::zsh_installed; then
-            options+=("Reinstall completions" "Remove completions")
-        elif _completions::bash_installed || _completions::zsh_installed; then
-            options+=("Install completions" "Remove completions")
+        # Bash
+        local bash_suffix=""
+        [[ "$current_shell" == "bash" ]] && bash_suffix=" (current shell)"
+
+        if _completions::bash_installed; then
+            options+=("Remove Bash completions${bash_suffix}")
         else
-            options+=("Install completions")
+            options+=("Install Bash completions${bash_suffix}")
+        fi
+
+        # Zsh
+        local zsh_suffix=""
+        [[ "$current_shell" == "zsh" ]] && zsh_suffix=" (current shell)"
+
+        if _completions::zsh_installed; then
+            options+=("Remove Zsh completions${zsh_suffix}")
+        else
+            options+=("Install Zsh completions${zsh_suffix}")
         fi
 
         options+=("Back" "Exit")
@@ -63,11 +81,33 @@ completions::run() {
             "${options[@]}")"
 
         case "$choice" in
-            "Install completions"|"Reinstall completions")
-                _completions::install
+            "Install Bash completions"*)
+                log::break
+                mkdir -p "$_COMPLETIONS_BASH_DIR"
+                ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK"
+                menu::list > /dev/null
+                log::ok "Bash completions installed"
+                log::warn "Restart your shell to activate"
                 ;;
-            "Remove completions")
-                _completions::remove
+            "Remove Bash completions"*)
+                log::break
+                rm "$_COMPLETIONS_BASH_LINK"
+                log::ok "Bash completions removed"
+                log::warn "Restart your shell to deactivate"
+                ;;
+            "Install Zsh completions"*)
+                log::break
+                mkdir -p "$_COMPLETIONS_ZSH_DIR"
+                ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK"
+                menu::list > /dev/null
+                log::ok "Zsh completions installed"
+                log::warn "Restart your shell to activate"
+                ;;
+            "Remove Zsh completions"*)
+                log::break
+                rm "$_COMPLETIONS_ZSH_LINK"
+                log::ok "Zsh completions removed"
+                log::warn "Restart your shell to deactivate"
                 ;;
             ""|"Back")
                 return
@@ -78,38 +118,4 @@ completions::run() {
                 ;;
         esac
     done
-}
-
-_completions::install() {
-    log::break
-
-    # Bash
-    mkdir -p "$_COMPLETIONS_BASH_DIR"
-    ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK"
-    log::ok "Bash completions installed"
-
-    # Zsh
-    mkdir -p "$_COMPLETIONS_ZSH_DIR"
-    ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK"
-    log::ok "Zsh completions installed"
-
-    log::break
-    log::warn "Restart your shell to activate completions"
-}
-
-_completions::remove() {
-    log::break
-
-    if [[ -L "$_COMPLETIONS_BASH_LINK" ]]; then
-        rm "$_COMPLETIONS_BASH_LINK"
-        log::ok "Bash completions removed"
-    fi
-
-    if [[ -L "$_COMPLETIONS_ZSH_LINK" ]]; then
-        rm "$_COMPLETIONS_ZSH_LINK"
-        log::ok "Zsh completions removed"
-    fi
-
-    log::break
-    log::warn "Restart your shell to deactivate completions"
 }

@@ -91,7 +91,14 @@ menu::list() {
         all+=("$cat_label")
     done
 
-    printf '%s\n' "${all[@]}" | sort -fu
+    local output
+    output="$(printf '%s\n' "${all[@]}" | sort -fu)"
+    printf '%s\n' "$output"
+
+    # Update cache for shell completions
+    local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/debian-setup"
+    mkdir -p "$cache_dir"
+    printf '%s\n' "$output" > "$cache_dir/tasks.txt"
 }
 
 # Main menu categories with their run/apply functions.
