@@ -8,6 +8,7 @@ _NODE_DESC="Install or remove fnm (Fast Node Manager) and Node.js LTS."
 
 _NODE_FNM_INSTALL_URL="https://fnm.vercel.app/install"
 _NODE_FNM_DIR="${HOME}/.local/share/fnm"
+_NODE_MEMORY_MARKER="# Node.js max heap size"
 
 _node::is_installed() {
     [[ -d "$_NODE_FNM_DIR" ]]
@@ -15,6 +16,117 @@ _node::is_installed() {
 
 _node::session_ready() {
     command -v fnm &>/dev/null
+}
+
+_node::memory_configured() {
+    grep -q "$_NODE_MEMORY_MARKER" "$HOME/.bashrc" 2>/dev/null
+}
+
+_node::memory_current() {
+    grep 'max-old-space-size' "$HOME/.bashrc" 2>/dev/null \
+        | sed 's/.*--max-old-space-size=\([0-9]*\).*/\1/'
+}
+
+_node::memory_options() {
+    local ram_mb
+    ram_mb="$(free --mebi | awk '/^Mem:/ {print $2}')"
+
+    if [[ $ram_mb -ge 16384 ]]; then
+        printf '4096\n8192\n16384*'
+    elif [[ $ram_mb -ge 8192 ]]; then
+        printf '4096\n8192*'
+    else
+        printf '2048\n4096*'
+    fi
+}
+
+_node::memory_apply() {
+    local size_options size choice
+    size_options="$(_node::memory_options)"
+
+    if _node::memory_configured; then
+        local current
+        current="$(_node::memory_current)"
+        log::ok "Current max heap size: ${current} MB"
+        log::break
+    fi
+
+    local items=()
+    while IFS= read -r size; do
+        if [[ "$size" == *"*" ]]; then
+            items+=("${size%\*} MB (recommended)")
+        else
+            items+=("${size} MB")
+        fi
+    done <<< "$size_options"
+    items+=("Custom" "Back")
+
+    if _node::memory_configured; then
+        items=("Remove memory limit" "${items[@]}")
+    fi
+
+    choice="$(gum::choose \
+        --header "Select max heap size:" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "${items[@]}")"
+
+    case "$choice" in
+        ""|"Back")
+            return
+            ;;
+        "Remove memory limit")
+            _node::memory_remove
+            ;;
+        "Custom")
+            local custom
+            custom="$(gum::input \
+                --header "Enter max heap size in MB:" \
+                --header.foreground "$HEX_LAVENDER" \
+                --cursor.foreground "$HEX_BLUE" \
+                --placeholder "e.g. 8192")"
+            if [[ -n "$custom" && "$custom" =~ ^[0-9]+$ ]]; then
+                _node::memory_set "$custom"
+            else
+                log::error "Invalid value — must be a number in MB"
+            fi
+            ;;
+        *)
+            local mb="${choice%% MB*}"
+            _node::memory_set "$mb"
+            ;;
+    esac
+}
+
+_node::memory_set() {
+    local size="$1"
+
+    # Remove existing entry if present
+    _node::memory_remove_silent
+
+    printf '\n%s\n' "$_NODE_MEMORY_MARKER" >> "$HOME/.bashrc"
+    printf '# Increase for large projects, monorepos, or heavy builds\n' >> "$HOME/.bashrc"
+    printf 'export NODE_OPTIONS="--max-old-space-size=%s"\n' "$size" >> "$HOME/.bashrc"
+
+    export NODE_OPTIONS="--max-old-space-size=${size}"
+    log::ok "Node.js max heap size set to ${size} MB"
+}
+
+_node::memory_remove() {
+    _node::memory_remove_silent
+    unset NODE_OPTIONS
+    log::ok "Node.js memory limit removed from .bashrc"
+}
+
+_node::memory_remove_silent() {
+    if [[ -f "$HOME/.bashrc" ]]; then
+        local tmp
+        tmp="$(mktemp)"
+        sed "/$_NODE_MEMORY_MARKER/,+2d" "$HOME/.bashrc" > "$tmp"
+        mv "$tmp" "$HOME/.bashrc"
+    fi
 }
 
 node::check() {
@@ -56,6 +168,11 @@ node::apply() {
                 else
                     log::warn "Node.js: no version installed"
                 fi
+                if _node::memory_configured; then
+                    log::ok "Heap limit: $(_node::memory_current) MB"
+                else
+                    log::warn "Heap limit: not configured"
+                fi
             else
                 log::ok "fnm: installed"
                 log::warn "Restart needed to activate fnm in current session"
@@ -76,6 +193,7 @@ node::apply() {
                 if [[ -z "$current" || "$current" == "none" ]]; then
                     options+=("Install Node.js LTS")
                 fi
+                options+=("Configure memory limit")
             fi
             options+=("Remove fnm")
         else
@@ -151,6 +269,10 @@ node::apply() {
                 else
                     log::error "Failed to install Node.js LTS"
                 fi
+                ;;
+            "Configure memory limit")
+                log::break
+                _node::memory_apply
                 ;;
             "Remove fnm")
                 log::break
