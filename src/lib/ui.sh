@@ -11,7 +11,7 @@ _UI_SPIN_PID=0
 
 ui::_cursor_row() {
     local row col
-    IFS=';' read -rs -d'R' -p $'\033[6n' row col
+    IFS=';' read -rs -d'R' -p $'\033[6n' row col || true
     printf '%s' "${row#*[}"
 }
 
