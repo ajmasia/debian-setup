@@ -1,5 +1,6 @@
 blur-my-shell@aunetx|Blur My Shell
 Vitals@CoreCoding.com|Vitals
+appindicatorsupport@rgcjonas.gmail.com|AppIndicator and KStatusNotifier
 caffeine@patapon.info|Caffeine
 PrivacyMenu@stuarthayhurst|Privacy Quick Settings
 quick-settings-audio-panel@rayzeq.github.io|Quick Settings Audio Panel
