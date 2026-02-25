@@ -2,11 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.13.9] - 2026-02-25
+## [0.13.10] - 2026-02-25
 
 ### Added
 
-- **Spotify** module under Software > Media -- Flatpak-based install/remove
+- **Spotify** module under Software > Media -- APT repo install, desktop entry patch for GNOME native decorations
 - **Node.js memory limit** configuration in Development > Node.js -- RAM-aware options with recommended value
 - **Caffeine** GNOME Shell extension added to extensions list
 - **Extensions Manager** and **Extensions app** install/remove options in GNOME Extensions wizard
@@ -33,6 +33,8 @@ All notable changes to this project will be documented in this file.
 - APT Sources label capitalized to match Title Case convention
 - Dead `vscode.txt` package list removed
 - QEMU default network uses `sudo virsh` consistently and shows actual errors on failure
+- Spotify moved to Software > Media sub-aggregator (was in Software root)
+- Spotify GPG key updated and install error handling improved
 
 ## [0.13.8] - 2026-02-18
 
