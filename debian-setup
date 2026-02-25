@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-trap 'printf "\n"; exit 130' INT
+trap 'ui::spin_stop 2>/dev/null; printf "\n"; exit 130' INT
 
 SCRIPT_SOURCE="${BASH_SOURCE[0]}"
 while [[ -L "$SCRIPT_SOURCE" ]]; do
