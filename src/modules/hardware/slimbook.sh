@@ -3,7 +3,7 @@
 [[ -n "${_MOD_SLIMBOOK_LOADED:-}" ]] && return 0
 _MOD_SLIMBOOK_LOADED=1
 
-_SLIMBOOK_LABEL="Configure Slimbook EVO"
+_SLIMBOOK_LABEL="Configure Slimbook"
 _SLIMBOOK_DESC="Install Slimbook repository and EVO/GNOME meta-packages."
 
 _SLIMBOOK_GPG_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/keys/slimbook.gpg"
