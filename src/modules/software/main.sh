@@ -11,6 +11,7 @@ _SOFTWARE_TASKS=(
     "${_PRODUCTIVITY_LABEL}|_PRODUCTIVITY_DESC|productivity::check|productivity::run|productivity::status"
     "${_MESSAGING_LABEL}|_MESSAGING_DESC|messaging::check|messaging::run|messaging::status"
     "${_MEDIA_LABEL}|_MEDIA_DESC|media::check|media::apply|media::status"
+    "${_SPOTIFY_LABEL}|_SPOTIFY_DESC|spotify::check|spotify::apply|spotify::status"
     "${_SECURITY_LABEL}|_SECURITY_DESC|security::check|security::run|security::status"
 )
 
