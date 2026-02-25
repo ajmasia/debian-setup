@@ -1,11 +1,12 @@
-# Google Chrome task
+# Google Chrome task (APT repo)
 
 [[ -n "${_MOD_CHROME_LOADED:-}" ]] && return 0
 _MOD_CHROME_LOADED=1
 
 _CHROME_LABEL="Configure Google Chrome"
 _CHROME_DESC="Install Google Chrome browser."
-_CHROME_DEB_URL="https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+_CHROME_REPO_URL="https://dl.google.com/linux/chrome/deb/"
+_CHROME_KEYRING="/usr/share/keyrings/google-chrome-keyring.gpg"
 
 _chrome::is_installed() {
     dpkg -l google-chrome-stable 2>/dev/null | grep -q '^ii'
@@ -34,7 +35,7 @@ chrome::apply() {
 
         if $installed; then
             local version
-            version="$(google-chrome-stable --version 2>/dev/null | sed 's/Google Chrome //' || true)"
+            version="$(dpkg -l google-chrome-stable 2>/dev/null | awk '/^ii/{print $3}')"
             log::ok "Google Chrome: ${version}"
         else
             log::warn "Google Chrome (not installed)"
@@ -70,37 +71,47 @@ chrome::apply() {
                 ;;
             "Install Google Chrome")
                 log::break
-                _chrome::install
+                _chrome::install || true
                 ;;
             "Remove Google Chrome")
                 log::break
-                _chrome::remove
+                _chrome::remove || true
                 ;;
         esac
     done
 }
 
 _chrome::install() {
-    log::info "Downloading Google Chrome"
+    log::info "Adding Google Chrome repository"
     ui::flush_input
 
-    local tmpfile
-    tmpfile="$(mktemp --suffix=.deb)"
+    # Download GPG key and dearmor
+    if [[ ! -f "$_CHROME_KEYRING" ]]; then
+        if ! curl -fsSL https://dl.google.com/linux/linux_signing_key.pub \
+            | sudo gpg --dearmor --yes -o "$_CHROME_KEYRING"; then
+            log::error "Failed to download Google Chrome GPG key"
+            ui::return_or_exit
+            return
+        fi
+        sudo chmod 644 "$_CHROME_KEYRING"
+    fi
 
-    if ! wget -qO "$tmpfile" "$_CHROME_DEB_URL"; then
-        log::error "Failed to download Google Chrome"
-        rm -f "$tmpfile"
-        return
+    # Add repository
+    local sources_file="/etc/apt/sources.list.d/google-chrome.list"
+    if [[ ! -f "$sources_file" ]]; then
+        printf 'deb [arch=amd64 signed-by=%s] %s stable main\n' "$_CHROME_KEYRING" "$_CHROME_REPO_URL" \
+            | sudo tee "$sources_file" >/dev/null
     fi
 
     log::info "Installing Google Chrome"
-    if sudo apt-get install -y "$tmpfile" </dev/tty; then
+    if sudo apt-get update -o Dir::Etc::sourcelist="$sources_file" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0" -qq </dev/tty \
+        && sudo apt-get install -y google-chrome-stable </dev/tty; then
         hash -r
         log::ok "Google Chrome installed"
     else
         log::error "Failed to install Google Chrome"
     fi
-    rm -f "$tmpfile"
+    ui::return_or_exit
 }
 
 _chrome::remove() {
@@ -113,13 +124,13 @@ _chrome::remove() {
         log::error "Failed to remove Google Chrome"
     fi
 
-    # Clean up repo and key that Chrome adds on install
+    # Clean up repo and key
     if [[ -f /etc/apt/sources.list.d/google-chrome.list ]]; then
         sudo rm -f /etc/apt/sources.list.d/google-chrome.list
         log::ok "Removed Chrome APT repository"
     fi
-    if [[ -f /usr/share/keyrings/google-chrome-keyring.gpg ]]; then
-        sudo rm -f /usr/share/keyrings/google-chrome-keyring.gpg
+    if [[ -f "$_CHROME_KEYRING" ]]; then
+        sudo rm -f "$_CHROME_KEYRING"
         log::ok "Removed Chrome signing key"
     fi
 }
