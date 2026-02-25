@@ -3,8 +3,24 @@
 ## Hierarchy (3 levels)
 
 1. **Top-level aggregators** (`development/main.sh`, `software/main.sh`) — iterate sub-registries via `local -n tasks_ref`, implement `log_status()` and `has_pending()`
-2. **Sub-aggregators** (`environments.sh`, `browsers.sh`, `tools.sh`, etc.) — own `_*_TASKS` array, implement `check/status/run`
+2. **Sub-aggregators** (`environments.sh`, `browsers.sh`, `tools.sh`, `appearance.sh`, etc.) — own `_*_TASKS` array, implement `check/status/run`
 3. **Leaf modules** — implement `check/status/apply`, do the actual work
+
+## Settings modules
+
+- `settings/main.sh` — submenu: System Health, Logs, Completions, About
+- `settings/completions.sh` — install/remove bash and zsh completion symlinks separately
+- `settings/about.sh` — version, install path, log dir, shell
+- `settings/logs.sh` — log file viewer
+
+## Appearance modules
+
+- `gnome/gtktheme.sh` — Catppuccin GTK theme with accent chooser, tweaks (macos/black/float/outline), User Themes extension check
+- `gnome/icons.sh` — Papirus icons with Catppuccin folder colors, change folder color
+- `gnome/cursors.sh` — Catppuccin cursors with variant chooser, change variant
+- `gnome/windowbuttons.sh` — window button layout presets (right/left/custom)
+- `gnome/termprofile.sh` — GNOME Terminal color profile
+- `gnome/appearance.sh` — sub-aggregator for the above
 
 ## Adding a new leaf module
 

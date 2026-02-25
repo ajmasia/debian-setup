@@ -10,6 +10,8 @@ _GTKTHEME_REPO="https://github.com/Fausto-Korpsvart/Catppuccin-GTK-Theme.git"
 _GTKTHEME_THEMES_DIR="$HOME/.themes"
 _GTKTHEME_GTK4_DIR="$HOME/.config/gtk-4.0"
 _GTKTHEME_DEPS=(git sassc gtk2-engines-murrine gnome-themes-extra gnome-shell-extension-user-theme)
+_GTKTHEME_ACCENTS=(lavender blue mauve pink rosewater flamingo red maroon peach yellow green teal sky sapphire)
+_GTKTHEME_TWEAKS=(macos black float outline)
 
 _gtktheme::is_installed() {
     local current
@@ -26,6 +28,7 @@ _gtktheme::dark_mode_enabled() {
 _gtktheme::find_theme() {
     local name
     name="$(find "$_GTKTHEME_THEMES_DIR" -maxdepth 1 -type d -name "Catppuccin*" \
+        ! -name "*-hdpi" ! -name "*-xhdpi" \
         -printf '%f\n' 2>/dev/null | head -1 || true)"
     printf '%s' "$name"
 }
@@ -87,6 +90,7 @@ gtktheme::apply() {
             if ! $installed; then
                 options+=("Apply Catppuccin GTK Theme")
             fi
+            options+=("Change Accent" "Change Tweaks")
             options+=("Remove Catppuccin GTK Theme")
         fi
 
@@ -131,6 +135,14 @@ gtktheme::apply() {
                 gsettings set org.gnome.desktop.interface gtk-theme "$theme_name" || true
                 log::ok "GTK theme applied: ${theme_name}"
                 ;;
+            "Change Accent")
+                log::break
+                _gtktheme::change_accent "$theme_name"
+                ;;
+            "Change Tweaks")
+                log::break
+                _gtktheme::change_tweaks "$theme_name"
+                ;;
             "Remove Catppuccin GTK Theme")
                 log::break
                 _gtktheme::remove "$theme_name"
@@ -139,8 +151,9 @@ gtktheme::apply() {
     done
 }
 
-_gtktheme::install() {
-    # Check dependencies
+# --- Helpers ---
+
+_gtktheme::ensure_deps() {
     local missing=()
     local dep
     for dep in "${_GTKTHEME_DEPS[@]}"; do
@@ -154,31 +167,83 @@ _gtktheme::install() {
         ui::flush_input
         if ! sudo apt-get install -y "${missing[@]}" </dev/tty; then
             log::error "Failed to install dependencies"
-            return
+            return 1
         fi
         hash -r
         log::ok "Dependencies installed"
     fi
 
-    # Choose accent color
-    log::break
-    local accent
-    accent="$(gum::choose \
-        --header "Select accent color:" \
+    # Check User Themes extension
+    local ut_uuid="user-theme@gnome-shell-extensions.gcampax.github.com"
+    if ! gnome-extensions info "$ut_uuid" &>/dev/null; then
+        log::warn "User Themes extension is not installed"
+        log::warn "Install it from GNOME > Extensions or run:"
+        log::warn "  sudo apt-get install gnome-shell-extension-user-theme"
+        log::break
+
+        local proceed
+        proceed="$(gum::choose \
+            --header "Continue without User Themes?" \
+            --header.foreground "$HEX_LAVENDER" \
+            --cursor.foreground "$HEX_BLUE" \
+            --item.foreground "$HEX_TEXT" \
+            --selected.foreground "$HEX_GREEN" \
+            "Install extension now" "Continue anyway" "Cancel")"
+
+        case "$proceed" in
+            "Install extension now")
+                ui::flush_input
+                if sudo apt-get install -y gnome-shell-extension-user-theme </dev/tty; then
+                    hash -r
+                    log::ok "User Themes extension installed"
+                    gnome-extensions enable "$ut_uuid" 2>/dev/null || true
+                    log::warn "You may need to log out and back in to activate"
+                else
+                    log::error "Failed to install extension"
+                    return 1
+                fi
+                ;;
+            "Continue anyway")
+                log::warn "Theme may not apply to GNOME Shell without User Themes"
+                ;;
+            *)
+                return 1
+                ;;
+        esac
+    elif ! gnome-extensions show "$ut_uuid" 2>/dev/null | grep -q "State: ACTIVE\|State: ENABLED"; then
+        log::info "Enabling User Themes extension"
+        gnome-extensions enable "$ut_uuid" 2>/dev/null || true
+        log::ok "User Themes extension enabled"
+    fi
+}
+
+_gtktheme::choose_accent() {
+    gum::choose \
+        --header "${1:-Select accent color:}" \
         --header.foreground "$HEX_LAVENDER" \
         --cursor.foreground "$HEX_BLUE" \
         --item.foreground "$HEX_TEXT" \
         --selected.foreground "$HEX_GREEN" \
-        "lavender" "blue" "mauve" "pink" "rosewater" "flamingo" \
-        "red" "maroon" "peach" "yellow" "green" "teal" "sky" "sapphire")"
+        "${_GTKTHEME_ACCENTS[@]}"
+}
 
-    if [[ -z "$accent" ]]; then
-        return
-    fi
+_gtktheme::choose_tweaks() {
+    gum::choose \
+        --header "Select tweaks (Space to mark, Enter to confirm):" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        --no-limit \
+        "macos (semaphore buttons)" "black (darker background)" \
+        "float (floating panel)" "outline (2px window border)"
+}
 
-    log::ok "Accent: ${accent}"
+_gtktheme::clone_and_install() {
+    local accent="$1"
+    shift
+    local tweaks=("$@")
 
-    # Clone and install
     local tmpdir
     tmpdir="$(mktemp -d)"
 
@@ -186,77 +251,144 @@ _gtktheme::install() {
     if ! git clone --depth 1 "$_GTKTHEME_REPO" "$tmpdir/catppuccin-gtk" 2>/dev/null; then
         log::error "Failed to clone repository"
         rm -rf "$tmpdir"
-        return
+        return 1
     fi
 
-    # Find install.sh (may be in themes/ subdirectory)
     local install_script
     install_script="$(find "$tmpdir/catppuccin-gtk" -name "install.sh" -type f | head -1)"
 
     if [[ -z "$install_script" ]]; then
         log::error "install.sh not found in repository"
         rm -rf "$tmpdir"
-        return
+        return 1
     fi
 
     local script_dir
     script_dir="$(dirname "$install_script")"
-
-    log::info "Installing theme (accent: ${accent})"
     chmod +x "$install_script"
-    if (cd "$script_dir" && bash ./install.sh -t "$accent" -c dark -s standard -l); then
-        log::ok "GTK theme files installed"
-    else
+
+    # Build install command (--tweaks must come before -t per upstream)
+    local cmd=(bash ./install.sh)
+    if [[ ${#tweaks[@]} -gt 0 && -n "${tweaks[0]}" ]]; then
+        cmd+=(--tweaks "${tweaks[@]}")
+    fi
+    cmd+=(-t "$accent" -c dark -s standard -l)
+
+    log::info "Installing theme (accent: ${accent}${tweaks[*]:+, tweaks: ${tweaks[*]}})"
+    if ! (cd "$script_dir" && "${cmd[@]}"); then
         log::error "Theme installation failed"
         rm -rf "$tmpdir"
-        return
+        return 1
     fi
 
     rm -rf "$tmpdir"
 
-    # Detect installed theme name
+    # Detect and setup
     local theme_name
     theme_name="$(_gtktheme::find_theme)"
 
     if [[ -z "$theme_name" ]]; then
         log::warn "Could not detect installed theme name"
-        return
+        return 1
     fi
 
-    # Setup GTK4/libadwaita (assets+dark as symlinks, gtk.css as copy for termcss compat)
-    local theme_path="$_GTKTHEME_THEMES_DIR/$theme_name"
-    if [[ -d "$theme_path/gtk-4.0" ]]; then
-        log::info "Setting up GTK4/libadwaita"
-        mkdir -p "$_GTKTHEME_GTK4_DIR"
-        ln -sf "$theme_path/gtk-4.0/assets" "$_GTKTHEME_GTK4_DIR/assets"
-        ln -sf "$theme_path/gtk-4.0/gtk-dark.css" "$_GTKTHEME_GTK4_DIR/gtk-dark.css"
+    _gtktheme::setup_gtk4 "$theme_name"
 
-        # Preserve terminal CSS snippet if present in existing gtk.css
-        local termcss_snippet=""
-        if [[ -f "$_GTKTHEME_GTK4_DIR/gtk.css" ]] || [[ -L "$_GTKTHEME_GTK4_DIR/gtk.css" ]]; then
-            termcss_snippet="$(sed -n '/debian-setup: vte padding/,/^}/p' "$_GTKTHEME_GTK4_DIR/gtk.css" 2>/dev/null || true)"
-            rm -f "$_GTKTHEME_GTK4_DIR/gtk.css"
-        fi
-
-        cp "$theme_path/gtk-4.0/gtk.css" "$_GTKTHEME_GTK4_DIR/gtk.css"
-
-        # Re-append terminal CSS if it was present
-        if [[ -n "$termcss_snippet" ]]; then
-            printf '\n%s\n' "$termcss_snippet" >> "$_GTKTHEME_GTK4_DIR/gtk.css"
-        fi
-
-        log::ok "GTK4 theme applied"
-    fi
-
-    # Apply theme
     gsettings set org.gnome.desktop.interface gtk-theme "$theme_name" || true
     log::ok "GTK theme applied: ${theme_name}"
 
-    # Enable dark mode if not already
     if ! _gtktheme::dark_mode_enabled; then
         gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
         log::ok "Dark mode enabled"
     fi
+}
+
+_gtktheme::setup_gtk4() {
+    local theme_name="$1"
+    local theme_path="$_GTKTHEME_THEMES_DIR/$theme_name"
+
+    [[ -d "$theme_path/gtk-4.0" ]] || return 0
+
+    log::info "Setting up GTK4/libadwaita"
+    mkdir -p "$_GTKTHEME_GTK4_DIR"
+    ln -sf "$theme_path/gtk-4.0/assets" "$_GTKTHEME_GTK4_DIR/assets"
+    ln -sf "$theme_path/gtk-4.0/gtk-dark.css" "$_GTKTHEME_GTK4_DIR/gtk-dark.css"
+
+    # Preserve terminal CSS snippet
+    local termcss_snippet=""
+    if [[ -f "$_GTKTHEME_GTK4_DIR/gtk.css" ]] || [[ -L "$_GTKTHEME_GTK4_DIR/gtk.css" ]]; then
+        termcss_snippet="$(sed -n '/debian-setup: vte padding/,/^}/p' "$_GTKTHEME_GTK4_DIR/gtk.css" 2>/dev/null || true)"
+        rm -f "$_GTKTHEME_GTK4_DIR/gtk.css"
+    fi
+
+    cp "$theme_path/gtk-4.0/gtk.css" "$_GTKTHEME_GTK4_DIR/gtk.css"
+
+    if [[ -n "$termcss_snippet" ]]; then
+        printf '\n%s\n' "$termcss_snippet" >> "$_GTKTHEME_GTK4_DIR/gtk.css"
+    fi
+
+    log::ok "GTK4 theme applied"
+}
+
+# --- Actions ---
+
+_gtktheme::parse_tweaks() {
+    # Extract tweak names from labels like "macos (semaphore buttons)"
+    local line
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && printf '%s\n' "${line%% *}"
+    done
+    return 0
+}
+
+_gtktheme::install() {
+    _gtktheme::ensure_deps || return
+
+    log::break
+    local accent
+    accent="$(_gtktheme::choose_accent)"
+    [[ -z "$accent" ]] && return
+
+    log::ok "Accent: ${accent}"
+    log::break
+
+    local tweaks
+    tweaks="$(_gtktheme::choose_tweaks | _gtktheme::parse_tweaks)"
+
+    _gtktheme::clone_and_install "$accent" $tweaks
+}
+
+_gtktheme::change_accent() {
+    local old_theme="$1"
+
+    local accent
+    accent="$(_gtktheme::choose_accent "Select new accent color:")"
+    [[ -z "$accent" ]] && return
+
+    rm -rf "$_GTKTHEME_THEMES_DIR/$old_theme"
+    rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-hdpi"
+    rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-xhdpi"
+    _gtktheme::clone_and_install "$accent"
+}
+
+_gtktheme::change_tweaks() {
+    local old_theme="$1"
+
+    # Extract accent from theme name (e.g., "Catppuccin-Mauve-Dark" → "mauve")
+    local accent
+    accent="$(printf '%s' "$old_theme" | sed 's/^Catppuccin-//; s/-Dark.*//; s/-Standard//' | tr '[:upper:]' '[:lower:]')"
+    [[ -z "$accent" ]] && accent="lavender"
+
+    log::info "Current accent: ${accent}"
+    log::break
+
+    local tweaks
+    tweaks="$(_gtktheme::choose_tweaks | _gtktheme::parse_tweaks)"
+
+    rm -rf "$_GTKTHEME_THEMES_DIR/$old_theme"
+    rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-hdpi"
+    rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-xhdpi"
+    _gtktheme::clone_and_install "$accent" $tweaks
 }
 
 _gtktheme::remove() {
@@ -264,19 +396,18 @@ _gtktheme::remove() {
 
     log::info "Removing Catppuccin GTK theme"
 
-    # Remove theme directory
     if [[ -d "$_GTKTHEME_THEMES_DIR/$theme_name" ]]; then
         rm -rf "$_GTKTHEME_THEMES_DIR/$theme_name"
+        rm -rf "$_GTKTHEME_THEMES_DIR/${theme_name}-hdpi"
+        rm -rf "$_GTKTHEME_THEMES_DIR/${theme_name}-xhdpi"
         log::ok "Theme files removed"
     fi
 
-    # Remove GTK4 files
     if [[ -L "$_GTKTHEME_GTK4_DIR/assets" ]]; then
         rm -f "$_GTKTHEME_GTK4_DIR/assets" "$_GTKTHEME_GTK4_DIR/gtk.css" "$_GTKTHEME_GTK4_DIR/gtk-dark.css"
         log::ok "GTK4 theme files removed"
     fi
 
-    # Reset to default theme
     gsettings reset org.gnome.desktop.interface gtk-theme 2>/dev/null || true
     log::ok "GTK theme reverted to default"
 }

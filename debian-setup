@@ -148,6 +148,7 @@ source "${SCRIPT_DIR}/src/modules/gnome/gtktheme.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/icons.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/cursors.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/termprofile.sh"
+source "${SCRIPT_DIR}/src/modules/gnome/windowbuttons.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/appearance.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/keyboard.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/termcss.sh"
@@ -155,8 +156,10 @@ source "${SCRIPT_DIR}/src/modules/gnome/extensions.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/browserthemes.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/appthemes.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/main.sh"
-source "${SCRIPT_DIR}/src/modules/diagnostics/logs.sh"
-source "${SCRIPT_DIR}/src/modules/diagnostics/main.sh"
+source "${SCRIPT_DIR}/src/modules/settings/completions.sh"
+source "${SCRIPT_DIR}/src/modules/settings/about.sh"
+source "${SCRIPT_DIR}/src/modules/settings/logs.sh"
+source "${SCRIPT_DIR}/src/modules/settings/main.sh"
 
 show_version() {
     printf "debian-setup %s\n" "$VERSION"
@@ -171,6 +174,8 @@ show_help() {
     printf "  -s, --search              Start in global search mode\n"
     printf "  -si, --search-to-install  Search only available (not installed) options\n"
     printf "  -sr, --search-to-remove   Search only installed (removable) options\n"
+    printf "  -l, --list                List all available tasks\n"
+    printf "  -o, --option <name>       Jump directly to a task or category\n"
     printf "  --update                  Update to latest version\n"
     printf "  --uninstall               Remove debian-setup\n"
 }
@@ -187,11 +192,24 @@ main() {
             show_help
             return 0
             ;;
+        -l|--list)
+            menu::list
+            return 0
+            ;;
         --update)
             exec "${SCRIPT_DIR}/install.sh" --update
             ;;
         --uninstall)
             exec "${SCRIPT_DIR}/install.sh" --uninstall
+            ;;
+        -o|--option)
+            if [[ -z "${2:-}" ]]; then
+                printf "Error: -o/--option requires an argument\n\n" >&2
+                show_help
+                return 1
+            fi
+            local _jump_target="$2"
+            shift
             ;;
         -s|--search)
             local _search_mode=1
@@ -210,6 +228,16 @@ main() {
             return 1
             ;;
     esac
+
+    if [[ -n "${_jump_target:-}" ]]; then
+        gum::check
+        ui::clear
+        log::break
+        ui::header "$VERSION"
+        ui::session_info
+        menu::jump "$_jump_target"
+        return 0
+    fi
 
     gum::check
 

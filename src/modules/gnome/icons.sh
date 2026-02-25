@@ -49,7 +49,7 @@ icons::apply() {
         local options=()
 
         if $installed; then
-            options+=("Revert Icons")
+            options+=("Change Folder Color" "Revert Icons")
         else
             options+=("Install Papirus" "Install Papirus + Catppuccin")
         fi
@@ -79,6 +79,10 @@ icons::apply() {
             "Install Papirus + Catppuccin")
                 log::break
                 _icons::install
+                ;;
+            "Change Folder Color")
+                log::break
+                _icons::change_color
                 ;;
             "Revert Icons")
                 log::break
@@ -158,6 +162,41 @@ _icons::install() {
         log::ok "Folder colors applied: cat-mocha-${accent}"
     else
         log::warn "Failed to apply folder colors"
+    fi
+
+    rm -rf "$tmpdir"
+}
+
+_icons::change_color() {
+    local accent
+    accent="$(gum::choose \
+        --header "Select accent color for folder icons:" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "lavender" "blue" "mauve" "pink" "rosewater" "flamingo" \
+        "red" "maroon" "peach" "yellow" "green" "teal" "sky" "sapphire")"
+
+    if [[ -z "$accent" ]]; then
+        return
+    fi
+
+    local tmpdir
+    tmpdir="$(mktemp -d)"
+
+    if ! curl -fsSL "$_ICONS_FOLDERS_SCRIPT" -o "$tmpdir/papirus-folders-bin"; then
+        log::error "Failed to download papirus-folders script"
+        rm -rf "$tmpdir"
+        return
+    fi
+    chmod +x "$tmpdir/papirus-folders-bin"
+
+    ui::flush_input
+    if sudo "$tmpdir/papirus-folders-bin" -C "cat-mocha-${accent}" --theme Papirus-Dark </dev/tty; then
+        log::ok "Folder color changed: cat-mocha-${accent}"
+    else
+        log::error "Failed to apply folder colors"
     fi
 
     rm -rf "$tmpdir"

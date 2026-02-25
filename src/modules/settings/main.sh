@@ -1,35 +1,43 @@
-# Diagnostics module
+# Settings module
 
-[[ -n "${_MOD_DIAGNOSTICS_LOADED:-}" ]] && return 0
-_MOD_DIAGNOSTICS_LOADED=1
+[[ -n "${_MOD_SETTINGS_LOADED:-}" ]] && return 0
+_MOD_SETTINGS_LOADED=1
 
-diagnostics::run() {
+settings::run() {
     local choice
 
     while true; do
         ui::clear_content
-        log::nav "Health"
+        log::nav "Settings"
         log::break
 
         choice="$(gum::choose \
-            --header "Select a category:" \
+            --header "Select an option:" \
             --header.foreground "$HEX_LAVENDER" \
             --cursor.foreground "$HEX_BLUE" \
             --item.foreground "$HEX_TEXT" \
             --selected.foreground "$HEX_GREEN" \
-            "Health" \
+            "System Health" \
             "Logs" \
+            "Completions" \
+            "About" \
             "Back" \
             "Exit")"
 
         case "$choice" in
-            "Health")
+            "System Health")
                 ui::clear_content
                 health::run
                 _UI_DIRTY=1
                 ;;
             "Logs")
                 logs::run
+                ;;
+            "Completions")
+                completions::run
+                ;;
+            "About")
+                about::run
                 ;;
             ""|"Back")
                 return

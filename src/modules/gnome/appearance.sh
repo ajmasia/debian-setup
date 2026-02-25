@@ -12,6 +12,7 @@ _APPEARANCE_TASKS=(
     "${_ICONS_LABEL}|_ICONS_DESC|icons::check|icons::apply|icons::status"
     "${_CURSORS_LABEL}|_CURSORS_DESC|cursors::check|cursors::apply|cursors::status"
     "${_TERMPROFILE_LABEL}|_TERMPROFILE_DESC|termprofile::check|termprofile::apply|termprofile::status"
+    "${_WINDOWBUTTONS_LABEL}|_WINDOWBUTTONS_DESC|windowbuttons::check|windowbuttons::apply|windowbuttons::status"
 )
 
 appearance::check() {
