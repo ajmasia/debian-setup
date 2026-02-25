@@ -201,6 +201,13 @@ main() {
         -sr|--search-to-remove)
             local _search_mode=3
             ;;
+        "")
+            ;;
+        *)
+            printf "Unknown option: %s\n\n" "$1" >&2
+            show_help
+            return 1
+            ;;
     esac
 
     gum::check
