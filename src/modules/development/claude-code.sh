@@ -4,7 +4,7 @@
 _MOD_CLAUDECODE_LOADED=1
 
 _CLAUDECODE_LABEL="Configure Claude Code"
-_CLAUDECODE_DESC="Install or remove Claude Code (npm global)."
+_CLAUDECODE_DESC="Install or remove Claude Code (native installer)."
 
 _claudecode::is_installed() {
     command -v claude &>/dev/null
@@ -80,13 +80,13 @@ claudecode::apply() {
 }
 
 _claudecode::install() {
-    if ! command -v npm &>/dev/null; then
-        log::error "npm not available. Install Node.js first (Development > Environments > Node.js)"
+    if ! command -v curl &>/dev/null; then
+        log::error "curl is required but not installed"
         return
     fi
 
-    log::info "Installing Claude Code"
-    if npm install -g @anthropic-ai/claude-code; then
+    log::info "Installing Claude Code (native installer)"
+    if curl -fsSL https://claude.ai/install.sh | bash; then
         hash -r
         log::ok "Claude Code installed"
     else
@@ -96,10 +96,8 @@ _claudecode::install() {
 
 _claudecode::remove() {
     log::info "Removing Claude Code"
-    if npm uninstall -g @anthropic-ai/claude-code; then
-        hash -r
-        log::ok "Claude Code removed"
-    else
-        log::error "Failed to remove Claude Code"
-    fi
+    rm -f "${HOME}/.local/bin/claude"
+    rm -rf "${HOME}/.local/share/claude"
+    hash -r
+    log::ok "Claude Code removed"
 }
