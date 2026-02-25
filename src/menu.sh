@@ -78,6 +78,22 @@ menu::_run_choice() {
     return 1
 }
 
+# Prints all available tasks and categories to stdout, sorted alphabetically.
+menu::list() {
+    menu::_collect_leaf_tasks
+
+    local all=("${_COLLECTED_LABELS[@]}")
+
+    # Include main menu categories
+    all+=(
+        "System Essentials" "Package Managers" "Hardware Support"
+        "OpenSSH Server" "Git" "Shell Tools" "Development"
+        "Dotfiles" "UI and Theming" "Software" "Virtualization" "Health"
+    )
+
+    printf '%s\n' "${all[@]}" | sort -fu
+}
+
 # --- Main menu ---
 
 menu::main() {

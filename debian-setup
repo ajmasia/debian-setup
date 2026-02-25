@@ -171,6 +171,7 @@ show_help() {
     printf "  -s, --search              Start in global search mode\n"
     printf "  -si, --search-to-install  Search only available (not installed) options\n"
     printf "  -sr, --search-to-remove   Search only installed (removable) options\n"
+    printf "  -l, --list                List all available tasks\n"
     printf "  --update                  Update to latest version\n"
     printf "  --uninstall               Remove debian-setup\n"
 }
@@ -185,6 +186,10 @@ main() {
             ;;
         -h|--help)
             show_help
+            return 0
+            ;;
+        -l|--list)
+            menu::list
             return 0
             ;;
         --update)
