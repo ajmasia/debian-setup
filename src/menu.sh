@@ -38,7 +38,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System Essentials" "Hardware Support" "Package Managers" "Dotfiles" "Shell Tools" "OpenSSH Server" "Git" "Development" "UI and Theming" "Software" "Virtualization" "Health" "Exit")
+        items=("System Essentials" "Package Managers" "Hardware Support" "OpenSSH Server" "Git" "Shell Tools" "Development" "Dotfiles" "UI and Theming" "Software" "Virtualization" "Health" "Exit")
 
         choice="$(gum::filter \
             --height 15 \
