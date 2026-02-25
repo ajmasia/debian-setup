@@ -102,6 +102,7 @@ source "${SCRIPT_DIR}/src/modules/software/brave.sh"
 source "${SCRIPT_DIR}/src/modules/software/librewolf.sh"
 source "${SCRIPT_DIR}/src/modules/software/mullvad.sh"
 source "${SCRIPT_DIR}/src/modules/software/chromium.sh"
+source "${SCRIPT_DIR}/src/modules/software/chrome.sh"
 source "${SCRIPT_DIR}/src/modules/software/browsers.sh"
 # Security > VPNs
 source "${SCRIPT_DIR}/src/modules/software/mullvadvpn.sh"
