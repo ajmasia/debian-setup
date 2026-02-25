@@ -12,6 +12,7 @@ _BROWSERS_TASKS=(
     "${_LIBREWOLF_LABEL}|_LIBREWOLF_DESC|librewolf::check|librewolf::apply|librewolf::status"
     "${_MULLVAD_LABEL}|_MULLVAD_DESC|mullvad::check|mullvad::apply|mullvad::status"
     "${_CHROMIUM_LABEL}|_CHROMIUM_DESC|chromium::check|chromium::apply|chromium::status"
+    "${_CHROME_LABEL}|_CHROME_DESC|chrome::check|chrome::apply|chrome::status"
 )
 
 browsers::check() {
