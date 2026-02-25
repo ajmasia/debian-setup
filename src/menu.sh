@@ -85,13 +85,110 @@ menu::list() {
     local all=("${_COLLECTED_LABELS[@]}")
 
     # Include main menu categories
-    all+=(
-        "System Essentials" "Package Managers" "Hardware Support"
-        "OpenSSH Server" "Git" "Shell Tools" "Development"
-        "Dotfiles" "UI and Theming" "Software" "Virtualization" "Health"
-    )
+    local entry cat_label cat_fn
+    for entry in "${_MENU_CATEGORIES[@]}"; do
+        IFS='|' read -r cat_label cat_fn <<< "$entry"
+        all+=("$cat_label")
+    done
 
     printf '%s\n' "${all[@]}" | sort -fu
+}
+
+# Main menu categories with their run/apply functions.
+_MENU_CATEGORIES=(
+    "System Essentials|system::run"
+    "Package Managers|packages::run"
+    "Hardware Support|hardware::run"
+    "OpenSSH Server|ssh::run"
+    "Git|git_config::apply"
+    "Shell Tools|shell::run"
+    "Development|development::run"
+    "Dotfiles|dotfiles::apply"
+    "UI and Theming|ui_module::run"
+    "Software|software::run"
+    "Virtualization|virtualization::run"
+    "Health|diagnostics::run"
+)
+
+# Jumps directly to a task or category matching the query.
+menu::jump() {
+    local query="$1"
+    local match_labels=() match_fns=()
+
+    # Collect leaf tasks
+    menu::_collect_leaf_tasks
+    local i
+    for i in "${!_COLLECTED_LABELS[@]}"; do
+        local lower_label="${_COLLECTED_LABELS[$i],,}"
+        local lower_query="${query,,}"
+        if [[ "$lower_label" == *"$lower_query"* ]]; then
+            match_labels+=("${_COLLECTED_LABELS[$i]}")
+            match_fns+=("${_COLLECTED_APPLY_FNS[$i]}")
+        fi
+    done
+
+    # Collect categories
+    local entry cat_label cat_fn
+    for entry in "${_MENU_CATEGORIES[@]}"; do
+        IFS='|' read -r cat_label cat_fn <<< "$entry"
+        local lower_label="${cat_label,,}"
+        local lower_query="${query,,}"
+        if [[ "$lower_label" == *"$lower_query"* ]]; then
+            # Avoid duplicate if leaf task already matched same name
+            local dup=false
+            local j
+            for j in "${!match_labels[@]}"; do
+                [[ "${match_labels[$j]}" == "$cat_label" ]] && dup=true && break
+            done
+            if ! $dup; then
+                match_labels+=("$cat_label")
+                match_fns+=("$cat_fn")
+            fi
+        fi
+    done
+
+    local count=${#match_labels[@]}
+
+    if [[ $count -eq 0 ]]; then
+        log::error "No match found for '${query}'"
+        exit 1
+    elif [[ $count -eq 1 ]]; then
+        "${match_fns[0]}"
+        ui::clear_content
+        ui::goodbye
+    else
+        # Multiple matches — let user pick
+        local choice
+        local items=("${match_labels[@]}" "Exit")
+
+        choice="$(gum::filter \
+            --height 20 \
+            --header "Multiple matches for '${query}' (${count}):" \
+            --header.foreground "$HEX_LAVENDER" \
+            --indicator.foreground "$HEX_BLUE" \
+            --text.foreground "$HEX_TEXT" \
+            --cursor-text.foreground "$HEX_GREEN" \
+            --match.foreground "$HEX_MAUVE" \
+            --placeholder "Type to filter..." \
+            "${items[@]}")"
+
+        case "$choice" in
+            ""|"Exit")
+                ui::clear_content
+                ui::goodbye
+                ;;
+            *)
+                local k
+                for k in "${!match_labels[@]}"; do
+                    if [[ "${match_labels[$k]}" == "$choice" ]]; then
+                        "${match_fns[$k]}"
+                        ui::clear_content
+                        ui::goodbye
+                    fi
+                done
+                ;;
+        esac
+    fi
 }
 
 # --- Main menu ---

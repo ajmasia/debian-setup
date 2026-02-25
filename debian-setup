@@ -172,6 +172,7 @@ show_help() {
     printf "  -si, --search-to-install  Search only available (not installed) options\n"
     printf "  -sr, --search-to-remove   Search only installed (removable) options\n"
     printf "  -l, --list                List all available tasks\n"
+    printf "  -o, --option <name>       Jump directly to a task or category\n"
     printf "  --update                  Update to latest version\n"
     printf "  --uninstall               Remove debian-setup\n"
 }
@@ -198,6 +199,15 @@ main() {
         --uninstall)
             exec "${SCRIPT_DIR}/install.sh" --uninstall
             ;;
+        -o|--option)
+            if [[ -z "${2:-}" ]]; then
+                printf "Error: -o/--option requires an argument\n\n" >&2
+                show_help
+                return 1
+            fi
+            local _jump_target="$2"
+            shift
+            ;;
         -s|--search)
             local _search_mode=1
             ;;
@@ -215,6 +225,16 @@ main() {
             return 1
             ;;
     esac
+
+    if [[ -n "${_jump_target:-}" ]]; then
+        gum::check
+        ui::clear
+        log::break
+        ui::header "$VERSION"
+        ui::session_info
+        menu::jump "$_jump_target"
+        return 0
+    fi
 
     gum::check
 
