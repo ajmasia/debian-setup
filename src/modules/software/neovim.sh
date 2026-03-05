@@ -45,6 +45,31 @@ _neovim::find_lazyvim_dir() {
     return 1
 }
 
+_neovim::is_nvim_config() {
+    [[ -f "$1/init.lua" ]]
+}
+
+_neovim::find_custom_configs() {
+    local lazyvim_dir="${1:-}"
+    local dir name
+
+    for dir in "$HOME"/.config/*/; do
+        [[ -d "$dir" ]] || continue
+        name="$(basename "$dir")"
+        [[ "$name" == "nvim" ]] && continue
+        [[ -n "$lazyvim_dir" && "${dir%/}" == "$lazyvim_dir" ]] && continue
+        if _neovim::is_nvim_config "$dir"; then
+            printf '%s\n' "$name"
+        fi
+    done
+}
+
+_neovim::has_alias() {
+    local config_name="$1"
+    local aliases_file="$HOME/.bash_aliases"
+    [[ -f "$aliases_file" ]] && grep -q "NVIM_APPNAME=${config_name}" "$aliases_file"
+}
+
 # --- Public API ---
 
 neovim::check() {
@@ -69,6 +94,12 @@ neovim::apply() {
         _neovim::is_installed && installed=true
         _neovim::session_ready && session_ready=true
         lazyvim_dir="$(_neovim::find_lazyvim_dir 2>/dev/null || true)"
+
+        local -a custom_configs=()
+        local _cfg
+        while IFS= read -r _cfg; do
+            [[ -n "$_cfg" ]] && custom_configs+=("$_cfg")
+        done < <(_neovim::find_custom_configs "$lazyvim_dir")
 
         ui::clear_content
         log::nav "Software > Neovim"
@@ -97,6 +128,16 @@ neovim::apply() {
             log::warn "LazyVim (not configured)"
         fi
 
+        local _cc aliases_pending=false
+        for _cc in "${custom_configs[@]}"; do
+            if _neovim::has_alias "$_cc"; then
+                log::ok "${_cc} (alias configured)"
+            else
+                log::warn "${_cc} (no alias)"
+                aliases_pending=true
+            fi
+        done
+
         log::break
 
         # Build options based on current state
@@ -110,6 +151,10 @@ neovim::apply() {
 
         if $installed && [[ -z "$lazyvim_dir" ]]; then
             options+=("Configure LazyVim")
+        fi
+
+        if $installed && $aliases_pending; then
+            options+=("Configure aliases")
         fi
 
         if $installed; then
@@ -148,6 +193,9 @@ neovim::apply() {
                 ;;
             "Configure LazyVim")
                 _neovim::configure_lazyvim
+                ;;
+            "Configure aliases")
+                _neovim::aliases_wizard "$lazyvim_dir"
                 ;;
             "Install dependencies")
                 _neovim::deps_wizard
@@ -769,6 +817,86 @@ return {
 EOF
 
     log::ok "Catppuccin ${flavour} colorscheme configured"
+}
+
+# --- Configure aliases for custom configs ---
+
+_neovim::aliases_wizard() {
+    local lazyvim_dir="${1:-}"
+    local -a configs=()
+    local line
+
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && configs+=("$line")
+    done < <(_neovim::find_custom_configs "$lazyvim_dir")
+
+    if [[ ${#configs[@]} -eq 0 ]]; then
+        return
+    fi
+
+    ui::clear_content
+    log::nav "Software > Neovim > Configure Aliases"
+    log::break
+
+    log::info "Neovim configurations detected"
+
+    local config
+    for config in "${configs[@]}"; do
+        if _neovim::has_alias "$config"; then
+            log::ok "${config} (alias configured)"
+        else
+            log::warn "${config} (no alias)"
+        fi
+    done
+
+    local aliases_added=false
+
+    for config in "${configs[@]}"; do
+        _neovim::has_alias "$config" && continue
+
+        log::break
+        log::info "Config: ${config}"
+        log::warn "Run with: NVIM_APPNAME=${config} nvim"
+        log::break
+
+        local add_alias
+        add_alias="$(gum::choose \
+            --header "Add alias for ${config} to .bash_aliases?" \
+            --header.foreground "$HEX_LAVENDER" \
+            --cursor.foreground "$HEX_BLUE" \
+            --item.foreground "$HEX_TEXT" \
+            --selected.foreground "$HEX_GREEN" \
+            "Yes" "No")"
+
+        if [[ "$add_alias" == "Yes" ]]; then
+            local alias_name
+            alias_name="$(gum::input \
+                --header "Alias name:" \
+                --header.foreground "$HEX_LAVENDER" \
+                --value "$config" \
+                --placeholder "Alias name")"
+
+            if [[ -z "$alias_name" || ! "$alias_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+                log::warn "Invalid alias name, skipping"
+            else
+                local alias_line="alias ${alias_name}='NVIM_APPNAME=${config} nvim'"
+                local aliases_file="$HOME/.bash_aliases"
+
+                if [[ -f "$aliases_file" ]] && grep -q "NVIM_APPNAME=${config}" "$aliases_file"; then
+                    log::ok "Alias for ${config} already exists"
+                else
+                    printf '\n# Neovim (%s)\n%s\n' "$alias_name" "$alias_line" >> "$aliases_file"
+                    log::ok "Added alias: ${alias_name}"
+                    aliases_added=true
+                fi
+            fi
+        fi
+    done
+
+    if $aliases_added; then
+        log::break
+        log::warn "Restart your shell or run: source ~/.bash_aliases"
+    fi
 }
 
 # --- Remove LazyVim ---

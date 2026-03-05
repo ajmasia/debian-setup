@@ -16,6 +16,7 @@ _PRODUCTIVITY_TASKS=(
     "${_LOCALSEND_LABEL}|_LOCALSEND_DESC|localsend::check|localsend::apply|localsend::status"
     "${_ETCHER_LABEL}|_ETCHER_DESC|etcher::check|etcher::apply|etcher::status"
     "${_OBSIDIAN_LABEL}|_OBSIDIAN_DESC|obsidian::check|obsidian::apply|obsidian::status"
+    "${_CALIBRE_LABEL}|_CALIBRE_DESC|calibre::check|calibre::apply|calibre::status"
 )
 
 productivity::check() {
