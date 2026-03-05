@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-03-05
+
+### Added
+
+- **Calibre** module under Software > Productivity -- Flatpak install for e-book management
+- **Custom Neovim config detection** -- scans ~/.config for Neovim configs with init.lua and offers alias setup
+
 ## [1.1.0] - 2026-02-25
 
 ### Added
