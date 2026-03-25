@@ -53,7 +53,7 @@ appearance::run() {
             items+=("${label#Configure }")
             apply_fns+=("$apply_fn")
         done
-        items+=("Back" "Exit")
+        items+=("Reset to Native GNOME" "Back" "Exit")
 
         choice="$(gum::choose \
             --header "Select an option:" \
@@ -70,6 +70,10 @@ appearance::run() {
             "Exit")
                 ui::clear_content
                 ui::goodbye
+                ;;
+            "Reset to Native GNOME")
+                log::break
+                _gtktheme::reset_native
                 ;;
             *)
                 local i

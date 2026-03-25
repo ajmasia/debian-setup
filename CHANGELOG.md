@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-03-25
+
+### Added
+
+- **Latte flavor support** -- GTK theme now supports Mocha (dark) and Latte (light), with "Change Variant" option and automatic color scheme sync
+- **Reset to Native GNOME** -- new option in Appearance to revert all theme customizations (GTK, Shell, icons, cursors, GTK4 CSS) back to Adwaita
+
 ## [1.2.0] - 2026-03-05
 
 ### Added
