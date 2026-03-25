@@ -4,7 +4,7 @@
 _MOD_GTKTHEME_LOADED=1
 
 _GTKTHEME_LABEL="Configure GTK Theme"
-_GTKTHEME_DESC="Install Catppuccin Mocha GTK theme."
+_GTKTHEME_DESC="Install Catppuccin GTK theme (Mocha or Latte)."
 
 _GTKTHEME_REPO="https://github.com/Fausto-Korpsvart/Catppuccin-GTK-Theme.git"
 _GTKTHEME_THEMES_DIR="$HOME/.themes"
@@ -33,14 +33,37 @@ _gtktheme::find_theme() {
     printf '%s' "$name"
 }
 
+_gtktheme::current_variant() {
+    local theme_name
+    theme_name="$(_gtktheme::find_theme)"
+    if [[ "$theme_name" == *"-Dark"* ]]; then
+        printf 'dark'
+    else
+        printf 'light'
+    fi
+}
+
 gtktheme::check() {
-    _gtktheme::is_installed && _gtktheme::dark_mode_enabled
+    _gtktheme::is_installed || return 1
+    local variant
+    variant="$(_gtktheme::current_variant)"
+    if [[ "$variant" == "dark" ]]; then
+        _gtktheme::dark_mode_enabled
+    else
+        ! _gtktheme::dark_mode_enabled
+    fi
 }
 
 gtktheme::status() {
     local issues=()
-    _gtktheme::dark_mode_enabled || issues+=("light mode")
-    _gtktheme::is_installed || issues+=("not installed")
+    _gtktheme::is_installed || { printf 'not installed'; return; }
+    local variant
+    variant="$(_gtktheme::current_variant)"
+    if [[ "$variant" == "dark" ]]; then
+        _gtktheme::dark_mode_enabled || issues+=("light mode active")
+    else
+        _gtktheme::dark_mode_enabled && issues+=("dark mode active")
+    fi
     if [[ ${#issues[@]} -gt 0 ]]; then
         local IFS=", "
         printf '%s' "${issues[*]}"
@@ -51,10 +74,11 @@ gtktheme::apply() {
     local choice
 
     while true; do
-        local installed=false dark=false theme_name=""
+        local installed=false dark=false theme_name="" variant=""
         _gtktheme::is_installed && installed=true
         _gtktheme::dark_mode_enabled && dark=true
         theme_name="$(_gtktheme::find_theme)"
+        [[ -n "$theme_name" ]] && variant="$(_gtktheme::current_variant)"
 
         ui::clear_content
         log::nav "GNOME > Appearance > GTK Theme"
@@ -62,10 +86,18 @@ gtktheme::apply() {
 
         log::info "GTK Theme"
 
-        if $dark; then
-            log::ok "Dark mode: enabled"
+        if [[ "$variant" == "light" ]]; then
+            if $dark; then
+                log::warn "Color scheme: dark (mismatched with Latte)"
+            else
+                log::ok "Color scheme: light"
+            fi
         else
-            log::warn "Dark mode: disabled"
+            if $dark; then
+                log::ok "Color scheme: dark"
+            else
+                log::warn "Color scheme: light (mismatched with Mocha)"
+            fi
         fi
 
         if $installed && [[ -n "$theme_name" ]]; then
@@ -80,21 +112,19 @@ gtktheme::apply() {
 
         local options=()
 
-        if ! $dark; then
-            options+=("Enable Dark Mode")
-        fi
-
         if [[ -z "$theme_name" ]]; then
             options+=("Install Catppuccin GTK Theme")
         else
             if ! $installed; then
                 options+=("Apply Catppuccin GTK Theme")
             fi
-            options+=("Change Accent" "Change Tweaks")
+            options+=("Change Accent" "Change Variant" "Change Tweaks")
             options+=("Remove Catppuccin GTK Theme")
         fi
 
-        if $dark; then
+        if ! $dark; then
+            options+=("Enable Dark Mode")
+        else
             options+=("Disable Dark Mode")
         fi
 
@@ -123,7 +153,7 @@ gtktheme::apply() {
                 ;;
             "Disable Dark Mode")
                 log::break
-                gsettings set org.gnome.desktop.interface color-scheme 'default' || true
+                gsettings set org.gnome.desktop.interface color-scheme 'prefer-light' || true
                 log::ok "Dark mode disabled"
                 ;;
             "Install Catppuccin GTK Theme")
@@ -138,6 +168,10 @@ gtktheme::apply() {
             "Change Accent")
                 log::break
                 _gtktheme::change_accent "$theme_name"
+                ;;
+            "Change Variant")
+                log::break
+                _gtktheme::change_variant "$theme_name"
                 ;;
             "Change Tweaks")
                 log::break
@@ -217,6 +251,16 @@ _gtktheme::ensure_deps() {
     fi
 }
 
+_gtktheme::choose_variant() {
+    gum::choose \
+        --header "${1:-Select flavor:}" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "mocha (dark)" "latte (light)"
+}
+
 _gtktheme::choose_accent() {
     gum::choose \
         --header "${1:-Select accent color:}" \
@@ -241,7 +285,8 @@ _gtktheme::choose_tweaks() {
 
 _gtktheme::clone_and_install() {
     local accent="$1"
-    shift
+    local variant="$2"   # "dark" (Mocha) or "light" (Latte)
+    shift 2
     local tweaks=("$@")
 
     local tmpdir
@@ -272,9 +317,9 @@ _gtktheme::clone_and_install() {
     if [[ ${#tweaks[@]} -gt 0 && -n "${tweaks[0]}" ]]; then
         cmd+=(--tweaks "${tweaks[@]}")
     fi
-    cmd+=(-t "$accent" -c dark -s standard -l)
+    cmd+=(-t "$accent" -c "$variant" -s standard -l)
 
-    log::info "Installing theme (accent: ${accent}${tweaks[*]:+, tweaks: ${tweaks[*]}})"
+    log::info "Installing theme (flavor: ${variant}, accent: ${accent}${tweaks[*]:+, tweaks: ${tweaks[*]}})"
     if ! (cd "$script_dir" && "${cmd[@]}"); then
         log::error "Theme installation failed"
         rm -rf "$tmpdir"
@@ -297,9 +342,16 @@ _gtktheme::clone_and_install() {
     gsettings set org.gnome.desktop.interface gtk-theme "$theme_name" || true
     log::ok "GTK theme applied: ${theme_name}"
 
-    if ! _gtktheme::dark_mode_enabled; then
-        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
-        log::ok "Dark mode enabled"
+    if [[ "$variant" == "dark" ]]; then
+        if ! _gtktheme::dark_mode_enabled; then
+            gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
+            log::ok "Dark mode enabled"
+        fi
+    else
+        if _gtktheme::dark_mode_enabled; then
+            gsettings set org.gnome.desktop.interface color-scheme 'default' || true
+            log::ok "Light mode enabled"
+        fi
     fi
 }
 
@@ -345,6 +397,15 @@ _gtktheme::install() {
     _gtktheme::ensure_deps || return
 
     log::break
+    local variant_choice variant
+    variant_choice="$(_gtktheme::choose_variant)"
+    [[ -z "$variant_choice" ]] && return
+    # Map flavor name to install.sh -c flag value: mocha→dark, latte→light
+    [[ "$variant_choice" == mocha* ]] && variant="dark" || variant="light"
+
+    log::ok "Flavor: ${variant_choice}"
+    log::break
+
     local accent
     accent="$(_gtktheme::choose_accent)"
     [[ -z "$accent" ]] && return
@@ -355,11 +416,13 @@ _gtktheme::install() {
     local tweaks
     tweaks="$(_gtktheme::choose_tweaks | _gtktheme::parse_tweaks)"
 
-    _gtktheme::clone_and_install "$accent" $tweaks
+    _gtktheme::clone_and_install "$accent" "$variant" $tweaks
 }
 
 _gtktheme::change_accent() {
     local old_theme="$1"
+    local current_variant
+    current_variant="$(_gtktheme::current_variant)"
 
     local accent
     accent="$(_gtktheme::choose_accent "Select new accent color:")"
@@ -368,18 +431,42 @@ _gtktheme::change_accent() {
     rm -rf "$_GTKTHEME_THEMES_DIR/$old_theme"
     rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-hdpi"
     rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-xhdpi"
-    _gtktheme::clone_and_install "$accent"
+    _gtktheme::clone_and_install "$accent" "$current_variant"
+}
+
+_gtktheme::change_variant() {
+    local old_theme="$1"
+
+    local accent
+    accent="$(printf '%s' "$old_theme" | sed 's/^Catppuccin-//; s/-Dark.*//; s/-Standard.*//; s/-Light.*//' | tr '[:upper:]' '[:lower:]')"
+    [[ -z "$accent" ]] && accent="lavender"
+
+    log::info "Current accent: ${accent}"
+    log::break
+
+    local variant_choice variant
+    variant_choice="$(_gtktheme::choose_variant "Select new flavor:")"
+    [[ -z "$variant_choice" ]] && return
+    # Map flavor name to install.sh -c flag value: mocha→dark, latte→light
+    [[ "$variant_choice" == mocha* ]] && variant="dark" || variant="light"
+
+    rm -rf "$_GTKTHEME_THEMES_DIR/$old_theme"
+    rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-hdpi"
+    rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-xhdpi"
+    _gtktheme::clone_and_install "$accent" "$variant"
 }
 
 _gtktheme::change_tweaks() {
     local old_theme="$1"
+    local current_variant
+    current_variant="$(_gtktheme::current_variant)"
 
     # Extract accent from theme name (e.g., "Catppuccin-Mauve-Dark" → "mauve")
     local accent
-    accent="$(printf '%s' "$old_theme" | sed 's/^Catppuccin-//; s/-Dark.*//; s/-Standard//' | tr '[:upper:]' '[:lower:]')"
+    accent="$(printf '%s' "$old_theme" | sed 's/^Catppuccin-//; s/-Dark.*//; s/-Standard.*//; s/-Light.*//' | tr '[:upper:]' '[:lower:]')"
     [[ -z "$accent" ]] && accent="lavender"
 
-    log::info "Current accent: ${accent}"
+    log::info "Current accent: ${accent}, flavor: ${current_variant}"
     log::break
 
     local tweaks
@@ -388,7 +475,7 @@ _gtktheme::change_tweaks() {
     rm -rf "$_GTKTHEME_THEMES_DIR/$old_theme"
     rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-hdpi"
     rm -rf "$_GTKTHEME_THEMES_DIR/${old_theme}-xhdpi"
-    _gtktheme::clone_and_install "$accent" $tweaks
+    _gtktheme::clone_and_install "$accent" "$current_variant" $tweaks
 }
 
 _gtktheme::remove() {
