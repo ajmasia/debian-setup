@@ -498,3 +498,79 @@ _gtktheme::remove() {
     gsettings reset org.gnome.desktop.interface gtk-theme 2>/dev/null || true
     log::ok "GTK theme reverted to default"
 }
+
+_gtktheme::reset_native() {
+    local theme_name
+    theme_name="$(_gtktheme::find_theme)"
+
+    log::info "The following changes will be applied:"
+    log::warn "  - GTK theme reset to Adwaita"
+    log::warn "  - Color scheme set to light (prefer-light)"
+    log::warn "  - GNOME Shell theme reset to default"
+    log::warn "  - Icon theme reset to default (Adwaita)"
+    log::warn "  - Cursor theme reset to default"
+    if [[ -n "$theme_name" ]]; then
+        log::warn "  - Catppuccin theme files removed (~/.themes)"
+    fi
+    if [[ -L "$_GTKTHEME_GTK4_DIR/assets" || -f "$_GTKTHEME_GTK4_DIR/gtk.css" ]]; then
+        log::warn "  - GTK4 CSS removed (including terminal padding)"
+    fi
+    log::break
+
+    local confirm
+    confirm="$(gum::choose \
+        --header "Apply all changes and reset to native GNOME?" \
+        --header.foreground "$HEX_LAVENDER" \
+        --cursor.foreground "$HEX_BLUE" \
+        --item.foreground "$HEX_TEXT" \
+        --selected.foreground "$HEX_GREEN" \
+        "Yes, reset to native GNOME" "Cancel")"
+
+    [[ "$confirm" != "Yes, reset to native GNOME" ]] && return 1
+
+    log::break
+    log::info "Resetting to native GNOME (Adwaita)"
+
+    # Remove Catppuccin theme files if present
+    if [[ -n "$theme_name" && -d "$_GTKTHEME_THEMES_DIR/$theme_name" ]]; then
+        rm -rf "$_GTKTHEME_THEMES_DIR/$theme_name"
+        rm -rf "$_GTKTHEME_THEMES_DIR/${theme_name}-hdpi"
+        rm -rf "$_GTKTHEME_THEMES_DIR/${theme_name}-xhdpi"
+        log::ok "Catppuccin theme files removed"
+    fi
+
+    # Remove GTK4 symlinks and CSS
+    if [[ -L "$_GTKTHEME_GTK4_DIR/assets" || -f "$_GTKTHEME_GTK4_DIR/gtk.css" ]]; then
+        rm -f "$_GTKTHEME_GTK4_DIR/assets" \
+              "$_GTKTHEME_GTK4_DIR/gtk.css" \
+              "$_GTKTHEME_GTK4_DIR/gtk-dark.css"
+        log::ok "GTK4 customizations removed"
+    fi
+
+    # Reset GTK theme to Adwaita
+    gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita' 2>/dev/null || true
+    log::ok "GTK theme set to Adwaita"
+
+    # Reset color scheme to light (GNOME 48 requires prefer-light, not default)
+    gsettings set org.gnome.desktop.interface color-scheme 'prefer-light' 2>/dev/null || true
+    log::ok "Color scheme set to light"
+
+    # Reset GNOME Shell theme (User Themes extension)
+    gsettings set org.gnome.shell.extensions.user-theme name '' 2>/dev/null || true
+    log::ok "GNOME Shell theme reset to default"
+
+    # Reset icon theme
+    gsettings reset org.gnome.desktop.interface icon-theme 2>/dev/null || true
+    log::ok "Icon theme reset to default"
+
+    # Reset cursor theme
+    gsettings reset org.gnome.desktop.interface cursor-theme 2>/dev/null || true
+    log::ok "Cursor theme reset to default"
+
+    log::break
+    log::warn "GNOME Shell requires a restart to apply the theme change"
+    log::warn "  Press Alt+F2, type 'r', press Enter  (X11 only)"
+    log::warn "  Or log out and back in (works on X11 and Wayland)"
+    log::info "Note: the quick settings panel stays dark by design (Adwaita shell theme)"
+    ui::return_or_exit
+}
