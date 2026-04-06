@@ -12,7 +12,20 @@ _ICONS_FOLDERS_SCRIPT="https://raw.githubusercontent.com/PapirusDevelopmentTeam/
 _icons::is_installed() {
     local current
     current="$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null || true)"
-    [[ "$current" == "'Papirus-Dark'" ]]
+    [[ "$current" == "'Papirus-Dark'" ]] \
+        || [[ "$current" == "'Papirus-Adwaita'" ]] \
+        || [[ "$current" == "'Papirus-Dark-Adwaita'" ]]
+}
+
+_icons::active_variant() {
+    local current
+    current="$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null || true)"
+    case "$current" in
+        "'Papirus-Dark'")          echo "catppuccin" ;;
+        "'Papirus-Adwaita'")       echo "adwaita" ;;
+        "'Papirus-Dark-Adwaita'")  echo "adwaita-dark" ;;
+        *)                         echo "none" ;;
+    esac
 }
 
 icons::check() {
@@ -27,42 +40,63 @@ icons::apply() {
     local choice
 
     while true; do
-        local installed=false
-        _icons::is_installed && installed=true
+        local variant
+        variant="$(_icons::active_variant)"
 
         ui::clear_content
         log::nav "GNOME > Appearance > Icons"
         log::break
 
-        log::info "Papirus Icons + Catppuccin"
+        log::info "Papirus Icons"
 
-        if $installed; then
-            log::ok "Icon theme: Papirus-Dark with Catppuccin"
-        else
-            local current
-            current="$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null || true)"
-            log::warn "Icon theme: ${current} (not Papirus-Dark)"
-        fi
+        case "$variant" in
+            "catppuccin")   log::ok "Icon theme: Papirus-Dark with Catppuccin folders" ;;
+            "adwaita")      log::ok "Icon theme: Papirus with Adwaita folders" ;;
+            "adwaita-dark") log::ok "Icon theme: Papirus-Dark with Adwaita folders" ;;
+            *)
+                local current
+                current="$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null || true)"
+                log::warn "Icon theme: ${current}"
+                ;;
+        esac
 
         log::break
 
         local options=()
 
-        if $installed; then
-            options+=("Change Folder Color" "Revert Icons")
-        else
-            options+=("Install Papirus" "Install Papirus + Catppuccin")
-        fi
+        case "$variant" in
+            "catppuccin")
+                options+=("Change Folder Color" "Revert Icons")
+                ;;
+            "adwaita"|"adwaita-dark")
+                options+=("Revert Icons")
+                ;;
+            *)
+                options+=("Install Papirus" "Install Papirus + Catppuccin" \
+                    "Install Papirus + Adwaita Folders" "Install Papirus-Dark + Adwaita Folders")
+                ;;
+        esac
 
         options+=("Back" "Exit")
 
-        choice="$(gum::choose \
-            --header "Select a change to apply:" \
-            --header.foreground "$HEX_LAVENDER" \
-            --cursor.foreground "$HEX_BLUE" \
-            --item.foreground "$HEX_TEXT" \
-            --selected.foreground "$HEX_GREEN" \
-            "${options[@]}")"
+        if [[ "${#options[@]}" -ge 5 ]]; then
+            choice="$(gum::filter \
+                --header "Select a change to apply:" \
+                --header.foreground "$HEX_LAVENDER" \
+                --indicator.foreground "$HEX_BLUE" \
+                --text.foreground "$HEX_TEXT" \
+                --match.foreground "$HEX_MAUVE" \
+                --cursor-text.foreground "$HEX_GREEN" \
+                "${options[@]}")"
+        else
+            choice="$(gum::choose \
+                --header "Select a change to apply:" \
+                --header.foreground "$HEX_LAVENDER" \
+                --cursor.foreground "$HEX_BLUE" \
+                --item.foreground "$HEX_TEXT" \
+                --selected.foreground "$HEX_GREEN" \
+                "${options[@]}")"
+        fi
 
         case "$choice" in
             ""|"Back")
@@ -79,6 +113,14 @@ icons::apply() {
             "Install Papirus + Catppuccin")
                 log::break
                 _icons::install
+                ;;
+            "Install Papirus + Adwaita Folders")
+                log::break
+                _icons::install_adwaita_folders "Papirus"
+                ;;
+            "Install Papirus-Dark + Adwaita Folders")
+                log::break
+                _icons::install_adwaita_folders "Papirus-Dark"
                 ;;
             "Change Folder Color")
                 log::break
@@ -200,6 +242,78 @@ _icons::change_color() {
     fi
 
     rm -rf "$tmpdir"
+}
+
+_icons::install_adwaita_folders() {
+    local base="${1:-Papirus}"  # Papirus or Papirus-Dark
+    local theme_name="${base}-Adwaita"
+
+    # Ensure Papirus is installed
+    if ! dpkg -l papirus-icon-theme 2>/dev/null | grep -q '^ii'; then
+        log::info "Installing Papirus icon theme"
+        ui::flush_input
+        if ! sudo apt-get install -y papirus-icon-theme </dev/tty; then
+            log::error "Failed to install Papirus"
+            return 1
+        fi
+        hash -r
+        log::ok "Papirus installed"
+    fi
+
+    local adwaita="/usr/share/icons/Adwaita"
+    if [[ ! -d "$adwaita" ]]; then
+        log::error "Adwaita icons not found at $adwaita"
+        return 1
+    fi
+
+    local theme_dir="$HOME/.local/share/icons/${theme_name}"
+    log::info "Creating ${theme_name} theme"
+    mkdir -p "$theme_dir/16x16" "$theme_dir/scalable" "$theme_dir/symbolic"
+
+    local dir
+    for dir in 16x16/places scalable/places symbolic/places; do
+        local src="$adwaita/$dir"
+        local dst="$theme_dir/$dir"
+        if [[ -d "$src" ]]; then
+            rm -rf "$dst"
+            ln -sf "$src" "$dst"
+            log::ok "Linked $dir"
+        else
+            log::warn "Not found: $src (skipped)"
+        fi
+    done
+
+    cat > "$theme_dir/index.theme" << EOF
+[Icon Theme]
+Name=${theme_name}
+Comment=${base} icons with original Adwaita folders
+Inherits=${base},Adwaita,hicolor
+
+Directories=16x16/places,scalable/places,symbolic/places
+
+[16x16/places]
+Size=16
+Type=Fixed
+Context=Places
+
+[scalable/places]
+Size=48
+MinSize=8
+MaxSize=512
+Type=Scalable
+Context=Places
+
+[symbolic/places]
+Size=16
+MinSize=8
+MaxSize=512
+Type=Scalable
+Context=Places
+EOF
+
+    gtk-update-icon-cache "$theme_dir" 2>/dev/null || true
+    gsettings set org.gnome.desktop.interface icon-theme "${theme_name}" || true
+    log::ok "${theme_name} icon theme applied"
 }
 
 _icons::revert() {

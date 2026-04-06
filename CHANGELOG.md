@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-04-06
+
+### Added
+
+- **Papirus + Adwaita Folders** -- new icon variant combining Papirus app icons with original Adwaita folder icons (light variant)
+- **Papirus-Dark + Adwaita Folders** -- same combination using Papirus-Dark as base theme
+
 ## [1.3.0] - 2026-03-25
 
 ### Added
