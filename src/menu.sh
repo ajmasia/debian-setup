@@ -39,7 +39,7 @@ _SEARCH_ARRAYS=(
 # Args: filter ("" = all, "available" = not installed, "installed" = installed only)
 menu::_collect_leaf_tasks() {
     local filter="${1:-}"
-    local arr_name task label desc_var check_fn apply_fn status_fn
+    local arr_name task label desc_var check_fn apply_fn status_fn compat_fn
 
     _COLLECTED_LABELS=()
     _COLLECTED_APPLY_FNS=()
@@ -48,7 +48,8 @@ menu::_collect_leaf_tasks() {
     for arr_name in "${_SEARCH_ARRAYS[@]}"; do
         local -n tasks_ref="$arr_name"
         for task in "${tasks_ref[@]}"; do
-            IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+            IFS='|' read -r label desc_var check_fn apply_fn status_fn compat_fn <<< "$task"
+            [[ -n "$compat_fn" ]] && ! "$compat_fn" 2>/dev/null && continue
             [[ "$apply_fn" == *"::run" ]] && continue
             _COLLECTED_TOTAL=$((_COLLECTED_TOTAL + 1))
             if [[ "$filter" == "available" ]]; then
