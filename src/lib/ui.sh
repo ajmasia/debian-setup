@@ -122,7 +122,6 @@ ui::session_info() {
     _UI_SESSION_LOG_START="$(wc -l < "$log_file")"
 
     log::info "${date_str} - Session started by ${user}@${hostname} running ${os_name}"
-    log::break
 }
 
 ui::goodbye() {
@@ -142,7 +141,6 @@ ui::goodbye() {
 
     log::break
     log::ok "Goodbye!"
-    log::break
 
     exit 0
 }

@@ -43,3 +43,24 @@ system::ram_total() {
 system::uptime() {
     uptime -p 2>/dev/null || uptime
 }
+
+system::distro_id() {
+    if [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        printf '%s' "${ID:-unknown}"
+    else
+        printf 'unknown'
+    fi
+}
+
+distro::is_debian() {
+    [[ "${DISTRO_ID:-}" == "debian" ]]
+}
+
+distro::is_ubuntu() {
+    [[ "${DISTRO_ID:-}" == "ubuntu" ]]
+}
+
+session::is_gnome() {
+    [[ "${XDG_CURRENT_DESKTOP:-}" == *"GNOME"* ]] || [[ "${DESKTOP_SESSION:-}" == *"gnome"* ]]
+}

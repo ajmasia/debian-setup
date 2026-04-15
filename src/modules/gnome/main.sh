@@ -3,22 +3,20 @@
 [[ -n "${_MOD_UI_MODULE_LOADED:-}" ]] && return 0
 _MOD_UI_MODULE_LOADED=1
 
-# Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
+# Task registry: "label|desc_var|check_fn|apply_fn|status_fn[|compat_fn]"
+# compat_fn: if non-empty, called to decide if the task is shown (0 = show, 1 = hide)
 _UI_TASKS=(
-    "${_APPEARANCE_LABEL}|_APPEARANCE_DESC|appearance::check|appearance::run|appearance::status"
-    "${_KEYBOARD_LABEL}|_KEYBOARD_DESC|keyboard::check|keyboard::apply|keyboard::status"
-    "${_TERMCSS_LABEL}|_TERMCSS_DESC|termcss::check|termcss::apply|termcss::status"
-    "${_EXTENSIONS_LABEL}|_EXTENSIONS_DESC|extensions::check|extensions::apply|extensions::status"
-    "${_BROWSERTHEMES_LABEL}|_BROWSERTHEMES_DESC|browserthemes::check|browserthemes::apply|browserthemes::status"
-    "${_APPTHEMES_LABEL}|_APPTHEMES_DESC|appthemes::check|appthemes::run|appthemes::status"
+    "${_KEYBOARD_LABEL}|_KEYBOARD_DESC|keyboard::check|keyboard::apply|keyboard::status|session::is_gnome"
+    "${_EXTENSIONS_LABEL}|_EXTENSIONS_DESC|extensions::check|extensions::apply|extensions::status|session::is_gnome"
     "${_FONTS_LABEL}|_FONTS_DESC|fonts::check|fonts::run|fonts::status"
 )
 
 ui_module::log_status() {
-    local task label desc_var check_fn apply_fn status_fn
+    local task label desc_var check_fn apply_fn status_fn compat_fn
     _log::to_file "info" "UI status"
     for task in "${_UI_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn compat_fn <<< "$task"
+        [[ -n "$compat_fn" ]] && ! "$compat_fn" 2>/dev/null && continue
         if "$check_fn"; then
             _log::to_file "ok" "${label}"
         else
@@ -30,9 +28,10 @@ ui_module::log_status() {
 }
 
 ui_module::has_pending() {
-    local task label desc_var check_fn apply_fn status_fn
+    local task label desc_var check_fn apply_fn status_fn compat_fn
     for task in "${_UI_TASKS[@]}"; do
-        IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+        IFS='|' read -r label desc_var check_fn apply_fn status_fn compat_fn <<< "$task"
+        [[ -n "$compat_fn" ]] && ! "$compat_fn" 2>/dev/null && continue
         if ! "$check_fn"; then
             return 0
         fi
@@ -41,17 +40,18 @@ ui_module::has_pending() {
 }
 
 ui_module::run() {
-    local task label desc_var check_fn apply_fn status_fn choice
+    local task label desc_var check_fn apply_fn status_fn compat_fn choice
 
     while true; do
         ui::clear_content
-        log::nav "UI and Theming"
+        log::nav "UI"
         log::break
 
-        # Build menu items (strip "Configure " prefix)
+        # Build menu items (strip "Configure " prefix), skipping incompatible tasks
         local items=() apply_fns=()
         for task in "${_UI_TASKS[@]}"; do
-            IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+            IFS='|' read -r label desc_var check_fn apply_fn status_fn compat_fn <<< "$task"
+            [[ -n "$compat_fn" ]] && ! "$compat_fn" 2>/dev/null && continue
             items+=("${label#Configure }")
             apply_fns+=("$apply_fn")
         done

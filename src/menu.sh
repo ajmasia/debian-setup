@@ -31,8 +31,6 @@ _SEARCH_ARRAYS=(
     _PRODUCTIVITY_TASKS
     _FONTS_TASKS
     _UI_TASKS
-    _APPEARANCE_TASKS
-    _APPTHEMES_TASKS
 )
 
 # --- Search helpers ---
@@ -41,7 +39,7 @@ _SEARCH_ARRAYS=(
 # Args: filter ("" = all, "available" = not installed, "installed" = installed only)
 menu::_collect_leaf_tasks() {
     local filter="${1:-}"
-    local arr_name task label desc_var check_fn apply_fn status_fn
+    local arr_name task label desc_var check_fn apply_fn status_fn compat_fn
 
     _COLLECTED_LABELS=()
     _COLLECTED_APPLY_FNS=()
@@ -50,7 +48,8 @@ menu::_collect_leaf_tasks() {
     for arr_name in "${_SEARCH_ARRAYS[@]}"; do
         local -n tasks_ref="$arr_name"
         for task in "${tasks_ref[@]}"; do
-            IFS='|' read -r label desc_var check_fn apply_fn status_fn <<< "$task"
+            IFS='|' read -r label desc_var check_fn apply_fn status_fn compat_fn <<< "$task"
+            [[ -n "$compat_fn" ]] && ! "$compat_fn" 2>/dev/null && continue
             [[ "$apply_fn" == *"::run" ]] && continue
             _COLLECTED_TOTAL=$((_COLLECTED_TOTAL + 1))
             if [[ "$filter" == "available" ]]; then
@@ -111,7 +110,7 @@ _MENU_CATEGORIES=(
     "Shell Tools|shell::run"
     "Development|development::run"
     "Dotfiles|dotfiles::apply"
-    "UI and Theming|ui_module::run"
+    "UI|ui_module::run"
     "Software|software::run"
     "Virtualization|virtualization::run"
     "Settings|settings::run"
@@ -204,7 +203,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System Essentials" "Package Managers" "Hardware Support" "OpenSSH Server" "Git" "Shell Tools" "Development" "Dotfiles" "UI and Theming" "Software" "Virtualization" "⚙ Settings" "Exit")
+        items=("System Essentials" "Package Managers" "Hardware Support" "OpenSSH Server" "Git" "Shell Tools" "Development" "Dotfiles" "UI" "Software" "Virtualization" "⚙ Settings" "Exit")
 
         choice="$(gum::filter \
             --height 15 \
@@ -250,7 +249,7 @@ menu::main() {
                 development::run
                 ui::clear_content
                 ;;
-            "UI and Theming")
+            "UI")
                 ui_module::run
                 ui::clear_content
                 ;;

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-trap 'ui::spin_stop 2>/dev/null; printf "\n"; exit 130' INT
+trap 'ui::spin_stop 2>/dev/null; exit 130' INT
 
 SCRIPT_SOURCE="${BASH_SOURCE[0]}"
 while [[ -L "$SCRIPT_SOURCE" ]]; do
@@ -17,6 +17,8 @@ source "${SCRIPT_DIR}/src/lib/colors.sh"
 source "${SCRIPT_DIR}/src/lib/xdg.sh"
 source "${SCRIPT_DIR}/src/lib/log.sh"
 source "${SCRIPT_DIR}/src/lib/system.sh"
+declare -gx DISTRO_ID
+DISTRO_ID="$(system::distro_id)"
 
 # When running as root, sudo is unnecessary — define pass-through
 if [[ $EUID -eq 0 ]]; then
@@ -36,9 +38,7 @@ source "${SCRIPT_DIR}/src/modules/system/editor.sh"
 source "${SCRIPT_DIR}/src/modules/system/zram.sh"
 source "${SCRIPT_DIR}/src/modules/system/kernel.sh"
 source "${SCRIPT_DIR}/src/modules/system/watchers.sh"
-source "${SCRIPT_DIR}/src/modules/system/plymouth.sh"
 source "${SCRIPT_DIR}/src/modules/system/grub.sh"
-source "${SCRIPT_DIR}/src/modules/system/hibernate.sh"
 source "${SCRIPT_DIR}/src/modules/system/main.sh"
 source "${SCRIPT_DIR}/src/modules/packages/upgrade.sh"
 source "${SCRIPT_DIR}/src/modules/packages/apt.sh"
@@ -146,17 +146,8 @@ source "${SCRIPT_DIR}/src/modules/software/productivity.sh"
 source "${SCRIPT_DIR}/src/modules/software/nerdfonts.sh"
 source "${SCRIPT_DIR}/src/modules/software/fonts.sh"
 source "${SCRIPT_DIR}/src/modules/software/main.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/gtktheme.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/icons.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/cursors.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/termprofile.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/windowbuttons.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/appearance.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/keyboard.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/termcss.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/extensions.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/browserthemes.sh"
-source "${SCRIPT_DIR}/src/modules/gnome/appthemes.sh"
 source "${SCRIPT_DIR}/src/modules/gnome/main.sh"
 source "${SCRIPT_DIR}/src/modules/settings/completions.sh"
 source "${SCRIPT_DIR}/src/modules/settings/about.sh"
@@ -236,7 +227,9 @@ main() {
         ui::clear
         log::break
         ui::header "$VERSION"
+        log::info "$(system::os)"
         ui::session_info
+        log::break
         menu::jump "$_jump_target"
         return 0
     fi
@@ -246,7 +239,9 @@ main() {
     ui::clear
     log::break
     ui::header "$VERSION"
+    log::info "$(system::os)"
     ui::session_info
+    log::break
 
     case "${_search_mode:-0}" in
         1) menu::search ;;
