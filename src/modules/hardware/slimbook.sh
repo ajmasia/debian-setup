@@ -7,7 +7,14 @@ _SLIMBOOK_LABEL="Configure Slimbook"
 _SLIMBOOK_DESC="Install Slimbook repository and EVO/GNOME meta-packages."
 
 _SLIMBOOK_GPG_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/keys/slimbook.gpg"
-_SLIMBOOK_LIST_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/sources/slimbook.list"
+case "${DISTRO_ID:-debian}" in
+    ubuntu)
+        _SLIMBOOK_LIST_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/sources/slimbook-ubuntu.list"
+        ;;
+    *)
+        _SLIMBOOK_LIST_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/sources/slimbook.list"
+        ;;
+esac
 _SLIMBOOK_GPG_PATH="/etc/apt/trusted.gpg.d/slimbook.gpg"
 _SLIMBOOK_LIST_PATH="/etc/apt/sources.list.d/slimbook.list"
 
