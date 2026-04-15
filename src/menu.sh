@@ -31,8 +31,6 @@ _SEARCH_ARRAYS=(
     _PRODUCTIVITY_TASKS
     _FONTS_TASKS
     _UI_TASKS
-    _APPEARANCE_TASKS
-    _APPTHEMES_TASKS
 )
 
 # --- Search helpers ---
@@ -111,7 +109,7 @@ _MENU_CATEGORIES=(
     "Shell Tools|shell::run"
     "Development|development::run"
     "Dotfiles|dotfiles::apply"
-    "UI and Theming|ui_module::run"
+    "UI|ui_module::run"
     "Software|software::run"
     "Virtualization|virtualization::run"
     "Settings|settings::run"
@@ -204,7 +202,7 @@ menu::main() {
     local choice items
 
     while true; do
-        items=("System Essentials" "Package Managers" "Hardware Support" "OpenSSH Server" "Git" "Shell Tools" "Development" "Dotfiles" "UI and Theming" "Software" "Virtualization" "⚙ Settings" "Exit")
+        items=("System Essentials" "Package Managers" "Hardware Support" "OpenSSH Server" "Git" "Shell Tools" "Development" "Dotfiles" "UI" "Software" "Virtualization" "⚙ Settings" "Exit")
 
         choice="$(gum::filter \
             --height 15 \
@@ -250,7 +248,7 @@ menu::main() {
                 development::run
                 ui::clear_content
                 ;;
-            "UI and Theming")
+            "UI")
                 ui_module::run
                 ui::clear_content
                 ;;

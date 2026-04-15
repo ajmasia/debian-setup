@@ -5,12 +5,8 @@ _MOD_UI_MODULE_LOADED=1
 
 # Task registry: "label|desc_var|check_fn|apply_fn|status_fn"
 _UI_TASKS=(
-    "${_APPEARANCE_LABEL}|_APPEARANCE_DESC|appearance::check|appearance::run|appearance::status"
     "${_KEYBOARD_LABEL}|_KEYBOARD_DESC|keyboard::check|keyboard::apply|keyboard::status"
-    "${_TERMCSS_LABEL}|_TERMCSS_DESC|termcss::check|termcss::apply|termcss::status"
     "${_EXTENSIONS_LABEL}|_EXTENSIONS_DESC|extensions::check|extensions::apply|extensions::status"
-    "${_BROWSERTHEMES_LABEL}|_BROWSERTHEMES_DESC|browserthemes::check|browserthemes::apply|browserthemes::status"
-    "${_APPTHEMES_LABEL}|_APPTHEMES_DESC|appthemes::check|appthemes::run|appthemes::status"
     "${_FONTS_LABEL}|_FONTS_DESC|fonts::check|fonts::run|fonts::status"
 )
 
@@ -45,7 +41,7 @@ ui_module::run() {
 
     while true; do
         ui::clear_content
-        log::nav "UI and Theming"
+        log::nav "UI"
         log::break
 
         # Build menu items (strip "Configure " prefix)

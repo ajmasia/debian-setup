@@ -39,7 +39,7 @@ fonts::run() {
 
     while true; do
         ui::clear_content
-        log::nav "UI and Theming > Fonts"
+        log::nav "UI > Fonts"
         log::break
 
         # Show warnings for tasks that need attention
