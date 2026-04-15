@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-04-15
+
+### Added
+
+- **Distro detection** -- detects the running distro at startup (`system::distro_id`) and exports `DISTRO_ID` for use across all modules
+- **OS info at startup** -- displays the current OS as `[info]` on launch
+- **Session detection** -- `session::is_gnome` detects active GNOME session to conditionally show GNOME-specific options
+- **Ubuntu support** -- APT sources module adapts URIs, keyring, file name and components for Ubuntu; backports and deb-src toggles work on both Debian and Ubuntu
+- **Compat filtering** -- optional sixth field `compat_fn` in task registry; tasks hidden when their compat function returns false
+
+### Changed
+
+- **UI category** renamed from "UI and Theming" to "UI"
+- **Keyboard and Extensions** hidden outside GNOME sessions
+- **Sudoers and Password Feedback** hidden on Ubuntu (handled by default)
+- **Kernel backports** hidden on Ubuntu (Debian-only concept)
+- **Slimbook** uses Ubuntu-specific repo list when running on Ubuntu
+- **Startup display** shows distro info before session line, with a single blank line before the menu
+
+### Removed
+
+- **Appearance, Terminal CSS, Browser Themes, App Themes** modules removed (overly personal theming)
+- **Plymouth** module removed
+- **Hibernate** module removed
+
 ## [1.4.0] - 2026-04-06
 
 ### Added
