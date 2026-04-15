@@ -17,6 +17,8 @@ source "${SCRIPT_DIR}/src/lib/colors.sh"
 source "${SCRIPT_DIR}/src/lib/xdg.sh"
 source "${SCRIPT_DIR}/src/lib/log.sh"
 source "${SCRIPT_DIR}/src/lib/system.sh"
+declare -gx DISTRO_ID
+DISTRO_ID="$(system::distro_id)"
 
 # When running as root, sudo is unnecessary — define pass-through
 if [[ $EUID -eq 0 ]]; then
@@ -36,9 +38,7 @@ source "${SCRIPT_DIR}/src/modules/system/editor.sh"
 source "${SCRIPT_DIR}/src/modules/system/zram.sh"
 source "${SCRIPT_DIR}/src/modules/system/kernel.sh"
 source "${SCRIPT_DIR}/src/modules/system/watchers.sh"
-source "${SCRIPT_DIR}/src/modules/system/plymouth.sh"
 source "${SCRIPT_DIR}/src/modules/system/grub.sh"
-source "${SCRIPT_DIR}/src/modules/system/hibernate.sh"
 source "${SCRIPT_DIR}/src/modules/system/main.sh"
 source "${SCRIPT_DIR}/src/modules/packages/upgrade.sh"
 source "${SCRIPT_DIR}/src/modules/packages/apt.sh"
@@ -227,7 +227,9 @@ main() {
         ui::clear
         log::break
         ui::header "$VERSION"
+        log::info "$(system::os)"
         ui::session_info
+        log::break
         menu::jump "$_jump_target"
         return 0
     fi
@@ -237,7 +239,9 @@ main() {
     ui::clear
     log::break
     ui::header "$VERSION"
+    log::info "$(system::os)"
     ui::session_info
+    log::break
 
     case "${_search_mode:-0}" in
         1) menu::search ;;
