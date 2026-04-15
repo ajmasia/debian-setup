@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2026-04-15
+
+### Fixed
+
+- **Slimbook on Ubuntu** -- use the same repo list URL as Debian (ubuntu-specific URL was failing); errors now remain visible for 2 seconds before the screen clears
+- **GRUB on Ubuntu** -- Debian theme options (disable/enable/restore) hidden when not running Debian
+- **Startup info** -- distro, available package managers and session log now displayed as three separate lines; removed duplicate OS line
+- **Settings > About** -- new System section shows OS and available package managers
+
 ## [1.5.0] - 2026-04-15
 
 ### Added

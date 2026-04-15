@@ -7,14 +7,7 @@ _SLIMBOOK_LABEL="Configure Slimbook"
 _SLIMBOOK_DESC="Install Slimbook repository and EVO/GNOME meta-packages."
 
 _SLIMBOOK_GPG_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/keys/slimbook.gpg"
-case "${DISTRO_ID:-debian}" in
-    ubuntu)
-        _SLIMBOOK_LIST_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/sources/slimbook-ubuntu.list"
-        ;;
-    *)
-        _SLIMBOOK_LIST_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/sources/slimbook.list"
-        ;;
-esac
+_SLIMBOOK_LIST_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-base-files/main/sources/slimbook.list"
 _SLIMBOOK_GPG_PATH="/etc/apt/trusted.gpg.d/slimbook.gpg"
 _SLIMBOOK_LIST_PATH="/etc/apt/sources.list.d/slimbook.list"
 
@@ -133,11 +126,13 @@ _slimbook::_install() {
 
         if ! curl -fsSL "$_SLIMBOOK_GPG_URL" -o "$tmp_gpg"; then
             log::error "Failed to download Slimbook GPG key"
+            sleep 2
             return
         fi
 
         if ! curl -fsSL "$_SLIMBOOK_LIST_URL" -o "$tmp_list"; then
             log::error "Failed to download Slimbook sources list"
+            sleep 2
             return
         fi
 
@@ -149,6 +144,7 @@ _slimbook::_install() {
 
         if ! _slimbook::has_repo; then
             log::error "Failed to configure Slimbook repository"
+            sleep 2
             return
         fi
 
@@ -180,6 +176,7 @@ _slimbook::_install() {
         log::ok "Slimbook EVO packages installed"
     else
         log::error "Failed to install Slimbook packages"
+        sleep 2
     fi
 }
 

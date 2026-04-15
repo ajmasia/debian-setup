@@ -228,6 +228,7 @@ main() {
         log::break
         ui::header "$VERSION"
         log::info "$(system::os)"
+        log::info "Package managers: $(system::package_managers)"
         ui::session_info
         log::break
         menu::jump "$_jump_target"
@@ -240,6 +241,7 @@ main() {
     log::break
     ui::header "$VERSION"
     log::info "$(system::os)"
+    log::info "Package managers: $(system::package_managers)"
     ui::session_info
     log::break
 

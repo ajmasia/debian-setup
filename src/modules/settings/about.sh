@@ -15,5 +15,10 @@ about::run() {
     log::ok "Shell:         ${BASH_VERSION}"
     log::break
 
+    log::info "System"
+    log::ok "OS:            $(system::os)"
+    log::ok "Packages:      $(system::package_managers)"
+    log::break
+
     ui::return_or_exit
 }

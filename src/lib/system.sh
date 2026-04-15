@@ -57,6 +57,15 @@ distro::is_debian() {
     [[ "${DISTRO_ID:-}" == "debian" ]]
 }
 
+system::package_managers() {
+    local managers=()
+    local mgr
+    for mgr in apt nala flatpak snap nix brew; do
+        command -v "$mgr" &>/dev/null && managers+=("$mgr")
+    done
+    printf '%s' "${managers[*]}"
+}
+
 distro::is_ubuntu() {
     [[ "${DISTRO_ID:-}" == "ubuntu" ]]
 }
