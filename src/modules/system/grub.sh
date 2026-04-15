@@ -40,7 +40,7 @@ grub::check() {
 grub::status() {
     local issues=()
     _grub::gfxmode_set || issues+=("default resolution")
-    if [[ -f "$_GRUB_DEBIAN_THEME" && -x "$_GRUB_DEBIAN_THEME" ]]; then
+    if [[ "${DISTRO_ID:-debian}" == "debian" ]] && [[ -f "$_GRUB_DEBIAN_THEME" && -x "$_GRUB_DEBIAN_THEME" ]]; then
         issues+=("Debian theme active")
     fi
     if [[ ${#issues[@]} -gt 0 ]]; then
@@ -83,14 +83,15 @@ grub::apply() {
             log::warn "Boot resolution: native (not inherited)"
         fi
 
-        # Show Debian theme status
+        # Show Debian theme status (Debian only)
         local theme_disabled=false
-        [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]] && theme_disabled=true
-
-        if $theme_disabled; then
-            log::ok "Debian theme: disabled"
-        elif [[ -f "$_GRUB_DEBIAN_THEME" ]]; then
-            log::warn "Debian theme: active"
+        if [[ "${DISTRO_ID:-debian}" == "debian" ]]; then
+            [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]] && theme_disabled=true
+            if $theme_disabled; then
+                log::ok "Debian theme: disabled"
+            elif [[ -f "$_GRUB_DEBIAN_THEME" ]]; then
+                log::warn "Debian theme: active"
+            fi
         fi
 
         # Show silent boot status
@@ -115,18 +116,20 @@ grub::apply() {
         if $payload_on; then
             options+=("Use native resolution during boot")
         fi
-        if ! $theme_disabled && [[ -f "$_GRUB_DEBIAN_THEME" ]]; then
-            options+=("Disable Debian theme")
-        fi
-        if $theme_disabled; then
-            options+=("Enable Debian theme")
+        if [[ "${DISTRO_ID:-debian}" == "debian" ]]; then
+            if ! $theme_disabled && [[ -f "$_GRUB_DEBIAN_THEME" ]]; then
+                options+=("Disable Debian theme")
+            fi
+            if $theme_disabled; then
+                options+=("Enable Debian theme")
+            fi
         fi
         if ! $silent_on; then
             options+=("Enable silent boot")
         else
             options+=("Disable silent boot")
         fi
-        if $gfxmode_ok || $theme_disabled || $payload_on || $silent_on; then
+        if $gfxmode_ok || ([[ "${DISTRO_ID:-debian}" == "debian" ]] && $theme_disabled) || $payload_on || $silent_on; then
             options+=("Restore defaults")
         fi
         options+=("Back" "Exit")
@@ -334,7 +337,7 @@ _grub::restore_defaults() {
         sudo sed -i '/^GRUB_GFXPAYLOAD_LINUX=/d' "$_GRUB_CONF" </dev/tty
         log::ok "GRUB_GFXPAYLOAD_LINUX removed"
     fi
-    if [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]]; then
+    if [[ "${DISTRO_ID:-debian}" == "debian" ]] && [[ -f "$_GRUB_DEBIAN_THEME" && ! -x "$_GRUB_DEBIAN_THEME" ]]; then
         sudo chmod +x "$_GRUB_DEBIAN_THEME" </dev/tty
         log::ok "Debian theme re-enabled"
     fi
