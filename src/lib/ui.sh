@@ -141,7 +141,6 @@ ui::goodbye() {
 
     log::break
     log::ok "Goodbye!"
-    log::break
 
     exit 0
 }
