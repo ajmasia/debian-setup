@@ -15,7 +15,9 @@ PATH_MARKER="# debian-setup"
 BASH_COMP_DIR="$HOME/.local/share/bash-completion/completions"
 ZSH_COMP_DIR="$HOME/.local/share/zsh/site-functions"
 BASH_COMP_LINK="${BASH_COMP_DIR}/debian-setup"
+BASH_COMP_LINK_DS="${BASH_COMP_DIR}/ds"
 ZSH_COMP_LINK="${ZSH_COMP_DIR}/_debian-setup"
+ZSH_COMP_LINK_DS="${ZSH_COMP_DIR}/_ds"
 
 # Colors (self-contained, no deps)
 RED='\033[0;31m'
@@ -77,10 +79,12 @@ refresh_completions() {
     local refreshed=false
     if [[ -L "$BASH_COMP_LINK" ]]; then
         ln -sf "${INSTALL_DIR}/completions/debian-setup.bash" "$BASH_COMP_LINK"
+        ln -sf "${INSTALL_DIR}/completions/debian-setup.bash" "$BASH_COMP_LINK_DS"
         refreshed=true
     fi
     if [[ -L "$ZSH_COMP_LINK" ]]; then
         ln -sf "${INSTALL_DIR}/completions/debian-setup.zsh" "$ZSH_COMP_LINK"
+        ln -sf "${INSTALL_DIR}/completions/debian-setup.zsh" "$ZSH_COMP_LINK_DS"
         refreshed=true
     fi
     $refreshed && ok "Shell completions refreshed"
@@ -88,7 +92,9 @@ refresh_completions() {
 
 remove_completions() {
     [[ -L "$BASH_COMP_LINK" ]] && rm "$BASH_COMP_LINK"
+    [[ -L "$BASH_COMP_LINK_DS" ]] && rm "$BASH_COMP_LINK_DS"
     [[ -L "$ZSH_COMP_LINK" ]] && rm "$ZSH_COMP_LINK"
+    [[ -L "$ZSH_COMP_LINK_DS" ]] && rm "$ZSH_COMP_LINK_DS"
     ok "Shell completions removed"
 }
 
@@ -103,6 +109,59 @@ clean_path() {
 }
 
 # --- Actions ----------------------------------------------------------------
+
+install_gum() {
+    if command -v gum &>/dev/null; then
+        ok "gum already installed"
+        return 0
+    fi
+
+    info "Installing gum (required dependency)..."
+
+    if ! command -v gpg &>/dev/null; then
+        info "Installing gpg..."
+        if sudo -n true 2>/dev/null || groups | grep -qw sudo; then
+            sudo apt-get update -qq && sudo apt-get install -y gpg
+        else
+            su -c "apt-get update -qq && apt-get install -y gpg" </dev/tty
+        fi
+    fi
+
+    local tmpkey
+    tmpkey="$(mktemp)"
+    if ! curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o "$tmpkey"; then
+        rm -f "$tmpkey"
+        error "Failed to download gum GPG key"
+        exit 1
+    fi
+
+    if sudo -n true 2>/dev/null || groups | grep -qw sudo; then
+        sudo mkdir -p /etc/apt/keyrings
+        sudo mv "$tmpkey" /etc/apt/keyrings/charm.gpg
+        sudo chmod 644 /etc/apt/keyrings/charm.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" \
+            | sudo tee /etc/apt/sources.list.d/charm.list > /dev/null
+        sudo apt-get update -qq
+        sudo apt-get install -y gum
+    else
+        su -c "
+            mkdir -p /etc/apt/keyrings
+            mv '$tmpkey' /etc/apt/keyrings/charm.gpg
+            chmod 644 /etc/apt/keyrings/charm.gpg
+            echo 'deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *' \
+                > /etc/apt/sources.list.d/charm.list
+            apt-get update -qq
+            apt-get install -y gum
+        " </dev/tty
+    fi
+
+    if ! command -v gum &>/dev/null; then
+        error "gum installation failed"
+        exit 1
+    fi
+
+    ok "gum installed"
+}
 
 do_install() {
     info "Installing ${APP_NAME}..."
@@ -127,6 +186,10 @@ do_install() {
         error "Failed to clone repository"
         exit 1
     fi
+
+    # gum (hard dependency)
+    printf "\n"
+    install_gum
 
     # Symlinks
     mkdir -p "$BIN_DIR"
