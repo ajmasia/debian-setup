@@ -60,7 +60,7 @@ distro::is_debian() {
 system::is_slimbook() {
     local vendor
     vendor="$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)"
-    [[ "$vendor" == *"Slimbook"* ]]
+    [[ "${vendor,,}" == *"slimbook"* ]]
 }
 
 system::package_managers() {
