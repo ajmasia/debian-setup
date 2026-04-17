@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.4] - 2026-04-17
+
+### Added
+
+- **Update notifications** -- on startup, checks for a newer version in the background; shows `[info] ⚡ New version available: vX.X.X — run ds --update` when a new release is detected. Cache refreshes every 24h to avoid unnecessary network requests.
+
 ## [1.6.3] - 2026-04-17
 
 ### Added

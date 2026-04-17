@@ -236,6 +236,7 @@ main() {
         log::info "$(system::os)"
         log::info "Package managers: $(system::package_managers)"
         ui::session_info
+        system::check_update "$VERSION"
         log::break
         menu::jump "$_jump_target"
         return 0
@@ -249,6 +250,7 @@ main() {
     log::info "$(system::os)"
     log::info "Package managers: $(system::package_managers)"
     ui::session_info
+    system::check_update "$VERSION"
     log::break
 
     case "${_search_mode:-0}" in
