@@ -18,7 +18,7 @@ _debian_setup() {
     esac
 
     # Complete flags
-    COMPREPLY=($(compgen -W "-v --version -h --help -s --search -si --search-to-install -sr --search-to-remove -l --list -o --option --update --uninstall" -- "$cur"))
+    COMPREPLY=($(compgen -W "-v --version -h --help -s --search -si --search-to-install -sr --search-to-remove -l --list -o --option --completions --update --uninstall" -- "$cur"))
 }
 
-complete -F _debian_setup debian-setup
+complete -F _debian_setup debian-setup ds

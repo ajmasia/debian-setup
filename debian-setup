@@ -155,12 +155,12 @@ source "${SCRIPT_DIR}/src/modules/settings/logs.sh"
 source "${SCRIPT_DIR}/src/modules/settings/main.sh"
 
 show_version() {
-    printf "debian-setup %s\n" "$VERSION"
+    printf "%s %s\n" "$(basename "$0")" "$VERSION"
 }
 
 show_help() {
-    printf "debian-setup %s\n\n" "$VERSION"
-    printf "Usage: debian-setup [options]\n\n"
+    printf "%s %s\n\n" "$(basename "$0")" "$VERSION"
+    printf "Usage: %s [options]\n\n" "$(basename "$0")"
     printf "Options:\n"
     printf "  -v, --version             Show version\n"
     printf "  -h, --help                Show this help message\n"
@@ -169,6 +169,7 @@ show_help() {
     printf "  -sr, --search-to-remove   Search only installed (removable) options\n"
     printf "  -l, --list                List all available tasks\n"
     printf "  -o, --option <name>       Jump directly to a task or category\n"
+    printf "  --completions [bash|zsh]  Install shell completions (default: current shell)\n"
     printf "  --update                  Update to latest version\n"
     printf "  --uninstall               Remove debian-setup\n"
 }
@@ -187,6 +188,11 @@ main() {
             ;;
         -l|--list)
             menu::list
+            return 0
+            ;;
+        --completions)
+            local _completions_shell="${2:-}"
+            completions::install $_completions_shell
             return 0
             ;;
         --update)

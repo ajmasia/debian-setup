@@ -1,4 +1,4 @@
-#compdef debian-setup
+#compdef debian-setup ds
 
 _debian_setup() {
     local -a flags
@@ -17,6 +17,7 @@ _debian_setup() {
         '--list:List all available tasks'
         '-o:Jump directly to a task or category'
         '--option:Jump directly to a task or category'
+        '--completions:Install shell completions'
         '--update:Update to latest version'
         '--uninstall:Remove debian-setup'
     )

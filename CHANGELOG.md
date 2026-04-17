@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-04-17
+
+### Added
+
+- **`ds` command** -- installer creates `ds` and `debian-setup` symlinks; both work identically
+- **`--completions` flag** -- install shell completions from the CLI without entering the interactive menu; defaults to current shell
+
+### Changed
+
+- **Help and version** -- output now reflects the command name used to invoke the tool (`ds` or `debian-setup`)
+- **Completions** -- registered for both `ds` and `debian-setup` automatically
+
 ## [1.5.2] - 2026-04-17
 
 ### Changed
