@@ -110,18 +110,13 @@ system::check_update() {
     local latest
     latest="$(cat "$_UPDATE_CHECK_CACHE" 2>/dev/null)" || latest=""
 
-    # Fast path: fresh cache with a known newer version
+    # Fast path: fresh cache already shows a newer version — skip fetch
     if [[ -n "$latest" ]] && ! system::_update_cache_stale && system::_version_gt "$current" "$latest"; then
         log::info "⚡ New version available: v${latest} — run ds --update"
         return 0
     fi
 
-    # Fast path: fresh cache matches current (up to date as of last check)
-    if [[ -n "$latest" ]] && ! system::_update_cache_stale && [[ "$latest" == "$current" ]]; then
-        return 0
-    fi
-
-    # Fetch: no cache, stale cache, or cache is behind current (user updated since last check)
+    # Fetch whenever cache is absent, stale, or not ahead of current
     local fetched
     fetched="$(system::_fetch_latest_version)" || fetched=""
     if [[ -n "$fetched" ]]; then
