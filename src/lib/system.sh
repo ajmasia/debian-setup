@@ -57,6 +57,12 @@ distro::is_debian() {
     [[ "${DISTRO_ID:-}" == "debian" ]]
 }
 
+system::is_slimbook() {
+    local vendor
+    vendor="$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)"
+    [[ "$vendor" == *"Slimbook"* ]]
+}
+
 system::package_managers() {
     local managers=()
     local mgr
@@ -91,29 +97,35 @@ system::_fetch_latest_version() {
         2>/dev/null
 }
 
+system::_version_gt() {
+    [[ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -1)" == "$2" && "$1" != "$2" ]]
+}
+
 system::check_update() {
     local current="$1"
-
     local latest
     latest="$(cat "$_UPDATE_CHECK_CACHE" 2>/dev/null)"
 
-    if [[ -n "$latest" && "$latest" != "$current" ]] && \
-       [[ "$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -1)" == "$latest" ]]; then
+    # Fast path: fresh cache with a known newer version
+    if [[ -n "$latest" ]] && ! system::_update_cache_stale && system::_version_gt "$current" "$latest"; then
         log::info "⚡ New version available: v${latest} — run ds --update"
         return 0
     fi
 
-    # Refresh when no cache, or cache <= current (up to date or manually updated ahead of cache)
-    if [[ -z "$latest" ]] || \
-       [[ "$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -1)" == "$current" ]]; then
-        (
-            local fetched
-            fetched="$(system::_fetch_latest_version)"
-            if [[ -n "$fetched" ]]; then
-                mkdir -p "$(dirname "$_UPDATE_CHECK_CACHE")"
-                printf '%s' "$fetched" > "$_UPDATE_CHECK_CACHE"
-            fi
-        ) &>/dev/null &
-        disown
+    # Fast path: fresh cache matches current (up to date as of last check)
+    if [[ -n "$latest" ]] && ! system::_update_cache_stale && [[ "$latest" == "$current" ]]; then
+        return 0
+    fi
+
+    # Fetch: no cache, stale cache, or cache is behind current (user updated since last check)
+    local fetched
+    fetched="$(system::_fetch_latest_version)"
+    if [[ -n "$fetched" ]]; then
+        mkdir -p "$(dirname "$_UPDATE_CHECK_CACHE")"
+        printf '%s' "$fetched" > "$_UPDATE_CHECK_CACHE"
+        latest="$fetched"
+    fi
+    if [[ -n "$latest" ]] && system::_version_gt "$current" "$latest"; then
+        log::info "⚡ New version available: v${latest} — run ds --update"
     fi
 }
