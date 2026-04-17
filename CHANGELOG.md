@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.2] - 2026-04-17
+
+### Fixed
+
+- **Version and help** -- `--version` and `--help` always show `debian-setup` as the canonical name regardless of the command used (`ds` or `debian-setup`)
+
 ## [1.6.1] - 2026-04-17
 
 ### Added
