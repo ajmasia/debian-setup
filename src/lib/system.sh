@@ -94,24 +94,25 @@ system::_fetch_latest_version() {
 system::check_update() {
     local current="$1"
 
-    if system::_update_cache_stale; then
-        (
-            local latest
-            latest="$(system::_fetch_latest_version)"
-            if [[ -n "$latest" ]]; then
-                mkdir -p "$(dirname "$_UPDATE_CHECK_CACHE")"
-                printf '%s' "$latest" > "$_UPDATE_CHECK_CACHE"
-            fi
-        ) &>/dev/null &
-        disown
+    local latest
+    latest="$(cat "$_UPDATE_CHECK_CACHE" 2>/dev/null)"
+
+    if [[ -n "$latest" && "$latest" != "$current" ]] && \
+       [[ "$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -1)" == "$latest" ]]; then
+        log::info "⚡ New version available: v${latest} — run ds --update"
         return 0
     fi
 
-    local latest
-    latest="$(cat "$_UPDATE_CHECK_CACHE" 2>/dev/null)"
-    [[ -z "$latest" || "$latest" == "$current" ]] && return 0
-
-    if [[ "$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -1)" == "$latest" ]]; then
-        log::info "⚡ New version available: v${latest} — run ds --update"
+    # Refresh in background when up to date or cache missing (check for next release)
+    if [[ -z "$latest" || "$latest" == "$current" ]]; then
+        (
+            local fetched
+            fetched="$(system::_fetch_latest_version)"
+            if [[ -n "$fetched" ]]; then
+                mkdir -p "$(dirname "$_UPDATE_CHECK_CACHE")"
+                printf '%s' "$fetched" > "$_UPDATE_CHECK_CACHE"
+            fi
+        ) &>/dev/null &
+        disown
     fi
 }
