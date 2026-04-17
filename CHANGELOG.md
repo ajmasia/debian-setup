@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1] - 2026-04-17
+
+### Added
+
+- **gum auto-install** -- installer now installs gum automatically as it is a hard dependency
+
+### Fixed
+
+- **`ds` completions** -- bash lazy-loads completions by command name; added a dedicated `ds` symlink so tab completion works for both `ds` and `debian-setup`
+
 ## [1.6.0] - 2026-04-17
 
 ### Added
