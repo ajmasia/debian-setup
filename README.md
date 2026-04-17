@@ -77,67 +77,189 @@ Run without options to start the interactive menu. Navigate with arrow keys, con
 
 ## Features
 
-### Hardware Support
-- **Slimbook EVO** -- Slimbook repository and EVO/GNOME meta-packages
-
 ### System Essentials
-- **Sudoers / Password Feedback / Default Editor** -- user privileges and environment basics
-- **Zram Swap** -- compressed RAM swap (zstd)
-- **Kernel** -- switch between stable and backports kernel
-- **Inotify Watchers** -- configure `fs.inotify.max_user_watches`
-- **Plymouth** -- boot splash with theme selection (spinner, bgrt, bgrt-luks, community themes)
-- **GRUB** -- resolution, silent boot, Debian theme toggle
-- **Hibernate** -- swap file + suspend-then-hibernate (coexists with zram)
+
+| Option | Description |
+|--------|-------------|
+| Sudoers | Manage `/etc/sudoers.d/${USER}` for sudo privileges |
+| Password Feedback | Enable `pwfeedback` in sudoers (asterisks while typing password) |
+| Default Editor | Set vim as default editor via `EDITOR`/`SUDO_EDITOR` in `~/.bashrc` |
+| Zram Swap | Compressed RAM swap (zstd) via zram-tools |
+| Inotify Watchers | Configure `fs.inotify` limits for development tools |
+| GRUB | Configure GRUB resolution and background image |
+
+### Hardware Support
+
+| Option | Description |
+|--------|-------------|
+| Kernel | Install or revert the Linux kernel from Debian backports |
+| Slimbook | Install Slimbook repository and EVO desktop meta-packages |
 
 ### Package Managers
-- **System Upgrade** -- update, dist-upgrade and autoremove in one step
-- **APT Sources** -- DEB822 format, non-free/backports/deb-src/testing toggles
-- **Flatpak** -- Flatpak with Flathub
-- **Nala / Nix / Homebrew** -- alternative package manager options
+
+| Option | Description |
+|--------|-------------|
+| System Upgrade | Update and upgrade all system packages |
+| APT Sources | Manage sources: DEB822 format, components, backports, deb-src |
+| Flatpak | Install or remove Flatpak with Flathub |
+| Nala | Prettier frontend for APT |
+| Nix | Nix package manager (multi-user daemon mode) |
+| Homebrew | Homebrew package manager |
 
 ### OpenSSH Server
-- **Server** -- install and manage openssh-server with service control
-- **Access** -- toggle pubkey-only, pubkey+password, or password-only
-- **Keys** -- generate ED25519 keys with multi-identity suffix support
-- **Config** -- manage `~/.ssh/config` entries (GitHub, GitLab, custom servers)
-- **Commit Signing** -- SSH-based git signing with `includeIf` for multiple identities
 
-### Development
-- **Environments** -- Node.js (fnm), Python (uv), Rust (rustup), Go
-- **Tools** -- Git (global config + signing), Build Essentials, GitHub CLI, AWS CLI v2, Docker CE, HTTPie, MongoDB Compass
-- **AI** -- Claude Code, OpenCode, GitHub Copilot CLI
+| Option | Description |
+|--------|-------------|
+| Server | Install and manage openssh-server with service control |
+| Access | Set SSH access mode: pubkey-only, pubkey+password, or password-only |
+| Keys | Generate and manage ED25519 SSH keys |
+| Config | Manage `~/.ssh/config` entries for GitHub, GitLab and custom servers |
+| Commit Signing | SSH-based git signing with `allowed_signers` and `includeIf` |
 
-### Dotfiles
-- Clone and apply dotfiles via GNU Stow
+### Git
+
+| Option | Description |
+|--------|-------------|
+| Git | Install git and configure global settings |
 
 ### Shell Tools
-- **Utilities** -- fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, fastfetch, and more
-- **Starship / Zoxide / Atuin / Tmux / Zellij** -- prompt, navigation and shell history
 
-### Virtualization
-- **QEMU/KVM** -- QEMU, libvirt, virt-manager with user groups and default network
+| Option | Description |
+|--------|-------------|
+| Utilities | Common CLI tools: fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, fastfetch |
+| Starship | Cross-shell prompt |
+| Zoxide | Smart directory jumper |
+| Atuin | Shell history manager |
+| Tmux | Terminal multiplexer |
+| Zellij | Terminal multiplexer (Rust-based) |
+| Dotfiles | Clone and apply dotfiles via GNU Stow |
+
+### Development
+
+#### Environments
+
+| Option | Description |
+|--------|-------------|
+| Node.js | fnm (Fast Node Manager) + Node.js LTS |
+| Python | uv (fast Python package manager) |
+| Rust | Rust via rustup (rustc, cargo, rustup) |
+| Go | Go programming language (APT or official tarball) |
+
+#### Tools
+
+| Option | Description |
+|--------|-------------|
+| Build Essentials | Core compilation tools and development libraries |
+| GitHub CLI | `gh` — GitHub CLI |
+| AWS CLI | AWS CLI v2 |
+| Docker | Docker CE |
+| HTTPie | Modern HTTP client |
+| MongoDB Compass | MongoDB GUI |
+
+#### AI
+
+| Option | Description |
+|--------|-------------|
+| Claude Code | Claude Code CLI (native installer) |
+| OpenCode | OpenCode (npm global) |
+| GitHub Copilot CLI | Copilot CLI (gh extension) |
+| AI Resources | Curated AI resources for development |
+
+### UI
+
+| Option | Description |
+|--------|-------------|
+| Keyboard | Keyboard layout, keybindings and fixed workspaces |
+| Extensions | Manage GNOME Shell extensions |
+| Fonts | Install Nerd Font families |
 
 ### Software
-- **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium, Chrome
-- **Editors** -- VS Code (with extensions), Neovim (LazyVim)
-- **Terminals** -- Alacritty, Kitty, Ptyxis
-- **Productivity** -- GIMP, Inkscape, OnlyOffice, LibreOffice, Nextcloud, Obsidian, Calibre, LocalSend, Etcher
-- **Messaging** -- Telegram, Slack, Discord, Element
-- **Security** -- Mullvad VPN, Proton VPN, Proton Pass, KeePassXC, Bitwarden, YubiKey, Nitrokey, OpenPGP
-- **Fonts** -- Nerd Fonts (Noto, Hack, CaskaydiaCove, CaskaydiaMono, FiraCode, Symbols Only)
 
-### UI and Theming
-- **Appearance** -- Catppuccin Mocha GTK theme, Papirus icons with folder colors, Catppuccin cursors, GNOME Terminal profile
-- **Keyboard** -- English intl layout, workspace switching, custom shortcuts
-- **Extensions** -- Blur My Shell, Vitals, AppIndicator, User Themes, and more
-- **App Themes** -- Catppuccin Mocha for btop, Alacritty, Atuin, bat, eza, lazygit, Starship
-- **Fonts** -- Nerd Fonts from GitHub releases
+#### Browsers
+
+| Option | Description |
+|--------|-------------|
+| Brave | Brave browser |
+| LibreWolf | LibreWolf browser via extrepo |
+| Mullvad Browser | Mullvad Browser |
+| Chromium | Chromium browser |
+| Google Chrome | Google Chrome browser |
+
+#### Editors
+
+| Option | Description |
+|--------|-------------|
+| VS Code | Visual Studio Code |
+| Neovim | Neovim with LazyVim |
+
+#### Terminals
+
+| Option | Description |
+|--------|-------------|
+| Alacritty | Alacritty terminal (built from source) |
+| Kitty | Kitty terminal |
+| Ptyxis | Ptyxis terminal |
+
+#### Productivity
+
+| Option | Description |
+|--------|-------------|
+| GIMP | Image editor |
+| Inkscape | Vector graphics editor |
+| OnlyOffice | OnlyOffice Desktop Editors |
+| LibreOffice | LibreOffice suite |
+| Nextcloud | Nextcloud Desktop client + Nautilus integration |
+| LocalSend | Local network file sharing |
+| Balena Etcher | USB/SD card flasher |
+| Obsidian | Note-taking app |
+| Calibre | E-book manager |
+
+#### Messaging
+
+| Option | Description |
+|--------|-------------|
+| Telegram | Telegram Desktop |
+| Slack | Slack |
+| Discord | Discord |
+| Element | Element Desktop |
+
+#### Media
+
+| Option | Description |
+|--------|-------------|
+| Media Packages | Media players, codecs and tools |
+| Spotify | Spotify music client |
+
+#### Security
+
+| Option | Description |
+|--------|-------------|
+| Mullvad VPN | Mullvad VPN client |
+| Proton VPN | Proton VPN client |
+| Proton Pass | Proton Pass password manager |
+| Proton Pass CLI | Proton Pass CLI |
+| KeePassXC | KeePassXC password manager |
+| Bitwarden CLI | Bitwarden CLI |
+| Proton Authenticator | Proton Authenticator |
+| Yubico Authenticator | Yubico Authenticator |
+| YubiKey Manager | YubiKey Manager |
+| Nitrokey App2 | Nitrokey App2 |
+| OpenPGP | OpenPGP tools |
+
+### Virtualization
+
+| Option | Description |
+|--------|-------------|
+| QEMU/KVM | QEMU, libvirt, virt-manager with user groups and default network |
 
 ### Settings
-- **Health Check** -- system info, dependency status, task overview
-- **Logs** -- view and clean session logs
-- **Completions** -- install/remove bash and zsh completions
-- **About** -- version, install path, shell, package managers
+
+| Option | Description |
+|--------|-------------|
+| System Health | System info, dependency status, task overview |
+| Logs | View and clean session logs |
+| Completions | Install/remove bash and zsh completions |
+| About | Version, install path, shell, package managers |
 
 ## Architecture
 
@@ -161,15 +283,15 @@ debian-setup/
 │   │   └── xdg.sh                 # XDG Base Directory support
 │   ├── menu.sh                    # Main menu, search, jump, task registry
 │   └── modules/
-│       ├── system/                # Sudoers, Editor, Zram, Kernel, GRUB, Plymouth, Hibernate
+│       ├── system/                # Sudoers, Editor, Zram, Watchers, GRUB
 │       ├── packages/              # Upgrade, APT Sources, Flatpak, Nala, Nix, Homebrew
 │       ├── ssh/                   # Server, Access, Keys, Config, Signing
 │       ├── development/           # Environments, Tools, AI
 │       ├── shell/                 # Utilities, Starship, Zoxide, Atuin, Tmux, Zellij, Dotfiles
-│       ├── hardware/              # Slimbook EVO
+│       ├── hardware/              # Kernel, Slimbook
 │       ├── virtualization/        # QEMU/KVM
-│       ├── software/              # Browsers, Editors, Terminals, Productivity, Messaging, Security, Fonts
-│       ├── gnome/                 # Appearance, Keyboard, Extensions, CSS
+│       ├── software/              # Browsers, Editors, Terminals, Productivity, Messaging, Media, Security
+│       ├── gnome/                 # Keyboard, Extensions, Fonts
 │       └── settings/              # Health, Logs, Completions, About
 └── packages/
     ├── apt/                       # APT package lists (one per line)
