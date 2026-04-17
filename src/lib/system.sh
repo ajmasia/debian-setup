@@ -108,7 +108,7 @@ system::_version_gt() {
 system::check_update() {
     local current="$1"
     local latest
-    latest="$(cat "$_UPDATE_CHECK_CACHE" 2>/dev/null)"
+    latest="$(cat "$_UPDATE_CHECK_CACHE" 2>/dev/null)" || latest=""
 
     # Fast path: fresh cache with a known newer version
     if [[ -n "$latest" ]] && ! system::_update_cache_stale && system::_version_gt "$current" "$latest"; then
@@ -123,7 +123,7 @@ system::check_update() {
 
     # Fetch: no cache, stale cache, or cache is behind current (user updated since last check)
     local fetched
-    fetched="$(system::_fetch_latest_version)"
+    fetched="$(system::_fetch_latest_version)" || fetched=""
     if [[ -n "$fetched" ]]; then
         mkdir -p "$(dirname "$_UPDATE_CHECK_CACHE")"
         printf '%s' "$fetched" > "$_UPDATE_CHECK_CACHE"
