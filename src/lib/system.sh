@@ -57,6 +57,12 @@ distro::is_debian() {
     [[ "${DISTRO_ID:-}" == "debian" ]]
 }
 
+system::is_slimbook() {
+    local vendor
+    vendor="$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)"
+    [[ "$vendor" == *"Slimbook"* ]]
+}
+
 system::package_managers() {
     local managers=()
     local mgr

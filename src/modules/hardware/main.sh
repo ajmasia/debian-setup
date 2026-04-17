@@ -7,7 +7,7 @@ _MOD_HARDWARE_LOADED=1
 # compat_fn: if non-empty, called to decide if the task is shown (0 = show, 1 = hide)
 _HARDWARE_TASKS=(
     "${_KERNEL_LABEL}|_KERNEL_DESC|kernel::check|kernel::apply|kernel::status|distro::is_debian"
-    "${_SLIMBOOK_LABEL}|_SLIMBOOK_DESC|slimbook::check|slimbook::apply|slimbook::status"
+    "${_SLIMBOOK_LABEL}|_SLIMBOOK_DESC|slimbook::check|slimbook::apply|slimbook::status|system::is_slimbook"
 )
 
 hardware::has_pending() {
