@@ -18,3 +18,7 @@ Thumbs.db
 
 # Claude Code
 .claude/
+
+# Local AI context and planning (not for public repo)
+.ai-context/
+.plans/
