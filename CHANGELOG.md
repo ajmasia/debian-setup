@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.6] - 2026-04-17
+
+### Fixed
+
+- **Menu header** -- removed `(ds)` hint from the title
+
 ## [1.6.5] - 2026-04-17
 
 ### Fixed
