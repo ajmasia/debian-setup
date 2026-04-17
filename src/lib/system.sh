@@ -80,6 +80,10 @@ session::is_gnome() {
     [[ "${XDG_CURRENT_DESKTOP:-}" == *"GNOME"* ]] || [[ "${DESKTOP_SESSION:-}" == *"gnome"* ]]
 }
 
+session::is_kde() {
+    [[ "${XDG_CURRENT_DESKTOP:-}" == *"KDE"* ]] || [[ "${DESKTOP_SESSION:-}" == *"plasma"* ]]
+}
+
 _UPDATE_CHECK_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/debian-setup/latest-version"
 _UPDATE_CHECK_MAX_AGE=86400
 
