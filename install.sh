@@ -15,7 +15,9 @@ PATH_MARKER="# debian-setup"
 BASH_COMP_DIR="$HOME/.local/share/bash-completion/completions"
 ZSH_COMP_DIR="$HOME/.local/share/zsh/site-functions"
 BASH_COMP_LINK="${BASH_COMP_DIR}/debian-setup"
+BASH_COMP_LINK_DS="${BASH_COMP_DIR}/ds"
 ZSH_COMP_LINK="${ZSH_COMP_DIR}/_debian-setup"
+ZSH_COMP_LINK_DS="${ZSH_COMP_DIR}/_ds"
 
 # Colors (self-contained, no deps)
 RED='\033[0;31m'
@@ -77,10 +79,12 @@ refresh_completions() {
     local refreshed=false
     if [[ -L "$BASH_COMP_LINK" ]]; then
         ln -sf "${INSTALL_DIR}/completions/debian-setup.bash" "$BASH_COMP_LINK"
+        ln -sf "${INSTALL_DIR}/completions/debian-setup.bash" "$BASH_COMP_LINK_DS"
         refreshed=true
     fi
     if [[ -L "$ZSH_COMP_LINK" ]]; then
         ln -sf "${INSTALL_DIR}/completions/debian-setup.zsh" "$ZSH_COMP_LINK"
+        ln -sf "${INSTALL_DIR}/completions/debian-setup.zsh" "$ZSH_COMP_LINK_DS"
         refreshed=true
     fi
     $refreshed && ok "Shell completions refreshed"
@@ -88,7 +92,9 @@ refresh_completions() {
 
 remove_completions() {
     [[ -L "$BASH_COMP_LINK" ]] && rm "$BASH_COMP_LINK"
+    [[ -L "$BASH_COMP_LINK_DS" ]] && rm "$BASH_COMP_LINK_DS"
     [[ -L "$ZSH_COMP_LINK" ]] && rm "$ZSH_COMP_LINK"
+    [[ -L "$ZSH_COMP_LINK_DS" ]] && rm "$ZSH_COMP_LINK_DS"
     ok "Shell completions removed"
 }
 

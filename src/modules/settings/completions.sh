@@ -8,7 +8,9 @@ _COMPLETIONS_ZSH_SRC="${SCRIPT_DIR}/completions/debian-setup.zsh"
 _COMPLETIONS_BASH_DIR="$HOME/.local/share/bash-completion/completions"
 _COMPLETIONS_ZSH_DIR="$HOME/.local/share/zsh/site-functions"
 _COMPLETIONS_BASH_LINK="${_COMPLETIONS_BASH_DIR}/debian-setup"
+_COMPLETIONS_BASH_LINK_DS="${_COMPLETIONS_BASH_DIR}/ds"
 _COMPLETIONS_ZSH_LINK="${_COMPLETIONS_ZSH_DIR}/_debian-setup"
+_COMPLETIONS_ZSH_LINK_DS="${_COMPLETIONS_ZSH_DIR}/_ds"
 
 _completions::bash_installed() {
     [[ -L "$_COMPLETIONS_BASH_LINK" ]]
@@ -33,6 +35,7 @@ completions::install() {
     if [[ "$shell" == "bash" ]]; then
         mkdir -p "$_COMPLETIONS_BASH_DIR"
         ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK"
+        ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK_DS"
         menu::list > /dev/null
         log::ok "Bash completions installed"
     fi
@@ -40,6 +43,7 @@ completions::install() {
     if [[ "$shell" == "zsh" ]]; then
         mkdir -p "$_COMPLETIONS_ZSH_DIR"
         ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK"
+        ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK_DS"
         menu::list > /dev/null
         log::ok "Zsh completions installed"
     fi
@@ -110,6 +114,7 @@ completions::run() {
                 log::break
                 mkdir -p "$_COMPLETIONS_BASH_DIR"
                 ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK"
+                ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK_DS"
                 menu::list > /dev/null
                 log::ok "Bash completions installed"
                 log::warn "Restart your shell to activate"
@@ -117,6 +122,7 @@ completions::run() {
             "Remove Bash completions"*)
                 log::break
                 rm "$_COMPLETIONS_BASH_LINK"
+                [[ -L "$_COMPLETIONS_BASH_LINK_DS" ]] && rm "$_COMPLETIONS_BASH_LINK_DS"
                 log::ok "Bash completions removed"
                 log::warn "Restart your shell to deactivate"
                 ;;
@@ -124,6 +130,7 @@ completions::run() {
                 log::break
                 mkdir -p "$_COMPLETIONS_ZSH_DIR"
                 ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK"
+                ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK_DS"
                 menu::list > /dev/null
                 log::ok "Zsh completions installed"
                 log::warn "Restart your shell to activate"
@@ -131,6 +138,7 @@ completions::run() {
             "Remove Zsh completions"*)
                 log::break
                 rm "$_COMPLETIONS_ZSH_LINK"
+                [[ -L "$_COMPLETIONS_ZSH_LINK_DS" ]] && rm "$_COMPLETIONS_ZSH_LINK_DS"
                 log::ok "Zsh completions removed"
                 log::warn "Restart your shell to deactivate"
                 ;;
