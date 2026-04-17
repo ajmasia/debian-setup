@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.8] - 2026-04-17
+
+### Added
+
+- **Slimbook detection** -- `system::is_slimbook()` reads `/sys/class/dmi/id/sys_vendor`; the Slimbook EVO option is now hidden on non-Slimbook hardware
+
+### Fixed
+
+- **Update detection** -- synchronous version fetch replaces background async fetch, so notifications appear in the same session that triggers the check
+- **Update cache refresh** -- when the installed version is ahead of the cached value (e.g. after a manual update), the cache is now refreshed immediately instead of being skipped
+
 ## [1.6.7] - 2026-04-17
 
 ### Fixed
