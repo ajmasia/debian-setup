@@ -103,8 +103,9 @@ system::check_update() {
         return 0
     fi
 
-    # Refresh in background when up to date or cache missing (check for next release)
-    if [[ -z "$latest" || "$latest" == "$current" ]]; then
+    # Refresh when no cache, or cache <= current (up to date or manually updated ahead of cache)
+    if [[ -z "$latest" ]] || \
+       [[ "$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -1)" == "$current" ]]; then
         (
             local fetched
             fetched="$(system::_fetch_latest_version)"
