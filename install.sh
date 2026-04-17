@@ -204,6 +204,7 @@ do_install() {
     ok "${APP_NAME} $(get_version) installed successfully"
     printf "\n"
     printf "  Run ${BOLD}ds${RESET} or ${BOLD}%s${RESET} to start\n" "$APP_NAME"
+    printf "  Run ${BOLD}ds --completions${RESET} to enable tab completions\n"
     printf "  Run ${BOLD}ds --update${RESET} to update later\n"
     printf "  Run ${BOLD}ds --uninstall${RESET} to remove\n"
     printf "\n"
