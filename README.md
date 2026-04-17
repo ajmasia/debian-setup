@@ -45,9 +45,9 @@ This clones the repo to `~/.local/share/debian-setup` and creates a symlink in `
 After installing, enable tab completions for your shell:
 
 ```bash
-debian-setup --completions        # bash + zsh
-debian-setup --completions bash   # bash only
-debian-setup --completions zsh    # zsh only
+debian-setup --completions        # current shell
+debian-setup --completions bash   # bash
+debian-setup --completions zsh    # zsh
 ```
 
 Restart your shell to activate them.
@@ -65,7 +65,7 @@ Options:
   -sr, --search-to-remove   Search only applied/installed tasks
   -l, --list                List all tasks (generates completion cache)
   -o, --option <name>       Jump directly to a task or category
-  --completions [bash|zsh]  Install shell completions (default: both)
+  --completions [bash|zsh]  Install shell completions (default: current shell)
   --update                  Update to latest version
   --uninstall               Remove debian-setup
 ```
