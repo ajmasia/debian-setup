@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2026-04-17
+
+### Changed
+
+- **Remote** -- origin migrated from self-hosted Gitea to GitHub (`github.com/ajmasia/debian-setup`)
+
 ## [1.5.1] - 2026-04-15
 
 ### Fixed
