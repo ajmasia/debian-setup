@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-1.6.2-blue)
+![Version](https://img.shields.io/badge/version-1.6.3-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Ubuntu](https://img.shields.io/badge/ubuntu-experimental-E95420?logo=ubuntu&logoColor=white)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
@@ -16,11 +16,13 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 
 > Ubuntu support is actively being developed. Most modules work on Ubuntu 24.04+, with ongoing work to adapt distro-specific options (APT sources, GRUB, sudoers, kernel backports).
 
+![debian-setup screenshot](assets/screenshot_debian-setup.png)
+
 ## Requirements
 
 - Debian 13 (Trixie) — primary target
 - Ubuntu 24.04+ — experimental
-- [gum](https://github.com/charmbracelet/gum) — auto-installed on first run if missing
+- [gum](https://github.com/charmbracelet/gum) — installed automatically by the installer
 
 ## Install
 

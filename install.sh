@@ -204,6 +204,7 @@ do_install() {
     ok "${APP_NAME} $(get_version) installed successfully"
     printf "\n"
     printf "  Run ${BOLD}ds${RESET} or ${BOLD}%s${RESET} to start\n" "$APP_NAME"
+    printf "  Run ${BOLD}ds --completions${RESET} to enable tab completions\n"
     printf "  Run ${BOLD}ds --update${RESET} to update later\n"
     printf "  Run ${BOLD}ds --uninstall${RESET} to remove\n"
     printf "\n"
@@ -254,7 +255,7 @@ do_uninstall() {
     info "Uninstalling ${APP_NAME}..."
     printf "\n"
 
-    if [[ ! -d "${INSTALL_DIR}" ]] && [[ ! -L "$BIN_PATH" ]]; then
+    if [[ ! -d "${INSTALL_DIR}" ]] && [[ ! -L "$BIN_PATH" ]] && [[ ! -L "$BIN_PATH_SHORT" ]]; then
         warn "Not installed, nothing to do"
         exit 0
     fi

@@ -36,6 +36,7 @@ completions::install() {
         mkdir -p "$_COMPLETIONS_BASH_DIR"
         ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK"
         ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK_DS"
+        log::info "Generating task cache..."
         menu::list > /dev/null
         log::ok "Bash completions installed"
     fi
@@ -44,6 +45,7 @@ completions::install() {
         mkdir -p "$_COMPLETIONS_ZSH_DIR"
         ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK"
         ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK_DS"
+        log::info "Generating task cache..."
         menu::list > /dev/null
         log::ok "Zsh completions installed"
     fi
@@ -115,6 +117,7 @@ completions::run() {
                 mkdir -p "$_COMPLETIONS_BASH_DIR"
                 ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK"
                 ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK_DS"
+                log::info "Generating task cache..."
                 menu::list > /dev/null
                 log::ok "Bash completions installed"
                 log::warn "Restart your shell to activate"
@@ -131,6 +134,7 @@ completions::run() {
                 mkdir -p "$_COMPLETIONS_ZSH_DIR"
                 ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK"
                 ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK_DS"
+                log::info "Generating task cache..."
                 menu::list > /dev/null
                 log::ok "Zsh completions installed"
                 log::warn "Restart your shell to activate"
