@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-1.5.2-blue)
+![Version](https://img.shields.io/badge/version-1.6.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Ubuntu](https://img.shields.io/badge/ubuntu-experimental-E95420?logo=ubuntu&logoColor=white)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
@@ -45,16 +45,17 @@ This clones the repo to `~/.local/share/debian-setup` and creates two symlinks i
 After installing, enable tab completions for your shell:
 
 ```bash
-debian-setup --completions        # current shell
-debian-setup --completions bash   # bash
-debian-setup --completions zsh    # zsh
+ds --completions        # current shell
+ds --completions bash   # bash only
+ds --completions zsh    # zsh only
 ```
 
-Restart your shell to activate them.
+Completions work for both `ds` and `debian-setup`. Restart your shell to activate them.
 
 ## Usage
 
 ```
+ds [options]
 debian-setup [options]
 
 Options:
