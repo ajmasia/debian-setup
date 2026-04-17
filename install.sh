@@ -8,6 +8,7 @@ APP_NAME="debian-setup"
 INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/${APP_NAME}"
 BIN_DIR="$HOME/.local/bin"
 BIN_PATH="${BIN_DIR}/${APP_NAME}"
+BIN_PATH_SHORT="${BIN_DIR}/ds"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/${APP_NAME}"
 BASHRC="$HOME/.bashrc"
 PATH_MARKER="# debian-setup"
@@ -127,10 +128,11 @@ do_install() {
         exit 1
     fi
 
-    # Symlink
+    # Symlinks
     mkdir -p "$BIN_DIR"
     ln -sf "${INSTALL_DIR}/${APP_NAME}" "$BIN_PATH"
-    ok "Symlink created: ${BIN_PATH}"
+    ln -sf "${INSTALL_DIR}/${APP_NAME}" "$BIN_PATH_SHORT"
+    ok "Symlinks created: ${BIN_PATH}, ${BIN_PATH_SHORT}"
 
     # PATH
     ensure_path
@@ -138,9 +140,9 @@ do_install() {
     printf "\n"
     ok "${APP_NAME} $(get_version) installed successfully"
     printf "\n"
-    printf "  Run ${BOLD}%s${RESET} to start\n" "$APP_NAME"
-    printf "  Run ${BOLD}%s --update${RESET} to update later\n" "$APP_NAME"
-    printf "  Run ${BOLD}%s --uninstall${RESET} to remove\n" "$APP_NAME"
+    printf "  Run ${BOLD}ds${RESET} or ${BOLD}%s${RESET} to start\n" "$APP_NAME"
+    printf "  Run ${BOLD}ds --update${RESET} to update later\n"
+    printf "  Run ${BOLD}ds --uninstall${RESET} to remove\n"
     printf "\n"
 
     if ! echo "$PATH" | grep -Fq "$BIN_DIR"; then
@@ -166,9 +168,10 @@ do_update() {
         exit 1
     fi
 
-    # Ensure symlink is correct (in case install dir changed)
+    # Ensure symlinks are correct (in case install dir changed)
     mkdir -p "$BIN_DIR"
     ln -sf "${INSTALL_DIR}/${APP_NAME}" "$BIN_PATH"
+    ln -sf "${INSTALL_DIR}/${APP_NAME}" "$BIN_PATH_SHORT"
 
     # Refresh completions if installed
     refresh_completions
@@ -193,10 +196,14 @@ do_uninstall() {
         exit 0
     fi
 
-    # Remove symlink
+    # Remove symlinks
     if [[ -L "$BIN_PATH" ]]; then
         rm "$BIN_PATH"
         ok "Removed symlink: ${BIN_PATH}"
+    fi
+    if [[ -L "$BIN_PATH_SHORT" ]]; then
+        rm "$BIN_PATH_SHORT"
+        ok "Removed symlink: ${BIN_PATH_SHORT}"
     fi
 
     # Remove repo

@@ -36,7 +36,7 @@ Then install debian-setup:
 curl -fsSL https://raw.githubusercontent.com/ajmasia/debian-setup/main/install.sh | bash
 ```
 
-This clones the repo to `~/.local/share/debian-setup` and creates a symlink in `~/.local/bin`.
+This clones the repo to `~/.local/share/debian-setup` and creates two symlinks in `~/.local/bin`: `ds` (short) and `debian-setup` (long form).
 
 > On a fresh install, start with **System Essentials > Sudoers** to grant sudo access to your user (uses `su` with the root password).
 
