@@ -6,6 +6,7 @@
 
 ![Version](https://img.shields.io/badge/version-1.5.2-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
+![Ubuntu](https://img.shields.io/badge/ubuntu-experimental-E95420?logo=ubuntu&logoColor=white)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -13,109 +14,13 @@ Post-install automation for the impatient developer.
 
 Interactive CLI tool that automates common Debian post-installation tasks: system configuration, package managers, development environments, virtualization, software installation, and more.
 
-## Features
-
-### Hardware Support
-- **Slimbook EVO** -- Install Slimbook repository and EVO/GNOME meta-packages
-
-### System essentials
-- **Sudoers** -- Add/remove current user to sudoers
-- **Password Feedback** -- Enable/disable asterisks on sudo password prompt
-- **Default Editor** -- Configure vim as system editor with `EDITOR`/`SUDO_EDITOR`
-- **Zram Swap** -- Install and configure compressed swap in RAM (zstd)
-- **Kernel** -- Switch between stable and backports kernel with safe removal and reboot
-- **Inotify Watchers** -- Configure fs.inotify.max_user_watches with RAM detection and custom input
-- **Plymouth** -- Plymouth boot splash with theme selection (spinner / bgrt / bgrt-luks for LUKS-visible logo), community themes from adi1090x/plymouth-themes, GRUB splash parameter
-- **GRUB** -- Configure GRUB resolution (detected display modes + custom), boot resolution inheritance, silent boot (quiet + loglevel + systemd status + VT cursor), disable Debian theme
-- **Hibernate** -- Swap file + suspend-then-hibernate (coexists with zram, low priority swap)
-
-### Package managers
-- **System Upgrade** -- Update, dist-upgrade and autoremove in one step
-- **APT Sources** -- Modernize to DEB822, toggle non-free/backports/deb-src/testing
-- **Flatpak** -- Install Flatpak with Flathub repository
-- **Nala** -- Install/remove Nala, a prettier APT frontend with parallel downloads
-- **Nix** -- Install/remove Nix package manager (multi-user daemon, flakes toggle)
-- **Homebrew** -- Install/remove Homebrew on Linux with automatic dependency setup
-
-### Development
-
-#### Environments
-- **Node.js** -- fnm + Node.js LTS
-- **Python** -- uv package manager
-- **Rust** -- rustup/cargo
-- **Go** -- Go via APT or official tarball
-
-#### Tools
-- **Git** -- Install git, configure global/local settings (identity, default branch, pull strategy, fetch pruning, rerere, colorMoved), large file guard (global pre-commit hook)
-- **Build Essentials** -- Core compilation tools and development libraries
-- **GitHub CLI** -- Official GitHub CLI (apt repo)
-- **AWS CLI** -- AWS CLI v2 (binary installer)
-- **Docker** -- Docker CE with post-install group management
-- **HTTPie** -- Modern HTTP client
-- **MongoDB Compass** -- MongoDB GUI (Flatpak)
-
-#### AI
-- **Claude Code** -- Anthropic CLI for Claude (npm global)
-- **OpenCode** -- Terminal AI assistant (npm global)
-- **GitHub Copilot CLI** -- AI-powered CLI (gh extension)
-- **AI Resources** -- Curated list of AI tools for developers
-
-### Dotfiles
-- **Dotfiles** -- Clone and apply dotfiles via GNU Stow (portable, compatible with standalone usage)
-
-### Shell Tools
-- **Utilities** -- CLI utilities (fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, cmatrix, fastfetch, etc.)
-- **Starship** -- Cross-shell prompt
-- **Zoxide** -- Smarter cd command
-- **Atuin** -- Shell history search
-- **Tmux** -- Terminal multiplexer
-- **Zellij** -- Terminal workspace
-
-### OpenSSH Server
-- **OpenSSH Server** -- Install and manage openssh-server with service control
-- **SSH Access** -- Toggle pubkey-only, pubkey+password, or password-only with root login control
-- **SSH Keys** -- Generate ED25519 keys with suffix support for multiple identities
-- **SSH Config** -- Manage `~/.ssh/config` entries for GitHub, GitLab, and custom servers
-- **Commit Signing** -- Configure git commit signing with SSH keys, conditional `includeIf` for multi-identity setups
-
-### Virtualization
-- **QEMU/KVM** -- QEMU, libvirt, virt-manager with user groups, libvirtd service, and default network
-
-### Software
-- **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium
-- **Editors** -- VS Code (with extensions management) and Neovim (LazyVim + dependencies wizard)
-- **Terminals** -- Alacritty (build from source), Kitty (user-space installer), Ptyxis (APT)
-- **Productivity** -- GIMP (Flatpak), Inkscape (Flatpak), OnlyOffice (Flatpak), LibreOffice (APT), Nextcloud (Flatpak / APT + Nautilus plugin), LocalSend (GitHub .deb), Balena Etcher (GitHub zip), Obsidian (GitHub .deb)
-- **Messaging** -- Telegram (Flatpak), Slack (Flatpak), Discord (Flatpak), Element (APT repo)
-- **Media** -- Media tools and codecs
-- **Security**
-  - **VPN** -- Mullvad VPN, Proton VPN
-  - **Password Managers** -- Proton Pass, Proton Pass CLI, KeePassXC (Flatpak), Bitwarden CLI
-  - **Authenticators** -- Proton Authenticator, Yubico Authenticator (Flatpak)
-  - **Hardware Keys** -- YubiKey Manager, Nitrokey App2 (Flatpak)
-  - **OpenPGP** -- gnupg, seahorse, scdaemon, pinentry-gnome3
-
-### UI and Theming
-- **Appearance**
-  - **GTK Theme** -- Catppuccin Mocha GTK theme with accent color selection, dark mode toggle, GTK4/libadwaita symlinks
-  - **Icons** -- Papirus icons (standalone or with Catppuccin folder colors)
-  - **Cursors** -- Catppuccin Mocha cursors (variant selection)
-  - **Terminal Profile** -- Catppuccin color profiles for GNOME Terminal
-- **Keyboard** -- English intl layout (AltGr dead keys), 4 fixed workspaces, Super+W close, Super+Return terminal, Super+1-4/Shift+1-4 workspace switching
-- **Terminal CSS** -- VTE terminal padding for GTK3 and GTK4
-- **Extensions** -- Manage GNOME Shell extensions (Blur My Shell, Vitals, AppIndicator, Privacy Quick Settings, Quick Settings Audio Panel, User Themes)
-- **Browser Themes** -- Catppuccin Mocha install guide for Brave, Chromium, Firefox, LibreWolf
-- **App Themes** -- Catppuccin Mocha themes for CLI apps (btop, Alacritty, Atuin, bat, cava, eza, lazygit, Starship) with install/remove, marker-based config, and accent color selection
-- **Fonts** -- Nerd Fonts (Noto, Symbols Only, Hack, CaskaydiaCove, CaskaydiaMono, FiraCode) from GitHub releases
-
-### Health
-- **Health check** -- System info, dependency status, and task overview
-- **Log management** -- View, delete, and clean session logs
+> Ubuntu support is actively being developed. Most modules work on Ubuntu 24.04+, with ongoing work to adapt distro-specific options (APT sources, GRUB, sudoers, kernel backports).
 
 ## Requirements
 
-- Debian 13 (Trixie) or compatible
-- [gum](https://github.com/charmbracelet/gum) -- auto-installed on first run if missing
+- Debian 13 (Trixie) — primary target
+- Ubuntu 24.04+ — experimental
+- [gum](https://github.com/charmbracelet/gum) — auto-installed on first run if missing
 
 ## Install
 
@@ -133,7 +38,19 @@ curl -fsSL https://raw.githubusercontent.com/ajmasia/debian-setup/main/install.s
 
 This clones the repo to `~/.local/share/debian-setup` and creates a symlink in `~/.local/bin`.
 
-The first thing to do after launching is **System Essentials > Sudoers** to grant sudo access to your user (uses `su` with root password).
+> On a fresh install, start with **System Essentials > Sudoers** to grant sudo access to your user (uses `su` with the root password).
+
+### Shell completions
+
+After installing, enable tab completions for your shell:
+
+```bash
+debian-setup --completions        # bash + zsh
+debian-setup --completions bash   # bash only
+debian-setup --completions zsh    # zsh only
+```
+
+Restart your shell to activate them.
 
 ## Usage
 
@@ -143,77 +60,132 @@ debian-setup [options]
 Options:
   -v, --version             Show version
   -h, --help                Show this help message
-  -s, --search              Start in global search mode
-  -si, --search-to-install  Search only available (not installed) options
-  -sr, --search-to-remove   Search only installed (removable) options
+  -s, --search              Global search across all tasks
+  -si, --search-to-install  Search only tasks not yet applied
+  -sr, --search-to-remove   Search only applied/installed tasks
+  -l, --list                List all tasks (generates completion cache)
+  -o, --option <name>       Jump directly to a task or category
+  --completions [bash|zsh]  Install shell completions (default: both)
   --update                  Update to latest version
   --uninstall               Remove debian-setup
 ```
 
-Run without options to start the interactive menu by categories. Use `--search` to start in global search mode where all options are available in a single flat, filterable list. Use `--search-to-install` to show only items not yet installed, or `--search-to-remove` to show only installed items. Navigate with arrow keys, confirm with Enter, go back with Escape, exit with Ctrl+C.
+Run without options to start the interactive menu. Navigate with arrow keys, confirm with Enter, go back with Escape, exit with Ctrl+C.
 
-## Project structure
+## Features
+
+### Hardware Support
+- **Slimbook EVO** -- Slimbook repository and EVO/GNOME meta-packages
+
+### System Essentials
+- **Sudoers / Password Feedback / Default Editor** -- user privileges and environment basics
+- **Zram Swap** -- compressed RAM swap (zstd)
+- **Kernel** -- switch between stable and backports kernel
+- **Inotify Watchers** -- configure `fs.inotify.max_user_watches`
+- **Plymouth** -- boot splash with theme selection (spinner, bgrt, bgrt-luks, community themes)
+- **GRUB** -- resolution, silent boot, Debian theme toggle
+- **Hibernate** -- swap file + suspend-then-hibernate (coexists with zram)
+
+### Package Managers
+- **System Upgrade** -- update, dist-upgrade and autoremove in one step
+- **APT Sources** -- DEB822 format, non-free/backports/deb-src/testing toggles
+- **Flatpak** -- Flatpak with Flathub
+- **Nala / Nix / Homebrew** -- alternative package manager options
+
+### OpenSSH Server
+- **Server** -- install and manage openssh-server with service control
+- **Access** -- toggle pubkey-only, pubkey+password, or password-only
+- **Keys** -- generate ED25519 keys with multi-identity suffix support
+- **Config** -- manage `~/.ssh/config` entries (GitHub, GitLab, custom servers)
+- **Commit Signing** -- SSH-based git signing with `includeIf` for multiple identities
+
+### Development
+- **Environments** -- Node.js (fnm), Python (uv), Rust (rustup), Go
+- **Tools** -- Git (global config + signing), Build Essentials, GitHub CLI, AWS CLI v2, Docker CE, HTTPie, MongoDB Compass
+- **AI** -- Claude Code, OpenCode, GitHub Copilot CLI
+
+### Dotfiles
+- Clone and apply dotfiles via GNU Stow
+
+### Shell Tools
+- **Utilities** -- fzf, bat, eza, ripgrep, fd, htop, btop, jq, yq, fastfetch, and more
+- **Starship / Zoxide / Atuin / Tmux / Zellij** -- prompt, navigation and shell history
+
+### Virtualization
+- **QEMU/KVM** -- QEMU, libvirt, virt-manager with user groups and default network
+
+### Software
+- **Browsers** -- Brave, LibreWolf, Mullvad Browser, Chromium, Chrome
+- **Editors** -- VS Code (with extensions), Neovim (LazyVim)
+- **Terminals** -- Alacritty, Kitty, Ptyxis
+- **Productivity** -- GIMP, Inkscape, OnlyOffice, LibreOffice, Nextcloud, Obsidian, Calibre, LocalSend, Etcher
+- **Messaging** -- Telegram, Slack, Discord, Element
+- **Security** -- Mullvad VPN, Proton VPN, Proton Pass, KeePassXC, Bitwarden, YubiKey, Nitrokey, OpenPGP
+- **Fonts** -- Nerd Fonts (Noto, Hack, CaskaydiaCove, CaskaydiaMono, FiraCode, Symbols Only)
+
+### UI and Theming
+- **Appearance** -- Catppuccin Mocha GTK theme, Papirus icons with folder colors, Catppuccin cursors, GNOME Terminal profile
+- **Keyboard** -- English intl layout, workspace switching, custom shortcuts
+- **Extensions** -- Blur My Shell, Vitals, AppIndicator, User Themes, and more
+- **App Themes** -- Catppuccin Mocha for btop, Alacritty, Atuin, bat, eza, lazygit, Starship
+- **Fonts** -- Nerd Fonts from GitHub releases
+
+### Settings
+- **Health Check** -- system info, dependency status, task overview
+- **Logs** -- view and clean session logs
+- **Completions** -- install/remove bash and zsh completions
+- **About** -- version, install path, shell, package managers
+
+## Architecture
 
 ```
 debian-setup/
 ├── debian-setup                    # Entry point
-├── install.sh                      # Installer (curl | bash)
+├── install.sh                      # Installer and updater (curl | bash)
 ├── VERSION
 ├── CHANGELOG.md
+├── completions/
+│   ├── debian-setup.bash
+│   └── debian-setup.zsh
 ├── src/
 │   ├── lib/
 │   │   ├── colors.sh              # Catppuccin Mocha palette
-│   │   ├── gum.sh                 # Gum wrappers (choose, filter, input, SIGINT)
+│   │   ├── gum.sh                 # gum wrappers (choose, filter, input, SIGINT)
 │   │   ├── log.sh                 # Logging (terminal + file)
-│   │   ├── apt.sh                 # APT package list utilities
-│   │   ├── system.sh              # System info queries
-│   │   ├── ui.sh                  # UI components (persistent header, dirty flag)
+│   │   ├── apt.sh                 # APT list and .deb utilities
+│   │   ├── system.sh              # System info (OS, distro, hardware)
+│   │   ├── ui.sh                  # Persistent header, dirty flag, spin
 │   │   └── xdg.sh                 # XDG Base Directory support
-│   ├── modules/
-│   │   ├── health.sh
-│   │   ├── system/                 # Sudoers, Password Feedback, Editor,
-│   │   │   ├── ...                 # Zram, Kernel, Watchers
-│   │   ├── packages/               # APT Sources, Flatpak, Nix
-│   │   │   ├── ...
-│   │   ├── development/            # Environments, Tools, AI
-│   │   │   ├── main.sh            # Top-level aggregator
-│   │   │   ├── environments.sh    # Node.js, Python, Rust, Go
-│   │   │   ├── tools.sh           # Build, GitHub CLI, AWS CLI, Docker, ...
-│   │   │   ├── ai.sh             # Claude Code, OpenCode, Copilot CLI, ...
-│   │   │   ├── ...
-│   │   ├── shell/                  # Shell Tools: Utilities, Starship, Zoxide, Atuin, Tmux, Zellij, Dotfiles
-│   │   │   ├── ...
-│   │   ├── hardware/               # Slimbook EVO
-│   │   │   ├── ...
-│   │   ├── virtualization/         # QEMU/KVM
-│   │   │   ├── ...
-│   │   ├── software/               # Browsers, Editors, Terminals, Productivity,
-│   │   │   ├── ...                 # Messaging, Media, Security, Fonts
-│   │   ├── gnome/                  # UI and Theming: Appearance, Keyboard, CSS, Extensions, Themes
-│   │   │   ├── ...
-│   │   ├── ssh/                    # OpenSSH Server, Access, Keys, Config, Signing
-│   │   │   ├── ...
-│   │   └── diagnostics/            # Health check, Logs
-│   │       ├── ...
-│   └── menu.sh
-├── packages/
-│   ├── apt/                        # Package lists (build, utils, media, openpgp)
-│   ├── gnome/
-│   │   └── extensions.txt          # GNOME Shell extensions (uuid|label)
-│   ├── fonts/
-│   │   └── nerdfonts.txt           # Nerd Fonts (archive_name|label)
-│   ├── plymouth/
-│   │   └── themes.txt              # Community Plymouth themes (dir_name|label|pack)
-│   └── vscode/
-│       └── extensions.txt          # VS Code extensions (id|label)
+│   ├── menu.sh                    # Main menu, search, jump, task registry
+│   └── modules/
+│       ├── system/                # Sudoers, Editor, Zram, Kernel, GRUB, Plymouth, Hibernate
+│       ├── packages/              # Upgrade, APT Sources, Flatpak, Nala, Nix, Homebrew
+│       ├── ssh/                   # Server, Access, Keys, Config, Signing
+│       ├── development/           # Environments, Tools, AI
+│       ├── shell/                 # Utilities, Starship, Zoxide, Atuin, Tmux, Zellij, Dotfiles
+│       ├── hardware/              # Slimbook EVO
+│       ├── virtualization/        # QEMU/KVM
+│       ├── software/              # Browsers, Editors, Terminals, Productivity, Messaging, Security, Fonts
+│       ├── gnome/                 # Appearance, Keyboard, Extensions, CSS
+│       └── settings/              # Health, Logs, Completions, About
+└── packages/
+    ├── apt/                       # APT package lists (one per line)
+    ├── deb/                       # Direct .deb installers (name|url)
+    ├── gnome/extensions.txt       # GNOME Shell extensions (uuid|label)
+    ├── fonts/nerdfonts.txt        # Nerd Fonts (archive_name|label)
+    ├── plymouth/themes.txt        # Plymouth community themes
+    └── vscode/extensions.txt      # VS Code extensions (id|label)
 ```
+
+Each module follows a consistent three-function pattern: `check` (returns 0 if already configured), `status` (human-readable description of pending work), and `apply` (interactive wizard). Top-level categories aggregate modules via task registries, enabling the global search and health check features.
 
 ## Design
 
 - **Catppuccin Mocha** color palette throughout
 - **XDG compliant** -- logs stored in `$XDG_STATE_HOME/debian-setup/logs/`
 - **Session logging** -- all actions recorded to daily log files
-- **Wizard pattern** -- each task shows current status and offers contextual actions (install/remove, enable/disable)
+- **Wizard pattern** -- each task shows current status and offers contextual actions
 - **Non-destructive** -- every configuration change can be undone from the same menu
-- **Repo cleanup** -- removing browsers/packages with external repos also removes the repo and GPG key
+- **Repo cleanup** -- removing packages with external repos also removes the repo and GPG key
 - **Ctrl+C safe** -- clean exit from any prompt via SIGINT handling
+- **Distro-aware** -- options hidden or adapted based on the running distribution
