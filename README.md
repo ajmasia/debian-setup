@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-1.6.11-blue)
+![Version](https://img.shields.io/github/v/tag/ajmasia/debian-setup?label=version&color=blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Ubuntu](https://img.shields.io/badge/ubuntu-experimental-E95420?logo=ubuntu&logoColor=white)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
