@@ -169,6 +169,7 @@ show_help() {
     printf "  -sr, --search-to-remove   Search only installed (removable) options\n"
     printf "  -l, --list                List all available tasks\n"
     printf "  -o, --option <name>       Jump directly to a task or category\n"
+    printf "  --completions [bash|zsh]  Install shell completions (default: both)\n"
     printf "  --update                  Update to latest version\n"
     printf "  --uninstall               Remove debian-setup\n"
 }
@@ -187,6 +188,11 @@ main() {
             ;;
         -l|--list)
             menu::list
+            return 0
+            ;;
+        --completions)
+            local _completions_shell="${2:-all}"
+            completions::install "$_completions_shell"
             return 0
             ;;
         --update)

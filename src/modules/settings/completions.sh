@@ -22,6 +22,31 @@ _completions::current_shell() {
     basename "${SHELL:-unknown}"
 }
 
+completions::install() {
+    local shell="${1:-all}"
+
+    if [[ "$shell" != "bash" && "$shell" != "zsh" && "$shell" != "all" ]]; then
+        printf "Unknown shell: %s. Use bash, zsh, or omit for both.\n" "$shell" >&2
+        return 1
+    fi
+
+    if [[ "$shell" == "bash" || "$shell" == "all" ]]; then
+        mkdir -p "$_COMPLETIONS_BASH_DIR"
+        ln -sf "$_COMPLETIONS_BASH_SRC" "$_COMPLETIONS_BASH_LINK"
+        menu::list > /dev/null
+        log::ok "Bash completions installed"
+    fi
+
+    if [[ "$shell" == "zsh" || "$shell" == "all" ]]; then
+        mkdir -p "$_COMPLETIONS_ZSH_DIR"
+        ln -sf "$_COMPLETIONS_ZSH_SRC" "$_COMPLETIONS_ZSH_LINK"
+        menu::list > /dev/null
+        log::ok "Zsh completions installed"
+    fi
+
+    log::warn "Restart your shell to activate"
+}
+
 completions::run() {
     local choice current_shell
 
