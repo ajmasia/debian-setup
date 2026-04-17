@@ -22,7 +22,7 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 
 - Debian 13 (Trixie) — primary target
 - Ubuntu 24.04+ — experimental
-- [gum](https://github.com/charmbracelet/gum) — auto-installed on first run if missing
+- [gum](https://github.com/charmbracelet/gum) — installed automatically by the installer
 
 ## Install
 
