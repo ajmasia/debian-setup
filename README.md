@@ -4,7 +4,7 @@
 
 # Debian Setup Script
 
-![Version](https://img.shields.io/badge/version-1.5.1-blue)
+![Version](https://img.shields.io/badge/version-1.5.2-blue)
 ![Platform](https://img.shields.io/badge/platform-Debian%2013-A81D33?logo=debian)
 ![Shell](https://img.shields.io/badge/shell-bash-4EAA25?logo=gnubash&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -128,7 +128,7 @@ su -c 'apt-get install -y curl git'
 Then install debian-setup:
 
 ```bash
-curl -fsSL https://git.qwertee.link/ajmasia.dev/debian-setup/raw/branch/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ajmasia/debian-setup/main/install.sh | bash
 ```
 
 This clones the repo to `~/.local/share/debian-setup` and creates a symlink in `~/.local/bin`.
