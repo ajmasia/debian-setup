@@ -4,7 +4,7 @@
 _MOD_SLIMBOOK_LOADED=1
 
 _SLIMBOOK_LABEL="Configure Slimbook"
-_SLIMBOOK_DESC="Install Slimbook repository and EVO/GNOME meta-packages."
+_SLIMBOOK_DESC="Install Slimbook repository and EVO desktop meta-packages."
 
 _SLIMBOOK_GPG_PATH="/etc/apt/trusted.gpg.d/slimbook.gpg"
 _SLIMBOOK_LIST_PATH="/etc/apt/sources.list.d/slimbook.list"
@@ -13,7 +13,15 @@ _SLIMBOOK_BASE_URL="https://raw.githubusercontent.com/Slimbook-Team/slimbook-bas
 _SLIMBOOK_GPG_URL="${_SLIMBOOK_BASE_URL}/keys/slimbook.gpg"
 _SLIMBOOK_LIST_URL="${_SLIMBOOK_BASE_URL}/sources/slimbook.list"
 
-_SLIMBOOK_PACKAGES=("slimbook-meta-evo" "slimbook-meta-gnome")
+_slimbook::desktop_pkg() {
+    if session::is_kde; then
+        printf "slimbook-meta-plasma"
+    else
+        printf "slimbook-meta-gnome"
+    fi
+}
+
+_SLIMBOOK_PACKAGES=("slimbook-meta-evo" "$(_slimbook::desktop_pkg)")
 
 _slimbook::has_repo() {
     [[ -f "$_SLIMBOOK_LIST_PATH" ]] && [[ -f "$_SLIMBOOK_GPG_PATH" ]]

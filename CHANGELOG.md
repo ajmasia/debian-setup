@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.9] - 2026-04-17
+
+### Added
+
+- **Slimbook desktop detection** -- installs `slimbook-meta-plasma` on KDE/Plasma sessions and `slimbook-meta-gnome` on GNOME (default); added `session::is_kde()` to system library
+
 ## [1.6.8] - 2026-04-17
 
 ### Added
