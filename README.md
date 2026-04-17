@@ -16,6 +16,8 @@ Interactive CLI tool that automates common Debian post-installation tasks: syste
 
 > Ubuntu support is actively being developed. Most modules work on Ubuntu 24.04+, with ongoing work to adapt distro-specific options (APT sources, GRUB, sudoers, kernel backports).
 
+![debian-setup screenshot](assets/screenshot_debian-setup.png)
+
 ## Requirements
 
 - Debian 13 (Trixie) — primary target
