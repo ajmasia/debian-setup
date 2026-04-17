@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.3] - 2026-04-17
+
+### Added
+
+- **Post-install guidance** -- installer success message now mentions `ds --completions` as next step
+- **Menu header** -- shows `(ds)` shortcut hint in the main menu header
+- **Completions feedback** -- shows "Generating task cache..." message while building the completion cache
+
+### Fixed
+
+- **Uninstall detection** -- `--uninstall` now also checks the `ds` symlink when deciding if the tool is installed
+
+### Changed
+
+- **README** -- gum listed as installed by the installer, not on first run
+
 ## [1.6.2] - 2026-04-17
 
 ### Fixed
