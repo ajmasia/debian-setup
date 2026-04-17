@@ -45,5 +45,6 @@ When changes on `develop` are ready for release:
 
 ## Remote
 
-- Origin: Self-hosted Gitea (`git.qwertee.link`)
-- Protocol: SSH (`ssh://gitea@git.qwertee.link:2022/...`)
+- Origin: GitHub (`github.com/ajmasia/debian-setup`)
+- Backup: Self-hosted Gitea (`git.qwertee.link`)
+- Protocol: SSH (`git@github.com:ajmasia/debian-setup.git`)

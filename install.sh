@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Constants
-REPO_HTTPS="https://git.qwertee.link/ajmasia.dev/debian-setup.git"
-REPO_SSH="ssh://git.qwertee.link:2022/ajmasia.dev/debian-setup.git"
+REPO_HTTPS="https://github.com/ajmasia/debian-setup.git"
+REPO_SSH="git@github.com:ajmasia/debian-setup.git"
 APP_NAME="debian-setup"
 INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/${APP_NAME}"
 BIN_DIR="$HOME/.local/bin"
