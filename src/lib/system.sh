@@ -100,23 +100,26 @@ system::check_update() {
     local latest
     latest="$(cat "$_UPDATE_CHECK_CACHE" 2>/dev/null)"
 
-    # Cache has a known newer version — show immediately
-    if system::_version_gt "$current" "$latest"; then
+    # Fast path: fresh cache with a known newer version
+    if [[ -n "$latest" ]] && ! system::_update_cache_stale && system::_version_gt "$current" "$latest"; then
         log::info "⚡ New version available: v${latest} — run ds --update"
         return 0
     fi
 
-    # Cache is absent, stale, or up to date — fetch synchronously
-    if [[ -z "$latest" ]] || system::_update_cache_stale || ! system::_version_gt "$latest" "$current"; then
-        local fetched
-        fetched="$(system::_fetch_latest_version)"
-        if [[ -n "$fetched" ]]; then
-            mkdir -p "$(dirname "$_UPDATE_CHECK_CACHE")"
-            printf '%s' "$fetched" > "$_UPDATE_CHECK_CACHE"
-            latest="$fetched"
-        fi
-        if system::_version_gt "$current" "$latest"; then
-            log::info "⚡ New version available: v${latest} — run ds --update"
-        fi
+    # Fast path: fresh cache matches current (up to date as of last check)
+    if [[ -n "$latest" ]] && ! system::_update_cache_stale && [[ "$latest" == "$current" ]]; then
+        return 0
+    fi
+
+    # Fetch: no cache, stale cache, or cache is behind current (user updated since last check)
+    local fetched
+    fetched="$(system::_fetch_latest_version)"
+    if [[ -n "$fetched" ]]; then
+        mkdir -p "$(dirname "$_UPDATE_CHECK_CACHE")"
+        printf '%s' "$fetched" > "$_UPDATE_CHECK_CACHE"
+        latest="$fetched"
+    fi
+    if [[ -n "$latest" ]] && system::_version_gt "$current" "$latest"; then
+        log::info "⚡ New version available: v${latest} — run ds --update"
     fi
 }
