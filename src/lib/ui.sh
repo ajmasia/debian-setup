@@ -26,7 +26,7 @@ ui::_paint_header() {
         --border-foreground "$HEX_LAVENDER" \
         --padding "0 2" \
         --bold \
-        "debian-setup v${_UI_VERSION}  (ds)"
+        "debian-setup v${_UI_VERSION}"
 
     gum::style \
         --foreground "$HEX_OVERLAY1" \
