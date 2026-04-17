@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.7] - 2026-04-17
+
+### Fixed
+
+- **Slimbook URLs** -- updated repository and GPG key download URLs to `debian/noble` branch (old `main` branch no longer contains these files)
+- **Update detection** -- version cache now refreshes every session when installed version is ahead of or equal to cached version, ensuring new releases are detected promptly
+
 ## [1.6.6] - 2026-04-17
 
 ### Fixed
