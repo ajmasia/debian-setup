@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.5] - 2026-04-17
+
+### Fixed
+
+- **APT detection** -- backports, deb-src, non-free and component detection always returned false on DEB822 format due to a quoted glob preventing shell expansion; replaced with direct file reference (`_APT_SOURCES_FILE`) consistent with `_apt::has_testing`
+
 ## [1.6.4] - 2026-04-17
 
 ### Added
