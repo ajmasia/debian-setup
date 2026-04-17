@@ -255,7 +255,7 @@ do_uninstall() {
     info "Uninstalling ${APP_NAME}..."
     printf "\n"
 
-    if [[ ! -d "${INSTALL_DIR}" ]] && [[ ! -L "$BIN_PATH" ]]; then
+    if [[ ! -d "${INSTALL_DIR}" ]] && [[ ! -L "$BIN_PATH" ]] && [[ ! -L "$BIN_PATH_SHORT" ]]; then
         warn "Not installed, nothing to do"
         exit 0
     fi
