@@ -30,7 +30,7 @@ _apt::is_modernized() {
 
 _apt::has_component() {
     if _apt::is_modernized; then
-        grep -rq "$1" "/etc/apt/sources.list.d/${_APT_SOURCES_GLOB}" 2>/dev/null
+        grep -q "$1" "/etc/apt/sources.list.d/${_APT_SOURCES_FILE}" 2>/dev/null
     else
         grep -q "$1" /etc/apt/sources.list
     fi
@@ -38,7 +38,7 @@ _apt::has_component() {
 
 _apt::has_nonfree() {
     if _apt::is_modernized; then
-        grep -rq "non-free-firmware" "/etc/apt/sources.list.d/${_APT_SOURCES_GLOB}" 2>/dev/null
+        grep -q "non-free-firmware" "/etc/apt/sources.list.d/${_APT_SOURCES_FILE}" 2>/dev/null
     else
         grep -q "non-free-firmware" /etc/apt/sources.list
     fi
@@ -46,7 +46,7 @@ _apt::has_nonfree() {
 
 _apt::has_backports() {
     if _apt::is_modernized; then
-        grep -rq "backports" "/etc/apt/sources.list.d/${_APT_SOURCES_GLOB}" 2>/dev/null
+        grep -q "backports" "/etc/apt/sources.list.d/${_APT_SOURCES_FILE}" 2>/dev/null
     else
         grep -q "backports" /etc/apt/sources.list
     fi
@@ -54,7 +54,7 @@ _apt::has_backports() {
 
 _apt::has_deb_src() {
     if _apt::is_modernized; then
-        grep -rq "deb-src" "/etc/apt/sources.list.d/${_APT_SOURCES_GLOB}" 2>/dev/null
+        grep -q "deb-src" "/etc/apt/sources.list.d/${_APT_SOURCES_FILE}" 2>/dev/null
     else
         grep -q "^deb-src " /etc/apt/sources.list
     fi
