@@ -8,6 +8,7 @@ _MOD_UI_MODULE_LOADED=1
 _UI_TASKS=(
     "${_KEYBOARD_LABEL}|_KEYBOARD_DESC|keyboard::check|keyboard::apply|keyboard::status|session::is_gnome"
     "${_EXTENSIONS_LABEL}|_EXTENSIONS_DESC|extensions::check|extensions::apply|extensions::status|session::is_gnome"
+    "${_ICONS_LABEL}|_ICONS_DESC|icons::check|icons::apply|icons::status|session::is_gnome"
     "${_FONTS_LABEL}|_FONTS_DESC|fonts::check|fonts::run|fonts::status"
 )
 
