@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.1] - 2026-04-25
+
+### Added
+
+- **Icons module** -- restored under UI; installs Papirus icon theme with options for Catppuccin folder colors, Papirus + Adwaita folders, and Papirus-Dark + Adwaita folders
+- **Terminal CSS module** -- restored under UI; adds VTE terminal padding to GTK3 and GTK4 stylesheets, with apply/remove actions
+- **Plymouth module** -- restored under System Essentials; manages boot splash with `spinner`, `bgrt` and custom `bgrt-luks` themes, plus optional community themes from `adi1090x/plymouth-themes`
+
 ## [1.6.9] - 2026-04-17
 
 ### Added
