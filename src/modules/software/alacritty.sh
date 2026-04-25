@@ -110,11 +110,15 @@ _alacritty::install() {
     if [[ -z "$cargo_bin" ]]; then
         log::error "Rust/cargo is required to build Alacritty"
         log::warn "Install Rust first via Development > Environments"
+        ui::return_or_exit
         return
     fi
 
     # Check and install build dependencies
-    _alacritty::check_deps || return
+    if ! _alacritty::check_deps; then
+        ui::return_or_exit
+        return
+    fi
 
     # Clone repo
     local tmpdir
@@ -124,6 +128,7 @@ _alacritty::install() {
     if ! git clone "$_ALACRITTY_REPO" "$tmpdir/alacritty" 2>/dev/null; then
         log::error "Failed to clone Alacritty repository"
         rm -rf "$tmpdir"
+        ui::return_or_exit
         return
     fi
     log::ok "Repository cloned"
@@ -147,6 +152,7 @@ _alacritty::install() {
         log::break
         log::error "Build failed"
         rm -rf "$tmpdir"
+        ui::return_or_exit
         return
     fi
 
@@ -177,6 +183,7 @@ _alacritty::install() {
 
     log::break
     log::ok "Alacritty installed"
+    ui::return_or_exit
 }
 
 _alacritty::check_deps() {
@@ -301,4 +308,5 @@ _alacritty::remove() {
     hash -r
 
     log::ok "Alacritty removed"
+    ui::return_or_exit
 }

@@ -90,12 +90,14 @@ _brave::install() {
 
     if ! sudo curl -fsSLo "$_BRAVE_GPG_KEY" "$_BRAVE_GPG_URL" </dev/tty; then
         log::error "Failed to download Brave GPG key"
+        ui::return_or_exit
         return
     fi
     sudo chmod 644 "$_BRAVE_GPG_KEY"
 
     if ! sudo curl -fsSLo "$_BRAVE_SOURCES" "$_BRAVE_SOURCES_URL" </dev/tty; then
         log::error "Failed to download Brave sources"
+        ui::return_or_exit
         return
     fi
     log::ok "Repository added"
@@ -112,6 +114,7 @@ _brave::install() {
     else
         log::error "Failed to install Brave"
     fi
+    ui::return_or_exit
 }
 
 _brave::remove() {
@@ -122,6 +125,7 @@ _brave::remove() {
         log::ok "Brave removed"
     else
         log::error "Failed to remove Brave"
+        ui::return_or_exit
         return
     fi
 
@@ -133,4 +137,5 @@ _brave::remove() {
         sudo rm -f "$_BRAVE_GPG_KEY"
         log::ok "Brave GPG key removed"
     fi
+    ui::return_or_exit
 }

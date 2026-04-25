@@ -82,6 +82,7 @@ opencode::apply() {
 _opencode::install() {
     if ! command -v npm &>/dev/null; then
         log::error "npm not available. Install Node.js first (Development > Environments > Node.js)"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _opencode::install() {
     else
         log::error "Failed to install OpenCode"
     fi
+    ui::return_or_exit
 }
 
 _opencode::remove() {
@@ -102,4 +104,5 @@ _opencode::remove() {
     else
         log::error "Failed to remove OpenCode"
     fi
+    ui::return_or_exit
 }

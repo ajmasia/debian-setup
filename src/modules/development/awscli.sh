@@ -89,6 +89,7 @@ _awscli::install() {
         aarch64) arch="aarch64" ;;
         *)
             log::error "Unsupported architecture: ${arch}"
+            ui::return_or_exit
             return
             ;;
     esac
@@ -101,6 +102,7 @@ _awscli::install() {
     if ! curl -fsSL "$url" -o "${tmp_dir}/awscliv2.zip"; then
         rm -rf "$tmp_dir"
         log::error "Failed to download AWS CLI"
+        ui::return_or_exit
         return
     fi
 
@@ -108,6 +110,7 @@ _awscli::install() {
     if ! unzip -q "${tmp_dir}/awscliv2.zip" -d "$tmp_dir"; then
         rm -rf "$tmp_dir"
         log::error "Failed to extract AWS CLI"
+        ui::return_or_exit
         return
     fi
 
@@ -121,6 +124,7 @@ _awscli::install() {
     fi
 
     rm -rf "$tmp_dir"
+    ui::return_or_exit
 }
 
 _awscli::remove() {
@@ -129,4 +133,5 @@ _awscli::remove() {
     sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws /usr/local/bin/aws_completer </dev/tty
     hash -r
     log::ok "AWS CLI removed"
+    ui::return_or_exit
 }

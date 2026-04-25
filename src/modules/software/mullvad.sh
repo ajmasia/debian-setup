@@ -89,6 +89,7 @@ _mullvad::install() {
 
     if ! sudo curl -fsSLo "$_MULLVAD_GPG_KEY" "$_MULLVAD_GPG_URL" </dev/tty; then
         log::error "Failed to download Mullvad GPG key"
+        ui::return_or_exit
         return
     fi
     sudo chmod 644 "$_MULLVAD_GPG_KEY"
@@ -111,6 +112,7 @@ _mullvad::install() {
     else
         log::error "Failed to install Mullvad Browser"
     fi
+    ui::return_or_exit
 }
 
 _mullvad::remove() {
@@ -121,6 +123,7 @@ _mullvad::remove() {
         log::ok "Mullvad Browser removed"
     else
         log::error "Failed to remove Mullvad Browser"
+        ui::return_or_exit
         return
     fi
 
@@ -137,4 +140,5 @@ _mullvad::remove() {
     else
         log::info "Keeping Mullvad repository (Mullvad VPN still installed)"
     fi
+    ui::return_or_exit
 }

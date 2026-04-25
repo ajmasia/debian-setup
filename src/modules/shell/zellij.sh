@@ -106,6 +106,7 @@ _zellij::install() {
 
     if [[ -z "$json" ]]; then
         log::error "Failed to fetch Zellij release info"
+        ui::return_or_exit
         return
     fi
 
@@ -113,6 +114,7 @@ _zellij::install() {
 
     if [[ -z "$version" ]]; then
         log::error "Failed to parse Zellij version"
+        ui::return_or_exit
         return
     fi
 
@@ -125,6 +127,7 @@ _zellij::install() {
         aarch64) arch="aarch64" ;;
         *)
             log::error "Unsupported architecture: ${arch}"
+            ui::return_or_exit
             return
             ;;
     esac
@@ -137,6 +140,7 @@ _zellij::install() {
     if ! curl -fsSL -o "$tmpdir/zellij.tar.gz" "$url"; then
         log::error "Failed to download Zellij"
         rm -rf "$tmpdir"
+        ui::return_or_exit
         return
     fi
 
@@ -156,6 +160,7 @@ _zellij::install() {
         log::warn "~/.local/bin is not in your PATH"
         log::warn "Add to .bashrc: export PATH=\"\$HOME/.local/bin:\$PATH\""
     fi
+    ui::return_or_exit
 }
 
 _zellij::remove() {
@@ -165,4 +170,5 @@ _zellij::remove() {
     hash -r
 
     log::ok "Zellij removed"
+    ui::return_or_exit
 }

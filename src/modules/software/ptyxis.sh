@@ -77,6 +77,7 @@ ptyxis::apply() {
                 else
                     log::error "Failed to install Ptyxis"
                 fi
+                ui::return_or_exit
                 ;;
             "Remove Ptyxis")
                 log::break
@@ -88,6 +89,7 @@ ptyxis::apply() {
                 else
                     log::error "Failed to remove Ptyxis"
                 fi
+                ui::return_or_exit
                 ;;
         esac
     done

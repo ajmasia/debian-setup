@@ -237,6 +237,7 @@ _grub::change_resolution() {
 
         if ! [[ "$resolution" =~ ^[0-9]+x[0-9]+$ ]]; then
             log::error "Invalid format (expected WIDTHxHEIGHT, e.g. 1920x1080)"
+            ui::return_or_exit
             return
         fi
     else
@@ -360,4 +361,5 @@ _grub::update() {
     else
         log::error "Failed to update GRUB"
     fi
+    ui::return_or_exit
 }

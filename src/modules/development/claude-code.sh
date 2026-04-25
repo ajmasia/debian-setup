@@ -82,6 +82,7 @@ claudecode::apply() {
 _claudecode::install() {
     if ! command -v curl &>/dev/null; then
         log::error "curl is required but not installed"
+        ui::return_or_exit
         return
     fi
 
@@ -92,6 +93,7 @@ _claudecode::install() {
     else
         log::error "Failed to install Claude Code"
     fi
+    ui::return_or_exit
 }
 
 _claudecode::remove() {
@@ -100,4 +102,5 @@ _claudecode::remove() {
     rm -rf "${HOME}/.local/share/claude"
     hash -r
     log::ok "Claude Code removed"
+    ui::return_or_exit
 }

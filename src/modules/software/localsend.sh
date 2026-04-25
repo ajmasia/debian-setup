@@ -90,6 +90,7 @@ _localsend::install() {
 
     if [[ -z "$json" ]]; then
         log::error "Failed to fetch LocalSend release info"
+        ui::return_or_exit
         return
     fi
 
@@ -97,6 +98,7 @@ _localsend::install() {
 
     if [[ -z "$version" ]]; then
         log::error "Failed to parse LocalSend version"
+        ui::return_or_exit
         return
     fi
 
@@ -109,6 +111,7 @@ _localsend::install() {
         aarch64) arch="arm-64" ;;
         *)
             log::error "Unsupported architecture: ${arch}"
+            ui::return_or_exit
             return
             ;;
     esac
@@ -119,6 +122,7 @@ _localsend::install() {
     ui::flush_input
     if ! sudo apt-get install -y "$_LOCALSEND_DEP" </dev/tty; then
         log::error "Failed to install dependency: ${_LOCALSEND_DEP}"
+        ui::return_or_exit
         return
     fi
 
@@ -130,6 +134,7 @@ _localsend::install() {
     if ! wget -qO "$tmpfile" "$url"; then
         log::error "Failed to download LocalSend"
         rm -f "$tmpfile"
+        ui::return_or_exit
         return
     fi
 
@@ -141,6 +146,7 @@ _localsend::install() {
         log::error "Failed to install LocalSend"
     fi
     rm -f "$tmpfile"
+    ui::return_or_exit
 }
 
 _localsend::remove() {
@@ -152,4 +158,5 @@ _localsend::remove() {
     else
         log::error "Failed to remove LocalSend"
     fi
+    ui::return_or_exit
 }

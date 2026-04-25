@@ -107,6 +107,7 @@ _starship::install() {
 
     if ! curl -sS "$_STARSHIP_INSTALL_URL" | sh -s -- -y -b "$HOME/.local/bin"; then
         log::error "Failed to install Starship"
+        ui::return_or_exit
         return
     fi
 
@@ -130,6 +131,7 @@ _starship::install() {
 
     log::break
     log::warn "Restart your shell to activate Starship"
+    ui::return_or_exit
 }
 
 _starship::remove() {
@@ -151,4 +153,5 @@ _starship::remove() {
     log::ok "Starship removed"
     log::break
     log::warn "Restart your shell to complete cleanup"
+    ui::return_or_exit
 }

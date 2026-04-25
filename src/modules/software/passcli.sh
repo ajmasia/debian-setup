@@ -104,6 +104,7 @@ _passcli::install() {
 
     if ! curl -fsSLo "$_PASSCLI_BIN" "$_PASSCLI_INSTALL_URL"; then
         log::error "Failed to download Proton Pass CLI"
+        ui::return_or_exit
         return
     fi
 
@@ -117,6 +118,7 @@ _passcli::install() {
         log::warn "~/.local/bin is not in your PATH"
         log::warn "Add to .bashrc: export PATH=\"\$HOME/.local/bin:\$PATH\""
     fi
+    ui::return_or_exit
 }
 
 _passcli::remove() {
@@ -126,4 +128,5 @@ _passcli::remove() {
     hash -r
 
     log::ok "Proton Pass CLI removed"
+    ui::return_or_exit
 }

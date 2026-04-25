@@ -94,6 +94,7 @@ _librewolf::install() {
         log::info "Installing extrepo"
         if ! sudo apt-get install -y extrepo </dev/tty; then
             log::error "Failed to install extrepo"
+            ui::return_or_exit
             return
         fi
         hash -r
@@ -103,6 +104,7 @@ _librewolf::install() {
     log::info "Enabling LibreWolf repository"
     if ! sudo extrepo enable librewolf </dev/tty; then
         log::error "Failed to enable LibreWolf repository"
+        ui::return_or_exit
         return
     fi
     log::ok "Repository enabled"
@@ -119,6 +121,7 @@ _librewolf::install() {
     else
         log::error "Failed to install LibreWolf"
     fi
+    ui::return_or_exit
 }
 
 _librewolf::remove() {
@@ -129,6 +132,7 @@ _librewolf::remove() {
         log::ok "LibreWolf removed"
     else
         log::error "Failed to remove LibreWolf"
+        ui::return_or_exit
         return
     fi
 
@@ -137,4 +141,5 @@ _librewolf::remove() {
         sudo extrepo disable librewolf 2>/dev/null || true
         log::ok "Repository disabled"
     fi
+    ui::return_or_exit
 }

@@ -90,6 +90,7 @@ _protonpass::install() {
     if ! wget -qO "$tmpfile" "$_PROTONPASS_DEB_URL"; then
         log::error "Failed to download Proton Pass"
         rm -f "$tmpfile"
+        ui::return_or_exit
         return
     fi
 
@@ -101,6 +102,7 @@ _protonpass::install() {
         log::error "Failed to install Proton Pass"
     fi
     rm -f "$tmpfile"
+    ui::return_or_exit
 }
 
 _protonpass::remove() {
@@ -112,4 +114,5 @@ _protonpass::remove() {
     else
         log::error "Failed to remove Proton Pass"
     fi
+    ui::return_or_exit
 }

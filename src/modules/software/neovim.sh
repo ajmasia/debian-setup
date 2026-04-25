@@ -223,6 +223,7 @@ _neovim::install() {
     if ! wget -qO "$tmpfile" "$_NEOVIM_TARBALL_URL"; then
         log::error "Failed to download Neovim"
         rm -f "$tmpfile"
+        ui::return_or_exit
         return
     fi
 
@@ -243,6 +244,7 @@ _neovim::install() {
         log::warn "~/.local/bin is not in your PATH"
         log::warn "Add to .bashrc: export PATH=\"\$HOME/.local/bin:\$PATH\""
     fi
+    ui::return_or_exit
 }
 
 # --- Remove Neovim ---
@@ -256,6 +258,7 @@ _neovim::remove() {
     hash -r
 
     log::ok "Neovim removed"
+    ui::return_or_exit
 }
 
 # --- Configure LazyVim ---
@@ -345,6 +348,7 @@ _neovim::configure_lazyvim() {
         log::ok "LazyVim starter cloned to ${config_dir}"
     else
         log::error "Failed to clone LazyVim starter"
+        ui::return_or_exit
         return
     fi
 
@@ -395,6 +399,7 @@ _neovim::configure_lazyvim() {
 
     log::break
     log::ok "LazyVim configuration complete"
+    ui::return_or_exit
 }
 
 # --- Dependencies wizard (standalone) ---
@@ -559,6 +564,7 @@ _neovim::deps_wizard() {
     if $lazygit_missing; then
         _neovim::install_lazygit
     fi
+    ui::return_or_exit
 }
 
 # --- Install APT dependencies (called during Configure LazyVim) ---
@@ -897,6 +903,7 @@ _neovim::aliases_wizard() {
         log::break
         log::warn "Restart your shell or run: source ~/.bash_aliases"
     fi
+    ui::return_or_exit
 }
 
 # --- Remove LazyVim ---
@@ -928,4 +935,5 @@ _neovim::remove_lazyvim() {
     fi
 
     log::ok "LazyVim removed"
+    ui::return_or_exit
 }

@@ -90,6 +90,7 @@ _protonauth::install() {
     if ! wget -qO "$tmpfile" "$_PROTONAUTH_DEB_URL"; then
         log::error "Failed to download Proton Authenticator"
         rm -f "$tmpfile"
+        ui::return_or_exit
         return
     fi
 
@@ -101,6 +102,7 @@ _protonauth::install() {
         log::error "Failed to install Proton Authenticator"
     fi
     rm -f "$tmpfile"
+    ui::return_or_exit
 }
 
 _protonauth::remove() {
@@ -112,4 +114,5 @@ _protonauth::remove() {
     else
         log::error "Failed to remove Proton Authenticator"
     fi
+    ui::return_or_exit
 }
