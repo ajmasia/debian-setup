@@ -102,6 +102,7 @@ _kitty::install() {
 
     if ! curl -L "$_KITTY_INSTALLER_URL" | sh /dev/stdin; then
         log::error "Failed to install Kitty"
+        ui::return_or_exit
         return
     fi
 
@@ -147,6 +148,8 @@ _kitty::install() {
         log::warn "~/.local/bin is not in your PATH"
         log::warn "Add to .bashrc: export PATH=\"\$HOME/.local/bin:\$PATH\""
     fi
+
+    ui::return_or_exit
 }
 
 _kitty::remove() {
@@ -161,4 +164,5 @@ _kitty::remove() {
     hash -r
 
     log::ok "Kitty removed"
+    ui::return_or_exit
 }
