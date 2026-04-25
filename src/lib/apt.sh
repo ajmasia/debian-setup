@@ -203,6 +203,7 @@ apt::list_wizard() {
             "Install all pending")
                 log::break
                 apt::install_list "$file"
+                ui::return_or_exit
                 ;;
             "Select packages to install")
                 log::break
@@ -233,6 +234,7 @@ apt::list_wizard() {
                     hash -r
                     log::break
                     log::ok "Packages installed"
+                    ui::return_or_exit
                 fi
                 ;;
             "Remove packages")
@@ -264,6 +266,7 @@ apt::list_wizard() {
                     hash -r
                     log::break
                     log::ok "Packages removed"
+                    ui::return_or_exit
                 fi
                 ;;
             "Edit packages list")
@@ -336,6 +339,7 @@ apt::deb_wizard() {
             "Install all pending")
                 log::break
                 apt::deb_install_all "$file"
+                ui::return_or_exit
                 ;;
             "Select packages to install")
                 log::break
@@ -359,6 +363,7 @@ apt::deb_wizard() {
                     while IFS= read -r name; do
                         apt::deb_install "$name" "${pending_urls[$name]}" || true
                     done <<< "$selected"
+                    ui::return_or_exit
                 fi
                 ;;
             "Remove packages")
@@ -390,6 +395,7 @@ apt::deb_wizard() {
                     hash -r
                     log::break
                     log::ok "Packages removed"
+                    ui::return_or_exit
                 fi
                 ;;
             "Edit packages list")
