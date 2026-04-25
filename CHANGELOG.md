@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.2] - 2026-04-25
+
+### Fixed
+
+- **Install error logs preserved** -- after running install, update or remove operations across all modules, the menu now pauses with a "Back / Exit" prompt so the user can read any error output before the screen redraws. Previously failures (e.g. broken `apt-get update` due to corrupted sources, missing build dependencies) flashed briefly and disappeared, leaving the user without context. Applied to `lib/apt.sh` wizards (covers all APT-list-based modules at once) and to the `_install`/`_remove`/`_update` helpers of 33 modules across software, development, shell, system, gnome, and SSH categories
+
 ## [1.7.1] - 2026-04-25
 
 ### Added
