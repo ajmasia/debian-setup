@@ -109,6 +109,7 @@ icons::apply() {
             "Install Papirus")
                 log::break
                 _icons::install_base
+                ui::return_or_exit
                 ;;
             "Install Papirus + Catppuccin")
                 log::break
@@ -160,7 +161,10 @@ _icons::install_base() {
 }
 
 _icons::install() {
-    _icons::install_base || return
+    if ! _icons::install_base; then
+        ui::return_or_exit
+        return
+    fi
 
     # Choose accent
     local accent
@@ -185,6 +189,7 @@ _icons::install() {
     if ! git clone --depth 1 "$_ICONS_PAPIRUS_FOLDERS_REPO" "$tmpdir/papirus-folders" 2>/dev/null; then
         log::error "Failed to clone repository"
         rm -rf "$tmpdir"
+        ui::return_or_exit
         return
     fi
 
@@ -196,6 +201,7 @@ _icons::install() {
     if ! curl -fsSL "$_ICONS_FOLDERS_SCRIPT" -o "$tmpdir/papirus-folders-bin"; then
         log::error "Failed to download papirus-folders script"
         rm -rf "$tmpdir"
+        ui::return_or_exit
         return
     fi
     chmod +x "$tmpdir/papirus-folders-bin"
@@ -207,6 +213,7 @@ _icons::install() {
     fi
 
     rm -rf "$tmpdir"
+    ui::return_or_exit
 }
 
 _icons::change_color() {
@@ -230,6 +237,7 @@ _icons::change_color() {
     if ! curl -fsSL "$_ICONS_FOLDERS_SCRIPT" -o "$tmpdir/papirus-folders-bin"; then
         log::error "Failed to download papirus-folders script"
         rm -rf "$tmpdir"
+        ui::return_or_exit
         return
     fi
     chmod +x "$tmpdir/papirus-folders-bin"
@@ -242,6 +250,7 @@ _icons::change_color() {
     fi
 
     rm -rf "$tmpdir"
+    ui::return_or_exit
 }
 
 _icons::install_adwaita_folders() {
@@ -254,6 +263,7 @@ _icons::install_adwaita_folders() {
         ui::flush_input
         if ! sudo apt-get install -y papirus-icon-theme </dev/tty; then
             log::error "Failed to install Papirus"
+            ui::return_or_exit
             return 1
         fi
         hash -r
@@ -263,6 +273,7 @@ _icons::install_adwaita_folders() {
     local adwaita="/usr/share/icons/Adwaita"
     if [[ ! -d "$adwaita" ]]; then
         log::error "Adwaita icons not found at $adwaita"
+        ui::return_or_exit
         return 1
     fi
 
@@ -314,10 +325,12 @@ EOF
     gtk-update-icon-cache "$theme_dir" 2>/dev/null || true
     gsettings set org.gnome.desktop.interface icon-theme "${theme_name}" || true
     log::ok "${theme_name} icon theme applied"
+    ui::return_or_exit
 }
 
 _icons::revert() {
     log::info "Reverting icon theme to default"
     gsettings reset org.gnome.desktop.interface icon-theme 2>/dev/null || true
     log::ok "Icon theme reverted"
+    ui::return_or_exit
 }

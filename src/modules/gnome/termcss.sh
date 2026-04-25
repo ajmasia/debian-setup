@@ -142,6 +142,7 @@ _termcss::apply_all() {
 
     _termcss::apply_to_file "$_TERMCSS_GTK4_FILE"
     log::ok "gtk-4.0/gtk.css updated"
+    ui::return_or_exit
 }
 
 # ── Remove ──────────────────────────────────────────────
@@ -165,4 +166,5 @@ _termcss::remove_all() {
 
     _termcss::remove_from_file "$_TERMCSS_GTK4_FILE"
     log::ok "gtk-4.0/gtk.css cleaned"
+    ui::return_or_exit
 }

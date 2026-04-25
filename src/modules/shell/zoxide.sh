@@ -107,6 +107,7 @@ _zoxide::install() {
 
     if ! curl -sSfL "$_ZOXIDE_INSTALL_URL" | sh; then
         log::error "Failed to install Zoxide"
+        ui::return_or_exit
         return
     fi
 
@@ -130,6 +131,7 @@ _zoxide::install() {
 
     log::break
     log::warn "Restart your shell to activate Zoxide"
+    ui::return_or_exit
 }
 
 _zoxide::remove() {
@@ -151,4 +153,5 @@ _zoxide::remove() {
     log::ok "Zoxide removed"
     log::break
     log::warn "Restart your shell to complete cleanup"
+    ui::return_or_exit
 }

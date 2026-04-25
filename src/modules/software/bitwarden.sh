@@ -105,6 +105,7 @@ _bitwarden::install_npm() {
     else
         log::error "Failed to install Bitwarden CLI"
     fi
+    ui::return_or_exit
 }
 
 _bitwarden::install_bin() {
@@ -112,6 +113,7 @@ _bitwarden::install_bin() {
 
     if ! command -v unzip &>/dev/null; then
         log::error "unzip is required. Install CLI utilities first"
+        ui::return_or_exit
         return
     fi
 
@@ -121,6 +123,7 @@ _bitwarden::install_bin() {
     if ! wget -qO "$tmpdir/bw.zip" "$_BITWARDEN_ZIP_URL"; then
         log::error "Failed to download Bitwarden CLI"
         rm -rf "$tmpdir"
+        ui::return_or_exit
         return
     fi
 
@@ -138,6 +141,7 @@ _bitwarden::install_bin() {
         log::warn "~/.local/bin is not in your PATH"
         log::warn "Add to .bashrc: export PATH=\"\$HOME/.local/bin:\$PATH\""
     fi
+    ui::return_or_exit
 }
 
 _bitwarden::remove() {
@@ -155,4 +159,5 @@ _bitwarden::remove() {
         hash -r
         log::ok "Bitwarden CLI removed"
     fi
+    ui::return_or_exit
 }

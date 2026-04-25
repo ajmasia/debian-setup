@@ -89,6 +89,7 @@ _ghcli::install() {
 
     if ! sudo curl -fsSLo "$_GHCLI_GPG_KEY" "$_GHCLI_GPG_URL" </dev/tty; then
         log::error "Failed to download GitHub CLI GPG key"
+        ui::return_or_exit
         return
     fi
     sudo chmod 644 "$_GHCLI_GPG_KEY"
@@ -123,6 +124,7 @@ EOF
     else
         log::error "Failed to install GitHub CLI"
     fi
+    ui::return_or_exit
 }
 
 _ghcli::remove() {
@@ -133,6 +135,7 @@ _ghcli::remove() {
         log::ok "GitHub CLI removed"
     else
         log::error "Failed to remove GitHub CLI"
+        ui::return_or_exit
         return
     fi
 
@@ -144,4 +147,5 @@ _ghcli::remove() {
         sudo rm -f "$_GHCLI_GPG_KEY"
         log::ok "GitHub CLI GPG key removed"
     fi
+    ui::return_or_exit
 }

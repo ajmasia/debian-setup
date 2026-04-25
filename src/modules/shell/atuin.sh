@@ -103,6 +103,7 @@ _atuin::install() {
 
     if ! curl --proto '=https' --tlsv1.2 -LsSf "$_ATUIN_INSTALL_URL" | sh; then
         log::error "Failed to install Atuin"
+        ui::return_or_exit
         return
     fi
 
@@ -118,6 +119,7 @@ _atuin::install() {
 
     log::break
     log::warn "Restart your shell to activate Atuin"
+    ui::return_or_exit
 }
 
 _atuin::remove() {
@@ -139,4 +141,5 @@ _atuin::remove() {
     log::ok "Atuin removed"
     log::break
     log::warn "Restart your shell to complete cleanup"
+    ui::return_or_exit
 }

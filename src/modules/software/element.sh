@@ -89,6 +89,7 @@ _element::install() {
 
     if ! sudo curl -fsSLo "$_ELEMENT_GPG_KEY" "$_ELEMENT_GPG_URL" </dev/tty; then
         log::error "Failed to download Element GPG key"
+        ui::return_or_exit
         return
     fi
     sudo chmod 644 "$_ELEMENT_GPG_KEY"
@@ -109,6 +110,7 @@ _element::install() {
     else
         log::error "Failed to install Element"
     fi
+    ui::return_or_exit
 }
 
 _element::remove() {
@@ -119,6 +121,7 @@ _element::remove() {
         log::ok "Element removed"
     else
         log::error "Failed to remove Element"
+        ui::return_or_exit
         return
     fi
 
@@ -130,4 +133,5 @@ _element::remove() {
         sudo rm -f "$_ELEMENT_GPG_KEY"
         log::ok "Element GPG key removed"
     fi
+    ui::return_or_exit
 }

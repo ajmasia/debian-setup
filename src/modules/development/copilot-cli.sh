@@ -82,6 +82,7 @@ copilot::apply() {
 _copilot::install() {
     if ! command -v gh &>/dev/null; then
         log::error "GitHub CLI (gh) not available. Install it first (Development > Tools > GitHub CLI)"
+        ui::return_or_exit
         return
     fi
 
@@ -91,6 +92,7 @@ _copilot::install() {
     else
         log::error "Failed to install GitHub Copilot CLI"
     fi
+    ui::return_or_exit
 }
 
 _copilot::remove() {
@@ -100,4 +102,5 @@ _copilot::remove() {
     else
         log::error "Failed to remove GitHub Copilot CLI"
     fi
+    ui::return_or_exit
 }

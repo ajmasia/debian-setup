@@ -131,6 +131,7 @@ _docker::install() {
     # Download GPG key and dearmor
     if ! curl -fsSL "$_DOCKER_GPG_URL" | sudo gpg --dearmor -o "$_DOCKER_GPG_KEY"; then
         log::error "Failed to download Docker GPG key"
+        ui::return_or_exit
         return
     fi
     sudo chmod 644 "$_DOCKER_GPG_KEY"
@@ -177,10 +178,12 @@ EOF
 
         if [[ "$add_group" == "Yes" ]]; then
             _docker::add_user_to_group
+            return
         fi
     else
         log::error "Failed to install Docker"
     fi
+    ui::return_or_exit
 }
 
 _docker::add_user_to_group() {
@@ -193,6 +196,7 @@ _docker::add_user_to_group() {
     else
         log::error "Failed to add user to docker group"
     fi
+    ui::return_or_exit
 }
 
 _docker::remove() {
@@ -204,6 +208,7 @@ _docker::remove() {
         log::ok "Docker removed"
     else
         log::error "Failed to remove Docker"
+        ui::return_or_exit
         return
     fi
 
@@ -215,4 +220,5 @@ _docker::remove() {
         sudo rm -f "$_DOCKER_GPG_KEY"
         log::ok "Docker GPG key removed"
     fi
+    ui::return_or_exit
 }

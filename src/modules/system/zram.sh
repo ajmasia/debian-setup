@@ -134,10 +134,10 @@ zram::apply() {
                 ui::flush_input
                 if sudo systemctl disable --now zramswap </dev/tty; then
                     log::ok "zram disabled"
-                    return
                 else
                     log::error "Failed to disable zram"
                 fi
+                ui::return_or_exit
                 ;;
             "Remove zram-tools")
                 log::break
@@ -146,10 +146,10 @@ zram::apply() {
                 if sudo apt remove -y zram-tools </dev/tty; then
                     hash -r
                     log::ok "zram-tools removed"
-                    return
                 else
                     log::error "Failed to remove zram-tools"
                 fi
+                ui::return_or_exit
                 ;;
         esac
     done
@@ -186,6 +186,7 @@ _zram::_configure_and_start() {
     log::info "Enabling zramswap service"
     if ! sudo systemctl enable --now zramswap </dev/tty; then
         log::error "Failed to enable zramswap"
+        ui::return_or_exit
         return
     fi
     if sudo systemctl restart zramswap; then
@@ -193,4 +194,5 @@ _zram::_configure_and_start() {
     else
         log::warn "zramswap enabled but restart failed"
     fi
+    ui::return_or_exit
 }

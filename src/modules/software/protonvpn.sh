@@ -90,6 +90,7 @@ _protonvpn::install() {
     if ! wget -qO "$tmpfile" "$_PROTONVPN_REPO_DEB_URL"; then
         log::error "Failed to download Proton VPN repo package"
         rm -f "$tmpfile"
+        ui::return_or_exit
         return
     fi
 
@@ -97,6 +98,7 @@ _protonvpn::install() {
     if ! sudo dpkg -i "$tmpfile" </dev/tty; then
         log::error "Failed to install repo package"
         rm -f "$tmpfile"
+        ui::return_or_exit
         return
     fi
     rm -f "$tmpfile"
@@ -113,6 +115,7 @@ _protonvpn::install() {
     else
         log::error "Failed to install Proton VPN"
     fi
+    ui::return_or_exit
 }
 
 _protonvpn::remove() {
@@ -123,6 +126,7 @@ _protonvpn::remove() {
         log::ok "Proton VPN removed"
     else
         log::error "Failed to remove Proton VPN"
+        ui::return_or_exit
         return
     fi
 
@@ -133,4 +137,5 @@ _protonvpn::remove() {
             log::ok "Proton VPN repository removed"
         fi
     fi
+    ui::return_or_exit
 }

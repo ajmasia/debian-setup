@@ -116,6 +116,7 @@ go::apply() {
                 else
                     log::error "Failed to install Go"
                 fi
+                ui::return_or_exit
                 ;;
             "Install Go (official tarball)")
                 log::break
@@ -152,6 +153,7 @@ go::apply() {
                     log::break
                     log::warn "Restart your shell to complete cleanup"
                 fi
+                ui::return_or_exit
                 ;;
         esac
     done
@@ -166,6 +168,7 @@ _go::_install_tarball() {
 
     if [[ -z "$latest" ]]; then
         log::error "Failed to determine latest Go version"
+        ui::return_or_exit
         return
     fi
 
@@ -181,6 +184,7 @@ _go::_install_tarball() {
         i386)  arch="386" ;;
         *)
             log::error "Unsupported architecture: ${arch}"
+            ui::return_or_exit
             return
             ;;
     esac
@@ -195,6 +199,7 @@ _go::_install_tarball() {
     if ! curl -fsSL "$url" -o "$tmp_file"; then
         rm -f "$tmp_file"
         log::error "Failed to download Go tarball"
+        ui::return_or_exit
         return
     fi
 
@@ -222,4 +227,5 @@ _go::_install_tarball() {
     log::ok "Go installed (${latest})"
     log::break
     log::warn "Restart your shell or run: export PATH=\"/usr/local/go/bin:\$PATH\""
+    ui::return_or_exit
 }

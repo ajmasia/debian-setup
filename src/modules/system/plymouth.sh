@@ -341,6 +341,7 @@ _plymouth::select_theme() {
 
     if [[ "$theme" == "$current" ]]; then
         log::ok "Theme already set to ${theme}"
+        ui::return_or_exit
         return
     fi
 
@@ -350,6 +351,7 @@ _plymouth::select_theme() {
         log::ok "Theme set to ${theme}"
     else
         log::error "Failed to set theme"
+        ui::return_or_exit
         return
     fi
 
@@ -359,6 +361,7 @@ _plymouth::select_theme() {
     else
         log::error "Failed to update initramfs"
     fi
+    ui::return_or_exit
 }
 
 _plymouth::install() {
@@ -382,6 +385,7 @@ _plymouth::configure() {
             log::ok "Theme set to ${target}"
         else
             log::error "Failed to set theme"
+            ui::return_or_exit
             return
         fi
     fi
@@ -411,6 +415,7 @@ _plymouth::configure() {
     else
         log::error "Failed to update initramfs"
     fi
+    ui::return_or_exit
 }
 
 # ── Community themes ───────────────────────────────────
@@ -431,6 +436,7 @@ _plymouth::install_community() {
 
     if [[ ${#pending_labels[@]} -eq 0 ]]; then
         log::ok "All community themes already installed"
+        ui::return_or_exit
         return
     fi
 
@@ -454,6 +460,7 @@ _plymouth::install_community() {
         ui::spin_stop
         log::error "Failed to clone repository"
         rm -rf "$tmpdir"
+        ui::return_or_exit
         return
     fi
     ui::spin_stop
@@ -485,6 +492,7 @@ _plymouth::install_community() {
     if [[ $count -gt 0 ]]; then
         log::ok "${count} theme(s) installed — use 'Change theme' to apply"
     fi
+    ui::return_or_exit
 }
 
 _plymouth::remove_community() {
@@ -503,6 +511,7 @@ _plymouth::remove_community() {
 
     if [[ ${#installed_labels[@]} -eq 0 ]]; then
         log::ok "No community themes installed"
+        ui::return_or_exit
         return
     fi
 
@@ -555,6 +564,7 @@ _plymouth::remove_community() {
     elif [[ $count -gt 0 ]]; then
         log::ok "${count} theme(s) removed"
     fi
+    ui::return_or_exit
 }
 
 _plymouth::remove() {
@@ -610,4 +620,5 @@ _plymouth::remove() {
     else
         log::error "Failed to update initramfs"
     fi
+    ui::return_or_exit
 }

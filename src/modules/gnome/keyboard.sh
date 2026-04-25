@@ -219,6 +219,7 @@ _keyboard::apply_all() {
     log::info "Setting keybinding: Super+Return → gnome-terminal"
     _keyboard::apply_terminal_binding
     log::ok "Terminal binding set"
+    ui::return_or_exit
 }
 
 _keyboard::apply_terminal_binding() {
@@ -265,6 +266,7 @@ _keyboard::reset_all() {
     _keyboard::remove_terminal_binding
 
     log::ok "All keyboard settings reset to defaults"
+    ui::return_or_exit
 }
 
 _keyboard::remove_terminal_binding() {

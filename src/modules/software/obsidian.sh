@@ -89,6 +89,7 @@ _obsidian::install() {
 
     if [[ -z "$json" ]]; then
         log::error "Failed to fetch Obsidian release info"
+        ui::return_or_exit
         return
     fi
 
@@ -96,6 +97,7 @@ _obsidian::install() {
 
     if [[ -z "$version" ]]; then
         log::error "Failed to parse Obsidian version"
+        ui::return_or_exit
         return
     fi
 
@@ -111,6 +113,7 @@ _obsidian::install() {
     if ! wget -qO "$tmpfile" "$url"; then
         log::error "Failed to download Obsidian"
         rm -f "$tmpfile"
+        ui::return_or_exit
         return
     fi
 
@@ -123,6 +126,7 @@ _obsidian::install() {
         log::error "Failed to install Obsidian"
     fi
     rm -f "$tmpfile"
+    ui::return_or_exit
 }
 
 _obsidian::remove() {
@@ -134,4 +138,5 @@ _obsidian::remove() {
     else
         log::error "Failed to remove Obsidian"
     fi
+    ui::return_or_exit
 }
