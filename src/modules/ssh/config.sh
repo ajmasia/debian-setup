@@ -4,7 +4,7 @@
 _MOD_SSH_CONFIG_LOADED=1
 
 _SSH_CONFIG_LABEL="Configure SSH Config"
-_SSH_CONFIG_DESC="Manage ~/.ssh/config entries for GitHub, GitLab, and custom servers."
+_SSH_CONFIG_DESC="Manage ~/.ssh/config entries for GitHub, GitLab, Codeberg, and custom servers."
 
 _SSH_CONFIG_FILE="$HOME/.ssh/config"
 
@@ -14,6 +14,10 @@ _ssh_config::has_github() {
 
 _ssh_config::has_gitlab() {
     [[ -f "$_SSH_CONFIG_FILE" ]] && grep -q '^# GitLab$' "$_SSH_CONFIG_FILE" 2>/dev/null
+}
+
+_ssh_config::has_codeberg() {
+    [[ -f "$_SSH_CONFIG_FILE" ]] && grep -q '^# Codeberg$' "$_SSH_CONFIG_FILE" 2>/dev/null
 }
 
 _ssh_config::_list_custom() {
@@ -27,12 +31,13 @@ _ssh_config::_list_custom() {
             next
         }
         {name=""}
-    ' "$_SSH_CONFIG_FILE" 2>/dev/null | grep -vE '^(GitHub|GitLab|\*)$' || true
+    ' "$_SSH_CONFIG_FILE" 2>/dev/null | grep -vE '^(GitHub|GitLab|Codeberg|\*)$' || true
 }
 
 ssh_config::check() {
     _ssh_config::has_github && return 0
     _ssh_config::has_gitlab && return 0
+    _ssh_config::has_codeberg && return 0
     local custom
     custom="$(_ssh_config::_list_custom)"
     [[ -n "$custom" ]] && return 0
@@ -43,6 +48,7 @@ ssh_config::status() {
     local configured=()
     _ssh_config::has_github && configured+=("GitHub")
     _ssh_config::has_gitlab && configured+=("GitLab")
+    _ssh_config::has_codeberg && configured+=("Codeberg")
     local custom
     custom="$(_ssh_config::_list_custom)"
     if [[ -n "$custom" ]]; then
@@ -86,6 +92,16 @@ ssh_config::apply() {
             log::warn "GitLab: not configured"
         fi
 
+        if _ssh_config::has_codeberg; then
+            if _ssh_config::_quick_test "codeberg.org"; then
+                log::ok "Codeberg: connected"
+            else
+                log::warn "Codeberg: configured (connection failed)"
+            fi
+        else
+            log::warn "Codeberg: not configured"
+        fi
+
         # Custom servers
         local custom_list
         custom_list="$(_ssh_config::_list_custom)"
@@ -114,6 +130,12 @@ ssh_config::apply() {
             options+=("Remove GitLab")
         else
             options+=("Add GitLab")
+        fi
+
+        if _ssh_config::has_codeberg; then
+            options+=("Remove Codeberg")
+        else
+            options+=("Add Codeberg")
         fi
 
         options+=("Add server")
@@ -151,6 +173,10 @@ ssh_config::apply() {
                 log::break
                 _ssh_config::_setup_service "GitLab" "gitlab.com" "gitlab.com" "22"
                 ;;
+            "Add Codeberg")
+                log::break
+                _ssh_config::_setup_service "Codeberg" "codeberg.org" "codeberg.org" "22"
+                ;;
             "Add server")
                 log::break
                 _ssh_config::_setup_manual
@@ -162,6 +188,10 @@ ssh_config::apply() {
             "Remove GitLab")
                 log::break
                 _ssh_config::_remove_entry "GitLab"
+                ;;
+            "Remove Codeberg")
+                log::break
+                _ssh_config::_remove_entry "Codeberg"
                 ;;
             Remove\ *)
                 log::break
