@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0] - 2026-05-17
+
+### Added
+
+- **Codeberg support in SSH Config** -- Codeberg (`codeberg.org`) is now a first-class SSH config service alongside GitHub and GitLab; the wizard shows its connection status and offers Add/Remove options in the menu
+
 ## [1.7.2] - 2026-04-25
 
 ### Fixed
